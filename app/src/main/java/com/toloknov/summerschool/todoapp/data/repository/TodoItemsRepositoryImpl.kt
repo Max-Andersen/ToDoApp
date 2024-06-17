@@ -1,0 +1,119 @@
+package com.toloknov.summerschool.todoapp.data.repository
+
+import com.toloknov.summerschool.todoapp.data.mapper.toDomain
+import com.toloknov.summerschool.todoapp.data.mapper.toEntity
+import com.toloknov.summerschool.todoapp.data.model.TodoItemEntity
+import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
+import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
+import com.toloknov.summerschool.todoapp.domain.model.TodoItem
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import java.time.Instant
+import java.time.ZoneId
+
+class TodoItemsRepositoryImpl : TodoItemsRepository {
+
+    private val items = mutableListOf(
+        TodoItemEntity(
+            id = "1",
+            text = "Buy groceries",
+            importance = ItemImportance.LOW,
+            isDone = false,
+            creationDate = Instant.now().atZone(ZoneId.systemDefault()),
+            deadlineTs = Instant.now().plusSeconds(3600 * 24).atZone(ZoneId.systemDefault())
+        ),
+        TodoItemEntity(
+            id = "2",
+            text = "Pay bills",
+            importance = ItemImportance.HIGH,
+            isDone = true,
+            creationDate = Instant.now().minusSeconds(3600 * 24 * 2).atZone(ZoneId.systemDefault()),
+            deadlineTs = Instant.now().minusSeconds(3600 * 24).atZone(ZoneId.systemDefault()),
+            updateTs = Instant.now().minusSeconds(3600 * 12).atZone(ZoneId.systemDefault())
+        ),
+        TodoItemEntity(
+            id = "3",
+            text = "Schedule meeting",
+            importance = ItemImportance.COMMON,
+            isDone = false,
+            creationDate = Instant.now().minusSeconds(3600 * 24 * 3).atZone(ZoneId.systemDefault()),
+            deadlineTs = Instant.now().plusSeconds(3600 * 48).atZone(ZoneId.systemDefault())
+        ),
+        TodoItemEntity(
+            id = "4",
+            text = "Visit doctor",
+            importance = ItemImportance.HIGH,
+            isDone = true,
+            creationDate = Instant.now().minusSeconds(3600 * 24 * 5).atZone(ZoneId.systemDefault())
+        ),
+        TodoItemEntity(
+            id = "5",
+            text = "Read book",
+            importance = ItemImportance.LOW,
+            isDone = false,
+            creationDate = Instant.now().minusSeconds(3600 * 24 * 10)
+                .atZone(ZoneId.systemDefault()),
+            updateTs = Instant.now().minusSeconds(3600 * 24 * 3).atZone(ZoneId.systemDefault())
+        ),
+        TodoItemEntity(
+            id = "6",
+            text = "Exercise",
+            importance = ItemImportance.COMMON,
+            isDone = true,
+            creationDate = Instant.now().minusSeconds(3600 * 24 * 7).atZone(ZoneId.systemDefault()),
+            deadlineTs = Instant.now().minusSeconds(3600 * 24 * 6).atZone(ZoneId.systemDefault())
+        ),
+        TodoItemEntity(
+            id = "7",
+            text = "Write report",
+            importance = ItemImportance.HIGH,
+            isDone = false,
+            creationDate = Instant.now().minusSeconds(3600 * 24).atZone(ZoneId.systemDefault()),
+            deadlineTs = Instant.now().plusSeconds(3600 * 24 * 3).atZone(ZoneId.systemDefault())
+        ),
+        TodoItemEntity(
+            id = "8",
+            text = "Plan vacation",
+            importance = ItemImportance.LOW,
+            isDone = false,
+            creationDate = Instant.now().atZone(ZoneId.systemDefault())
+        ),
+        TodoItemEntity(
+            id = "9",
+            text = "Clean house",
+            importance = ItemImportance.COMMON,
+            isDone = true,
+            creationDate = Instant.now().minusSeconds(3600 * 24 * 12)
+                .atZone(ZoneId.systemDefault()),
+            deadlineTs = Instant.now().minusSeconds(3600 * 24 * 2).atZone(ZoneId.systemDefault())
+        ),
+        TodoItemEntity(
+            id = "10",
+            text = "Organize files",
+            importance = ItemImportance.LOW,
+            isDone = false,
+            creationDate = Instant.now().minusSeconds(3600 * 24 * 15)
+                .atZone(ZoneId.systemDefault()),
+            updateTs = Instant.now().minusSeconds(3600 * 24 * 7).atZone(ZoneId.systemDefault())
+        )
+    )
+
+    override fun getAllItems(): Flow<TodoItem> = flow { items.forEach { emit(it.toDomain()) } }
+
+    override suspend fun getById(itemId: String): TodoItem? =
+        items.find { entity -> entity.id == itemId }?.toDomain()
+
+    override suspend fun addItem(item: TodoItem) {
+        items.add(item.toEntity())
+    }
+
+    override suspend fun updateItem(item: TodoItem) {
+        val index = items.indexOfFirst { it.id == item.id }
+        items[index] = item.toEntity()
+    }
+
+    override suspend fun removeItem(itemId: String) {
+        val index = items.indexOfFirst { it.id == itemId }
+        items.removeAt(index)
+    }
+}
