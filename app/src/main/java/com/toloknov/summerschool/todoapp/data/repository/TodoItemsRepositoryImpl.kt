@@ -1,5 +1,6 @@
 package com.toloknov.summerschool.todoapp.data.repository
 
+import android.util.Log
 import com.toloknov.summerschool.todoapp.data.mapper.toDomain
 import com.toloknov.summerschool.todoapp.data.mapper.toEntity
 import com.toloknov.summerschool.todoapp.data.model.TodoItemEntity
@@ -7,6 +8,8 @@ import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import java.time.Instant
 import java.time.ZoneId
@@ -98,22 +101,45 @@ class TodoItemsRepositoryImpl : TodoItemsRepository {
         )
     )
 
-    override fun getAllItems(): Flow<TodoItem> = flow { items.forEach { emit(it.toDomain()) } }
+    private val dataFlow: MutableStateFlow<List<TodoItemEntity>> = MutableStateFlow(items)
+
+    override fun getAllItems(): Flow<List<TodoItem>> =
+        flow {
+            dataFlow.collect{
+                Log.d("TodoItemsRepositoryImpl", "collect ${dataFlow.value.size}")
+
+                emit(it.map { it.toDomain() })
+            }
+        }
 
     override suspend fun getById(itemId: String): TodoItem? =
-        items.find { entity -> entity.id == itemId }?.toDomain()
+        dataFlow.value.find { entity -> entity.id == itemId }?.toDomain()
 
     override suspend fun addItem(item: TodoItem) {
-        items.add(item.toEntity())
+        val newList = dataFlow.value.toMutableList()
+        newList.add(item.toEntity())
+        dataFlow.value = newList
     }
 
     override suspend fun updateItem(item: TodoItem) {
         val index = items.indexOfFirst { it.id == item.id }
+        if (index == -1) return
         items[index] = item.toEntity()
+    }
+
+    override suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean) {
+        val items = dataFlow.value.toMutableList()
+        val index = items.indexOfFirst { it.id == itemId }
+        if (index == -1) return
+        items[index] = items[index].copy(isDone = isDone)
+        dataFlow.emit(items)
+        Log.d("TodoItemsRepositoryImpl", "setDoneStatusForItem: $itemId, $isDone")
+        Log.d("TodoItemsRepositoryImpl", "${dataFlow.value.size}")
     }
 
     override suspend fun removeItem(itemId: String) {
         val index = items.indexOfFirst { it.id == itemId }
+        if (index == -1) return
         items.removeAt(index)
     }
 }
