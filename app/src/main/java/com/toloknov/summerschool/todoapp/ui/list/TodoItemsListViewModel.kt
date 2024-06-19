@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.toloknov.summerschool.todoapp.data.repository.TodoItemsRepositoryImpl
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
-import com.toloknov.summerschool.todoapp.domain.model.TodoItem
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -42,7 +41,7 @@ class TodoItemsListViewModel(
 
     fun reduce(intent: TodoItemsListIntent) = viewModelScope.launch {
         when (intent) {
-            is TodoItemsListIntent.ClickOnShowDone -> {
+            is TodoItemsListIntent.ClickOnShowDoneItems -> {
                 _uiState.update { lastState ->
                     lastState.copy(
                         showDoneItems = !lastState.showDoneItems
@@ -70,7 +69,7 @@ sealed class TodoItemsListEffect {
 }
 
 sealed class TodoItemsListIntent {
-    data object ClickOnShowDone : TodoItemsListIntent()
+    data object ClickOnShowDoneItems : TodoItemsListIntent()
     data class ChangeItemStatus(val itemId: String, val newStatus: Boolean) : TodoItemsListIntent()
     data class DeleteItem(val itemId: String) : TodoItemsListIntent()
 

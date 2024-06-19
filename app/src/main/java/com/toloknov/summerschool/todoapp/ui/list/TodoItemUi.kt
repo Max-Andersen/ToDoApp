@@ -22,6 +22,6 @@ fun TodoItem.toUiModel() = TodoItemUi(
     importance = importance,
     isDone = isDone,
     creationDate = creationDate.convertToReadable() ?: "",
-    deadlineTs = deadlineTs?.convertToReadable() ?: "",
-    updateTs = updateTs?.convertToReadable() ?: ""
+    deadlineTs = deadlineTs?.convertToReadable(),
+    updateTs = updateTs?.convertToReadable()
 )

@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">ToDoApp</string>
+
+    <string name="my_todo_items">Мои дела</string>
+    <string name="count_done_items">Выполнено — %1$s</string>
+
+    <string name="new_item">Новое</string>
+
 </resources>
