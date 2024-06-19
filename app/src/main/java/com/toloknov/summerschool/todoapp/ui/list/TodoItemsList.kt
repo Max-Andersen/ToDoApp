@@ -2,6 +2,7 @@ package com.toloknov.summerschool.todoapp.ui.list
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
+import com.toloknov.summerschool.todoapp.ui.theme.LightAcceptGreeen
+import com.toloknov.summerschool.todoapp.ui.theme.LightRejectRed
 import com.toloknov.summerschool.todoapp.ui.toolbar.CollapsingTitle
 import com.toloknov.summerschool.todoapp.ui.toolbar.CollapsingTopbar
 import com.toloknov.summerschool.todoapp.ui.toolbar.rememberToolbarScrollBehavior
@@ -184,6 +191,7 @@ private fun ShowDoneItemsIcon(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TodoListItem(
     modifier: Modifier = Modifier,
@@ -192,29 +200,84 @@ private fun TodoListItem(
     onChangeStatus: (Boolean) -> Unit,
     onDelete: () -> Unit
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.Top
+
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = {
+            when (it) {
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    onChangeStatus(true)
+                }
+
+                SwipeToDismissBoxValue.EndToStart -> {
+                    onDelete()
+                }
+
+                SwipeToDismissBoxValue.Settled -> return@rememberSwipeToDismissBoxState false
+            }
+            return@rememberSwipeToDismissBoxState false
+        },
+        // positional threshold of 25%
+        positionalThreshold = { it * .25f }
+    )
+
+    val color = when (dismissState.dismissDirection) {
+        SwipeToDismissBoxValue.StartToEnd -> LightAcceptGreeen
+        SwipeToDismissBoxValue.EndToStart -> LightRejectRed
+        SwipeToDismissBoxValue.Settled -> Color.Transparent
+    }
+
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color)
+                    .padding(12.dp, 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_accept_24),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_delete_24),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+        }
     ) {
-        Checkbox(
-            checked = itemUi.isDone,
-            onCheckedChange = { newStatus -> onChangeStatus(newStatus) },
-            colors = MaterialTheme.colorScheme.importanceCheckBoxTheme(itemUi.importance),
-        )
-
-        TodoListItemText(
-            modifier = Modifier.weight(1f),
-            itemUi = itemUi,
-        )
-
-        IconButton(onClick = clickOnItem) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_info_24),
-                contentDescription = null
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainer),
+            verticalAlignment = Alignment.Top
+        ) {
+            Checkbox(
+                checked = itemUi.isDone,
+                onCheckedChange = { newStatus -> onChangeStatus(newStatus) },
+                colors = MaterialTheme.colorScheme.importanceCheckBoxTheme(itemUi.importance),
             )
+
+            TodoListItemText(
+                modifier = Modifier.weight(1f),
+                itemUi = itemUi,
+            )
+
+            IconButton(onClick = clickOnItem) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_info_24),
+                    contentDescription = null
+                )
+            }
         }
     }
+
+
 }
 
 @Composable

@@ -139,17 +139,13 @@ class TodoItemsRepositoryImpl : TodoItemsRepository {
         ),
 
 
-
-
-
-
-    )
+        )
 
     private val dataFlow: MutableStateFlow<List<TodoItemEntity>> = MutableStateFlow(items)
 
     override fun getAllItems(): Flow<List<TodoItem>> =
         flow {
-            dataFlow.collect{
+            dataFlow.collect {
                 Log.d("TodoItemsRepositoryImpl", "collect ${dataFlow.value.size}")
 
                 emit(it.map { it.toDomain() })
@@ -162,13 +158,15 @@ class TodoItemsRepositoryImpl : TodoItemsRepository {
     override suspend fun addItem(item: TodoItem) {
         val newList = dataFlow.value.toMutableList()
         newList.add(item.toEntity())
-        dataFlow.value = newList
+        dataFlow.emit(newList)
     }
 
     override suspend fun updateItem(item: TodoItem) {
+        val items = dataFlow.value.toMutableList()
         val index = items.indexOfFirst { it.id == item.id }
         if (index == -1) return
         items[index] = item.toEntity()
+        dataFlow.emit(items)
     }
 
     override suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean) {
@@ -177,13 +175,13 @@ class TodoItemsRepositoryImpl : TodoItemsRepository {
         if (index == -1) return
         items[index] = items[index].copy(isDone = isDone)
         dataFlow.emit(items)
-        Log.d("TodoItemsRepositoryImpl", "setDoneStatusForItem: $itemId, $isDone")
-        Log.d("TodoItemsRepositoryImpl", "${dataFlow.value.size}")
     }
 
     override suspend fun removeItem(itemId: String) {
+        val items = dataFlow.value.toMutableList()
         val index = items.indexOfFirst { it.id == itemId }
         if (index == -1) return
         items.removeAt(index)
+        dataFlow.emit(items)
     }
 }
