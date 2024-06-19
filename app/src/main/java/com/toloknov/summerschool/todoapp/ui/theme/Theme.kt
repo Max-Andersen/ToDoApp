@@ -3,6 +3,9 @@ package com.toloknov.summerschool.todoapp.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -28,9 +31,10 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    surface = Color(0xFFf7f6f2),
-    surfaceContainer = Color(0xFFFFFFFF)
-
+    surface = LightSurface,
+    surfaceContainer = LightSurfaceContainer,
+    primaryContainer = LightFab,
+    onPrimaryContainer = White,
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
@@ -46,9 +50,35 @@ private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
     tertiary = Pink80,
-    surface = Color(0xFF161618),
-    surfaceContainer = Color(0xFF252528)
+
+    surface = DarkSurface,
+    surfaceContainer = DarkSurfaceContainer,
+    primaryContainer = DarkFab,
+    onPrimaryContainer = White,
 )
+
+
+val ColorScheme.checkBoxTheme: CheckboxColors
+    @Composable get() =
+        if (!isSystemInDarkTheme()) {
+            CheckboxDefaults.colors(
+                checkedColor = LightAcceptGreeen,
+                uncheckedColor = Color(0xFFcccccc),
+                checkmarkColor = White,
+                disabledCheckedColor = MaterialTheme.colorScheme.primary,
+                disabledUncheckedColor = MaterialTheme.colorScheme.primary,
+                disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
+            )
+        } else {
+            CheckboxDefaults.colors(
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.primary,
+                checkmarkColor = MaterialTheme.colorScheme.primary,
+                disabledCheckedColor = MaterialTheme.colorScheme.primary,
+                disabledUncheckedColor = MaterialTheme.colorScheme.primary,
+                disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
+            )
+        }
 
 
 @Composable
