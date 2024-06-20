@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.ui.toolbar
+package com.toloknov.summerschool.todoapp.ui.common.toolbar
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable

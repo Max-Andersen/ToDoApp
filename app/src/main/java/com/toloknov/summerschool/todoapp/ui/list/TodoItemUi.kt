@@ -2,7 +2,7 @@ package com.toloknov.summerschool.todoapp.ui.list
 
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
-import com.toloknov.summerschool.todoapp.ui.utils.convertToReadable
+import com.toloknov.summerschool.todoapp.ui.common.utils.convertToReadable
 
 data class TodoItemUi(
     val id: String,

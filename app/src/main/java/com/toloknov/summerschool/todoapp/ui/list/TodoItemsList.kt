@@ -1,27 +1,31 @@
 package com.toloknov.summerschool.todoapp.ui.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
@@ -31,36 +35,39 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
-import com.toloknov.summerschool.todoapp.ui.theme.LightAcceptGreeen
-import com.toloknov.summerschool.todoapp.ui.theme.LightRejectRed
-import com.toloknov.summerschool.todoapp.ui.toolbar.CollapsingTitle
-import com.toloknov.summerschool.todoapp.ui.toolbar.CollapsingTopbar
-import com.toloknov.summerschool.todoapp.ui.toolbar.rememberToolbarScrollBehavior
-import com.toloknov.summerschool.todoapp.ui.theme.PADDING_BIG
-import com.toloknov.summerschool.todoapp.ui.theme.PADDING_MEDIUM
-import com.toloknov.summerschool.todoapp.ui.theme.ToDoAppTheme
-import com.toloknov.summerschool.todoapp.ui.theme.importanceCheckBoxTheme
-import com.toloknov.summerschool.todoapp.ui.utils.convertToReadable
+import com.toloknov.summerschool.todoapp.ui.common.theme.LightAcceptGreen
+import com.toloknov.summerschool.todoapp.ui.common.theme.LightRejectRed
+import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTitle
+import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
+import com.toloknov.summerschool.todoapp.ui.common.toolbar.rememberToolbarScrollBehavior
+import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG
+import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
+import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_SMALL
+import com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme
+import com.toloknov.summerschool.todoapp.ui.common.theme.importanceCheckBoxTheme
+import com.toloknov.summerschool.todoapp.ui.common.utils.convertToReadable
 import java.time.ZonedDateTime
 
 @Composable
-fun TodoItemsList() {
+fun TodoItemsList(
+    clickOnItem: (itemId: String) -> Unit,
+    clickOnCreate: () -> Unit
+) {
     val viewModel: TodoItemsListViewModel = viewModel()
 
     val uiState by viewModel.uiState.collectAsState()
@@ -68,17 +75,20 @@ fun TodoItemsList() {
     TodoItemsStateless(
         items = uiState.items,
         showDoneItems = uiState.showDoneItems,
-        reduce = viewModel::reduce
+        reduce = viewModel::reduce,
+        clickOnItem = clickOnItem,
+        clickOnCreate = clickOnCreate,
     )
-
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TodoItemsStateless(
     items: List<TodoItemUi>,
     showDoneItems: Boolean,
-    reduce: (TodoItemsListIntent) -> Unit
+    reduce: (TodoItemsListIntent) -> Unit,
+    clickOnItem: (itemId: String) -> Unit,
+    clickOnCreate: () -> Unit
 ) {
     val scrollBehavior = rememberToolbarScrollBehavior()
 
@@ -116,7 +126,7 @@ private fun TodoItemsStateless(
         containerColor = MaterialTheme.colorScheme.surface,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = clickOnCreate,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_plus_24),
@@ -125,52 +135,57 @@ private fun TodoItemsStateless(
             }
         }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp),
+            contentPadding = PaddingValues(
+                top = paddingValues.calculateTopPadding() - PADDING_BIG,
+                bottom = PADDING_BIG * 2
+            )
         ) {
-            Spacer(modifier = Modifier.size(paddingValues.calculateTopPadding()))
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .shadow(2.dp, RoundedCornerShape(PADDING_MEDIUM))
-                    .clip(RoundedCornerShape(PADDING_MEDIUM))
-                    .background(MaterialTheme.colorScheme.surfaceContainer),
-            ) {
-                Spacer(modifier = Modifier.size(PADDING_MEDIUM))
-                items.forEach { itemUi ->
-                    key(itemUi.id) {
-                        TodoListItem(
-                            modifier = Modifier.defaultMinSize(minHeight = 48.dp),
-                            itemUi = itemUi,
-                            clickOnItem = { },
-                            onChangeStatus = { newStatus ->
-                                reduce(TodoItemsListIntent.ChangeItemStatus(itemUi.id, newStatus))
-                            },
-                            onDelete = { reduce(TodoItemsListIntent.DeleteItem(itemUi.id)) }
+
+            if (items.isEmpty()) {
+                item {
+                    Box(modifier = Modifier.fillParentMaxSize()) {
+                        Text(
+                            text = stringResource(id = R.string.list_is_empty),
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
-
                 }
-                Box(
-                    modifier = Modifier
-                        .padding(start = 48.dp)
-                        .requiredHeight(48.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.new_item),
+            } else {
+                item {
+                    CornerItem(
+                        clipShape = RoundedCornerShape(
+                            topStart = PADDING_MEDIUM, topEnd = PADDING_MEDIUM
+                        )
                     )
                 }
 
-                Spacer(modifier = Modifier.size(PADDING_MEDIUM))
+                items(items, key = { it.id }) { itemUi ->
+                    TodoListItem(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = 48.dp)
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        itemUi = itemUi,
+                        clickOnItem = { clickOnItem(itemUi.id) },
+                        onChangeStatus = { newStatus ->
+                            reduce(TodoItemsListIntent.ChangeItemStatus(itemUi.id, newStatus))
+                        },
+                        onDelete = { reduce(TodoItemsListIntent.DeleteItem(itemUi.id)) }
+                    )
+                }
 
-
+                item {
+                    CornerItem(
+                        clipShape = RoundedCornerShape(
+                            bottomStart = PADDING_MEDIUM, bottomEnd = PADDING_MEDIUM
+                        )
+                    )
+                }
             }
-            Spacer(modifier = Modifier.size(PADDING_BIG * 2))
         }
-
     }
 }
 
@@ -191,9 +206,24 @@ private fun ShowDoneItemsIcon(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TodoListItem(
+private fun LazyItemScope.CornerItem(
+    clipShape: RoundedCornerShape
+) {
+    Box(
+        modifier = Modifier
+            .height(PADDING_SMALL)
+            .fillMaxWidth()
+            .clip(clipShape)
+            .animateItemPlacement()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+private fun LazyItemScope.TodoListItem(
     modifier: Modifier = Modifier,
     itemUi: TodoItemUi,
     clickOnItem: () -> Unit,
@@ -221,7 +251,7 @@ private fun TodoListItem(
     )
 
     val color = when (dismissState.dismissDirection) {
-        SwipeToDismissBoxValue.StartToEnd -> LightAcceptGreeen
+        SwipeToDismissBoxValue.StartToEnd -> LightAcceptGreen
         SwipeToDismissBoxValue.EndToStart -> LightRejectRed
         SwipeToDismissBoxValue.Settled -> Color.Transparent
     }
@@ -233,7 +263,7 @@ private fun TodoListItem(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color)
-                    .padding(12.dp, 8.dp),
+                    .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -249,13 +279,13 @@ private fun TodoListItem(
                     tint = Color.White
                 )
             }
-        }
+        },
+        modifier = Modifier.animateItemPlacement()
     ) {
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainer),
-            verticalAlignment = Alignment.Top
+                .background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
             Checkbox(
                 checked = itemUi.isDone,
@@ -277,7 +307,6 @@ private fun TodoListItem(
         }
     }
 
-
 }
 
 @Composable
@@ -285,25 +314,29 @@ fun TodoListItemText(
     modifier: Modifier = Modifier,
     itemUi: TodoItemUi,
 ) {
+    // Если элемент помечен как выполненный, то стиль будет содержать зачеркивание
+    val textStyle =
+        LocalTextStyle.current.copy(textDecoration = if (itemUi.isDone) TextDecoration.LineThrough else null)
+
     Column(
         modifier = modifier.padding(vertical = 12.dp)
     ) {
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             // Почему это картинками?
             // Такие символы не будут отображаться одинаково на всех устройствах
             if (!itemUi.isDone) {
                 if (itemUi.importance == ItemImportance.LOW) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_down_arrow),
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.Top)
+                        contentDescription = null
                     )
                 }
                 if (itemUi.importance == ItemImportance.HIGH) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_warning),
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.Top)
+                        contentDescription = null
                     )
                 }
                 Spacer(modifier = Modifier.size(3.dp))
@@ -311,11 +344,14 @@ fun TodoListItemText(
             Text(
                 text = itemUi.text,
                 maxLines = 3,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                style = textStyle
             )
         }
         itemUi.deadlineTs?.let { deadline ->
-            Text(text = deadline)
+            Text(
+                text = deadline
+            )
         }
     }
 }
@@ -353,8 +389,10 @@ private fun TodoItemListPreview() {
                     updateTs = null
                 ),
             ),
+            showDoneItems = true,
             reduce = {},
-            showDoneItems = true
+            clickOnItem = {},
+            clickOnCreate = {}
         )
     }
 }

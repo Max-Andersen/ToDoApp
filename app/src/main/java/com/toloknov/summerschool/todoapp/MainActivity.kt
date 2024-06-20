@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.toloknov.summerschool.todoapp.ui.AppNavGraph
-import com.toloknov.summerschool.todoapp.ui.theme.ToDoAppTheme
+import com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

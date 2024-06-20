@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.ui.toolbar
+package com.toloknov.summerschool.todoapp.ui.common.toolbar
 
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.DecayAnimationSpec

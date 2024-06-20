@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.ui.theme
+package com.toloknov.summerschool.todoapp.ui.common.theme
 
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -54,55 +54,63 @@ private val DarkColorScheme = darkColorScheme(
     onPrimaryContainer = White,
 )
 
-@Composable
-private fun getCheckBoxColors(importance: ItemImportance): CheckboxColors {
-    return if (!isSystemInDarkTheme()) {
+private val ColorScheme.checkBoxCheckedColor: Color
+    @Composable
+    get() {
+        return if (!isSystemInDarkTheme()) {
+            LightAcceptGreen
+        } else {
+            DarkAcceptGreeen
+        }
+    }
+
+private val ColorScheme.checkBoxUnCheckedHightImportanceColor: Color
+    @Composable
+    get() {
+        return if (!isSystemInDarkTheme()) {
+            LightRejectRed
+        } else {
+            DarkRejectRed
+        }
+    }
+
+private val ColorScheme.checkBoxUnCheckedNormalImportanceColor: Color
+    @Composable
+    get() {
+        return if (!isSystemInDarkTheme()) {
+            LightUncheckedBox
+        } else {
+            DarkUncheckedBox
+        }
+    }
+
+
+val ColorScheme.importanceCheckBoxTheme: @Composable (ItemImportance) -> CheckboxColors
+    @Composable get() = { importance ->
         when (importance) {
             ItemImportance.HIGH -> {
                 CheckboxDefaults.colors(
-                    checkedColor = LightAcceptGreeen,
-                    uncheckedColor = LightRejectRed,
-                    checkmarkColor = White,
-                    disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                    disabledUncheckedColor = MaterialTheme.colorScheme.primary,
-                    disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
+                    checkedColor = MaterialTheme.colorScheme.checkBoxCheckedColor,
+                    uncheckedColor = MaterialTheme.colorScheme.checkBoxUnCheckedHightImportanceColor,
+                    checkmarkColor = MaterialTheme.colorScheme.surfaceContainer
                 )
             }
 
             else -> {
                 CheckboxDefaults.colors(
-                    checkedColor = LightAcceptGreeen,
-                    uncheckedColor = Color(0xFFcccccc),
-                    checkmarkColor = White,
-                    disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                    disabledUncheckedColor = MaterialTheme.colorScheme.primary,
-                    disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
+                    checkedColor = MaterialTheme.colorScheme.checkBoxCheckedColor,
+                    uncheckedColor = MaterialTheme.colorScheme.checkBoxUnCheckedNormalImportanceColor,
+                    checkmarkColor = MaterialTheme.colorScheme.surfaceContainer
                 )
             }
         }
-    } else {
-        CheckboxDefaults.colors(
-            checkedColor = MaterialTheme.colorScheme.primary,
-            uncheckedColor = MaterialTheme.colorScheme.primary,
-            checkmarkColor = MaterialTheme.colorScheme.primary,
-            disabledCheckedColor = MaterialTheme.colorScheme.primary,
-            disabledUncheckedColor = MaterialTheme.colorScheme.primary,
-            disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
-        )
-    }
-}
-
-
-val ColorScheme.importanceCheckBoxTheme: @Composable (ItemImportance) -> CheckboxColors
-    @Composable get() = { importance ->
-        getCheckBoxColors( importance)
     }
 
 val ColorScheme.plainImportancecheckBoxTheme: CheckboxColors
     @Composable get() =
         if (!isSystemInDarkTheme()) {
             CheckboxDefaults.colors(
-                checkedColor = LightAcceptGreeen,
+                checkedColor = LightAcceptGreen,
                 uncheckedColor = Color(0xFFcccccc),
                 checkmarkColor = White,
                 disabledCheckedColor = MaterialTheme.colorScheme.primary,
@@ -124,7 +132,7 @@ val ColorScheme.hightImportancecheckBoxTheme: CheckboxColors
     @Composable get() =
         if (!isSystemInDarkTheme()) {
             CheckboxDefaults.colors(
-                checkedColor = LightAcceptGreeen,
+                checkedColor = LightAcceptGreen,
                 uncheckedColor = LightRejectRed,
                 checkmarkColor = White,
                 disabledCheckedColor = MaterialTheme.colorScheme.primary,

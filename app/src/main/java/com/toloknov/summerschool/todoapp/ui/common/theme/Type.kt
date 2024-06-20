@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.ui.theme
+package com.toloknov.summerschool.todoapp.ui.common.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

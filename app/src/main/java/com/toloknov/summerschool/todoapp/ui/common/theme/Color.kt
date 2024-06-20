@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.ui.theme
+package com.toloknov.summerschool.todoapp.ui.common.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -12,8 +12,9 @@ val Pink80 = Color(0xFFEFB8C8)
 val LightFab = Color(0xFF007aff)
 val LightSurface = Color(0xFFf7f6f2)
 val LightSurfaceContainer = Color(0xFFFFFFFF)
-val LightAcceptGreeen = Color(0xFF34c759)
+val LightAcceptGreen = Color(0xFF34c759)
 val LightRejectRed = Color(0xFFff3b30)
+val LightUncheckedBox = Color(0xFFcccccc)
 
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
@@ -23,4 +24,6 @@ val DarkSurface = Color(0xFF161618)
 val DarkSurfaceContainer = Color(0xFF252528)
 val DarkAcceptGreeen = Color(0xFF32d74b)
 val DarkRejectRed = Color(0xFFff453a)
+val DarkUncheckedBox = Color(0xFF515153)
+
 

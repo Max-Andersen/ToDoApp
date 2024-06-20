@@ -5,5 +5,6 @@
     <string name="count_done_items">Выполнено — %1$s</string>
 
     <string name="new_item">Новое</string>
+    <string name="list_is_empty">Список пуст</string>
 
 </resources>

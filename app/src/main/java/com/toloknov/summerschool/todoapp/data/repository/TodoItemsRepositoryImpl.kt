@@ -146,8 +146,6 @@ class TodoItemsRepositoryImpl : TodoItemsRepository {
     override fun getAllItems(): Flow<List<TodoItem>> =
         flow {
             dataFlow.collect {
-                Log.d("TodoItemsRepositoryImpl", "collect ${dataFlow.value.size}")
-
                 emit(it.map { it.toDomain() })
             }
         }

@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.ui.utils
+package com.toloknov.summerschool.todoapp.ui.common.utils
 
 import java.text.SimpleDateFormat
 import java.time.ZonedDateTime

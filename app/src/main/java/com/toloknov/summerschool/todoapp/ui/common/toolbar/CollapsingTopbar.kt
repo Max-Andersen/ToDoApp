@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.ui.toolbar
+package com.toloknov.summerschool.todoapp.ui.common.toolbar
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
@@ -234,7 +234,7 @@ fun CollapsingTopbar(
             }
 
             val toolbarHeightPx =
-                layoutHeightPx.roundToInt() + (additionalContentPlaceable?.height ?: 0)
+                layoutHeightPx.roundToInt() + (additionalContentPlaceable?.height?.minus(40) ?: 0)
 
 
             // Placing toolbar widgets:
@@ -286,7 +286,7 @@ data class CollapsingTitle(
     val expandedTextStyle: TextStyle,
 )
 
-private val MinCollapsedHeight = 36.dp
+private val MinCollapsedHeight = 46.dp
 private val HorizontalPadding = 16.dp
 private val ExpandedTitleBottomPadding = 8.dp
 private val CollapsedTitleLineHeight = 28.sp
