@@ -21,6 +21,13 @@ android {
     }
 
     buildTypes {
+
+        create("staging") {
+            initWith(getByName("debug"))
+            isDebuggable = false
+        }
+
+
         release {
             isMinifyEnabled = false
             proguardFiles(
