@@ -1,9 +1,15 @@
 package com.toloknov.summerschool.todoapp.ui.list
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import com.toloknov.summerschool.todoapp.TodoApp
 import com.toloknov.summerschool.todoapp.data.repository.TodoItemsRepositoryImpl
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
+import com.toloknov.summerschool.todoapp.ui.card.TodoItemCardViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -55,6 +61,23 @@ class TodoItemsListViewModel(
 
             is TodoItemsListIntent.ChangeItemStatus -> {
                 todoItemsRepository.setDoneStatusForItem(intent.itemId, intent.newStatus)
+            }
+        }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>,
+                extras: CreationExtras
+            ): T {
+                // Получаем инстанс приложения (а он один, поэтому и di контейнер будет один)
+                val application = checkNotNull(extras[APPLICATION_KEY])
+
+                return TodoItemsListViewModel(
+                    (application as TodoApp).getTodoItemsRepository(),
+                ) as T
             }
         }
     }

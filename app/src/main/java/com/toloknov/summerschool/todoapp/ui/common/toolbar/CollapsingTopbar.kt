@@ -40,7 +40,7 @@ fun CollapsingTopbar(
     collapsedElevation: Dp = DefaultCollapsedElevation,
 ) {
     val collapsedFraction = when {
-        scrollBehavior != null  -> scrollBehavior.state.collapsedFraction
+        scrollBehavior != null -> scrollBehavior.state.collapsedFraction
         else -> 1f
     }
 
@@ -60,7 +60,8 @@ fun CollapsingTopbar(
 
     val elevationState = animateDpAsState(if (showElevation) collapsedElevation else 0.dp)
 
-    val paddingMediumPxValue = with(LocalDensity.current) { 8.dp.toPx() }
+    val actionPaddingPxValue =
+        with(LocalDensity.current) { if (collapsingTitle != null) 8.dp.toPx() else 2.dp.toPx() }
 
     Surface(
         modifier = modifier,
@@ -246,7 +247,7 @@ fun CollapsingTopbar(
                 )
                 actionsPlaceable?.placeRelative(
                     x = actionsX,
-                    y = (actionsY - paddingMediumPxValue).roundToInt()
+                    y = (actionsY - actionPaddingPxValue).roundToInt()
                 )
                 if (expandedTitlePlaceable?.width == collapsedTitlePlaceable?.width) {
                     expandedTitlePlaceable?.placeRelative(

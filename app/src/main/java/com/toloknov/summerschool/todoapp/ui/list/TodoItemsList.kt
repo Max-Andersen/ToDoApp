@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
+import com.toloknov.summerschool.todoapp.ui.card.TodoItemCardViewModel
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightAcceptGreen
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightRejectRed
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTitle
@@ -68,7 +69,7 @@ fun TodoItemsList(
     clickOnItem: (itemId: String) -> Unit,
     clickOnCreate: () -> Unit
 ) {
-    val viewModel: TodoItemsListViewModel = viewModel()
+    val viewModel: TodoItemsListViewModel = viewModel(factory = TodoItemsListViewModel.Factory)
 
     val uiState by viewModel.uiState.collectAsState()
 
@@ -93,10 +94,12 @@ private fun TodoItemsStateless(
     val scrollBehavior = rememberToolbarScrollBehavior()
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .systemBarsPadding(),
         topBar = {
             CollapsingTopbar(
-                modifier = Modifier.systemBarsPadding(),
+                modifier = Modifier,
                 scrollBehavior = scrollBehavior,
                 collapsingTitle = CollapsingTitle(
                     titleText = stringResource(id = R.string.my_todo_items),
@@ -140,7 +143,7 @@ private fun TodoItemsStateless(
                 .fillMaxSize()
                 .padding(horizontal = 8.dp),
             contentPadding = PaddingValues(
-                top = paddingValues.calculateTopPadding() - PADDING_BIG,
+                top = paddingValues.calculateTopPadding() + PADDING_MEDIUM,
                 bottom = PADDING_BIG * 2
             )
         ) {

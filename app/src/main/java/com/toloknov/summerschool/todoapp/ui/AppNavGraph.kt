@@ -20,15 +20,19 @@ fun AppNavGraph(
     ) {
         composable("list") {
             TodoItemsList(
-                clickOnItem = {},
-                clickOnCreate = {},
+                clickOnItem = { itemId ->
+                    navController.navigate("card/${itemId}")
+                },
+                clickOnCreate = {
+                    navController.navigate("card/-1")
+                },
             )
         }
 
         composable(
-            route = "card/{itemId}",
+            route = "card/{isNewItem}",
             arguments = listOf(
-                navArgument("itemId") {
+                navArgument("isNewItem") {
                     type = NavType.StringType
                 }
             )
