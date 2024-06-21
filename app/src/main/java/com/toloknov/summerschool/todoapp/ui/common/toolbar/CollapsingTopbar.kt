@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
 import kotlin.math.roundToInt
 
 
@@ -61,7 +62,10 @@ fun CollapsingTopbar(
     val elevationState = animateDpAsState(if (showElevation) collapsedElevation else 0.dp)
 
     val actionPaddingPxValue =
-        with(LocalDensity.current) { if (collapsingTitle != null) 8.dp.toPx() else 2.dp.toPx() }
+        with(LocalDensity.current) { if (collapsingTitle != null) PADDING_MEDIUM.toPx() else 2.dp.toPx() }
+
+    val paddingMediumPxValue =
+        with(LocalDensity.current) { PADDING_MEDIUM.toPx() }
 
     Surface(
         modifier = modifier,
@@ -187,7 +191,7 @@ fun CollapsingTopbar(
             // Calculating coordinates of widgets inside toolbar:
 
             // Current coordinates of navigation icon
-            val navigationIconX = horizontalPaddingPx.roundToInt()
+            val navigationIconX = (horizontalPaddingPx - paddingMediumPxValue).roundToInt()
             val navigationIconY =
                 ((collapsedHeightPx - (navigationIconPlaceable?.height ?: 0)) / 2).roundToInt()
 
