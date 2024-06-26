@@ -32,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -284,7 +285,9 @@ private fun LazyItemScope.TodoListItem(
                 )
             }
         },
-        modifier = Modifier.animateItemPlacement().clickable { clickOnItem() }
+        modifier = Modifier
+            .animateItemPlacement()
+            .clickable { clickOnItem() }
     ) {
         Row(
             modifier = modifier
@@ -302,12 +305,11 @@ private fun LazyItemScope.TodoListItem(
                 itemUi = itemUi,
             )
 
-            IconButton(onClick = clickOnItem) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_info_24),
-                    contentDescription = null
-                )
-            }
+            Icon(
+                modifier = Modifier.minimumInteractiveComponentSize(),
+                painter = painterResource(id = R.drawable.ic_info_24),
+                contentDescription = null
+            )
         }
     }
 

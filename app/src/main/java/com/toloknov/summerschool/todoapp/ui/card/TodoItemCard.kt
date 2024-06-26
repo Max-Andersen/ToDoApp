@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -50,6 +51,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,8 +60,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG
+import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_LARGE
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
 import com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme
+import com.toloknov.summerschool.todoapp.ui.common.theme.textFieldTheme
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.rememberToolbarScrollBehavior
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToReadable
@@ -197,11 +201,12 @@ private fun DeleteSection(
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .defaultMinSize(minHeight = PADDING_LARGE)
             .clip(RoundedCornerShape(PADDING_MEDIUM))
             .clickable(enabled = !uiState.isNewItem) {
                 reduce(TodoItemCardItent.DeleteTodoItem)
-            }
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
@@ -282,24 +287,25 @@ private fun InputTodoText(
         value = uiState.text,
         onValueChange = { reduce(TodoItemCardItent.SetText(it)) },
         shape = RoundedCornerShape(PADDING_MEDIUM),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black,
-            disabledTextColor = Color.Gray,
-            errorTextColor = Color.Red,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            disabledContainerColor = Color.White,
-            errorContainerColor = Color.White,
-            cursorColor = Color.Black,
-            errorCursorColor = Color.Red,
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            disabledBorderColor = Color.Transparent,
-            errorBorderColor = Color.Red,
-            focusedLabelColor = Color.Gray,
-            unfocusedLabelColor = Color.Gray
-        ),
+        colors = MaterialTheme.colorScheme.textFieldTheme,
+//        OutlinedTextFieldDefaults.colors(
+//            focusedTextColor = Color.Black,
+//            unfocusedTextColor = Color.Black,
+//            disabledTextColor = Color.Gray,
+//            errorTextColor = Color.Red,
+//            focusedContainerColor = Color.White,
+//            unfocusedContainerColor = Color.White,
+//            disabledContainerColor = Color.White,
+//            errorContainerColor = Color.White,
+//            cursorColor = Color.Black,
+//            errorCursorColor = Color.Red,
+//            focusedBorderColor = Color.Transparent,
+//            unfocusedBorderColor = Color.Transparent,
+//            disabledBorderColor = Color.Transparent,
+//            errorBorderColor = Color.Red,
+//            focusedLabelColor = Color.Gray,
+//            unfocusedLabelColor = Color.Gray
+//        ),
         placeholder = {
             Text(
                 text = stringResource(id = R.string.what_need_to_do),
