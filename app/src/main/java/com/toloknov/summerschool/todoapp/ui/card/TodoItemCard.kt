@@ -1,5 +1,6 @@
 package com.toloknov.summerschool.todoapp.ui.card
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -380,8 +382,87 @@ private fun CloseButton(onClick: () -> Unit) {
 
 @Composable
 @Preview
-private fun TodoItemCardPreview() {
+private fun TodoItemCardPreviewLight() {
     ToDoAppTheme {
+        TodoItemCardStateless(
+            uiState = TodoItemCardUiState(),
+            onBackClick = { },
+            reduce = {}
+        )
+    }
+}
 
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+private fun TodoItemCardPreviewDark() {
+    ToDoAppTheme {
+        TodoItemCardStateless(
+            uiState = TodoItemCardUiState(),
+            onBackClick = { },
+            reduce = {}
+        )
+    }
+}
+
+// Превью выглядит страшно :(
+@Composable
+@Preview
+private fun DatePickerLight() {
+    ToDoAppTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            DateDialog(
+                currPickedDate = ZonedDateTime.now(),
+                onConfirmButtonClick = { },
+                onDismissRequest = { }
+            )
+        }
+    }
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+private fun DatePickerDark() {
+    ToDoAppTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            DateDialog(
+                currPickedDate = ZonedDateTime.now(),
+                onConfirmButtonClick = { },
+                onDismissRequest = { }
+            )
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun ToggleLight() {
+    ToDoAppTheme {
+        Surface {
+            Column {
+                Switch(checked = true, onCheckedChange = {})
+                Switch(checked = false, onCheckedChange = {})
+            }
+
+        }
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+private fun ToggleDark() {
+    ToDoAppTheme {
+        Surface {
+            Column {
+                Switch(checked = true, onCheckedChange = {})
+                Switch(checked = false, onCheckedChange = {})
+            }
+        }
     }
 }

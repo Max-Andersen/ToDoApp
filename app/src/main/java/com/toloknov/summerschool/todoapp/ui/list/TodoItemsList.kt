@@ -1,5 +1,6 @@
 package com.toloknov.summerschool.todoapp.ui.list
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -372,7 +374,7 @@ fun TodoListItemText(
 
 @Preview
 @Composable
-private fun TodoItemListPreview() {
+private fun TodoListPreviewLight() {
     ToDoAppTheme {
         TodoItemsStateless(
             items = listOf(
@@ -409,3 +411,142 @@ private fun TodoItemListPreview() {
         )
     }
 }
+
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Composable
+private fun TodoListPreviewDark() {
+    ToDoAppTheme {
+        TodoItemsStateless(
+            items = listOf(
+                TodoItemUi(
+                    id = "1",
+                    text = "Купить хлеб",
+                    importance = ItemImportance.LOW,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    isDone = false,
+                    updateTs = null
+                ),
+                TodoItemUi(
+                    id = "2",
+                    text = "Купить хлеб",
+                    importance = ItemImportance.LOW,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    isDone = false,
+                    updateTs = null
+                ),
+                TodoItemUi(
+                    id = "3",
+                    text = "Купить хлеб важно!",
+                    importance = ItemImportance.HIGH,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = "2022-01-01",
+                    isDone = false,
+                    updateTs = null
+                ),
+            ),
+            showDoneItems = true,
+            reduce = {},
+            clickOnItem = {},
+            clickOnCreate = {}
+        )
+    }
+}
+
+
+@Preview
+@Composable
+private fun TodoItemListPreviewLight() {
+    ToDoAppTheme {
+        Surface {
+            val list = listOf(
+                TodoItemUi(
+                    id = "1",
+                    text = "Купить хлеб",
+                    importance = ItemImportance.COMMON,
+                    isDone = false,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                ),
+                TodoItemUi(
+                    id = "2",
+                    text = "Купить много хлеба",
+                    importance = ItemImportance.HIGH,
+                    isDone = false,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
+                ),
+                TodoItemUi(
+                    id = "3",
+                    text = "Купить много хлеба",
+                    importance = ItemImportance.HIGH,
+                    isDone = true,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
+                )
+            )
+
+            LazyColumn() {
+                items(list, key = { it.id }) { item ->
+                    TodoListItem(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = 48.dp)
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        itemUi = item,
+                        clickOnItem = { },
+                        onChangeStatus = { },
+                        onDelete = { }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Composable
+private fun TodoItemListPreviewDark() {
+    ToDoAppTheme {
+        Surface {
+            val list = listOf(
+                TodoItemUi(
+                    id = "1",
+                    text = "Купить хлеб",
+                    importance = ItemImportance.COMMON,
+                    isDone = false,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                ),
+                TodoItemUi(
+                    id = "2",
+                    text = "Купить много хлеба",
+                    importance = ItemImportance.HIGH,
+                    isDone = false,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
+                ),
+                TodoItemUi(
+                    id = "3",
+                    text = "Купить много хлеба",
+                    importance = ItemImportance.HIGH,
+                    isDone = true,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
+                )
+            )
+
+            LazyColumn() {
+                items(list, key = { it.id }) { item ->
+                    TodoListItem(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = 48.dp)
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        itemUi = item,
+                        clickOnItem = { },
+                        onChangeStatus = { },
+                        onDelete = { }
+                    )
+                }
+            }
+        }
+    }
+}
+
