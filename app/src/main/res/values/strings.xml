@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">ToDoApp</string>
+
+    <string name="my_todo_items">Мои дела</string>
+    <string name="count_done_items">Выполнено — %1$s</string>
+
+    <string name="new_item">Новое</string>
+    <string name="list_is_empty">Список пуст</string>
+    <string name="importance">Приоритет</string>
+    <string name="what_need_to_do">Что надо сделать…</string>
+
+
+    <string name="select">Выбрать</string>
+    <string name="cancel">Отмена</string>
+    <string name="date">Дата</string>
+
+    <string name="delete">Удалить</string>
+    <string name="save">Сохранить</string>
+    <string name="do_before">Сделать до</string>
+
+
 </resources>
