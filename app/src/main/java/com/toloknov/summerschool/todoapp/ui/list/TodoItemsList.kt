@@ -105,7 +105,7 @@ private fun TodoItemsStateless(
                 scrollBehavior = scrollBehavior,
                 collapsingTitle = CollapsingTitle(
                     titleText = stringResource(id = R.string.my_todo_items),
-                    expandedTextStyle = MaterialTheme.typography.headlineLarge
+                    expandedTextStyle = MaterialTheme.typography.titleLarge
                 ),
                 actions = {
                     ShowDoneItemsIcon(showDoneItems) {
@@ -121,7 +121,8 @@ private fun TodoItemsStateless(
                                 R.string.count_done_items,
                                 "${items.filter { it.isDone }.size}"
                             ),
-                            modifier = Modifier.padding(start = PADDING_BIG)
+                            modifier = Modifier.padding(start = PADDING_BIG),
+                            color = MaterialTheme.colorScheme.surfaceContainerLowest
                         )
                     }
                 } else null,
@@ -321,8 +322,12 @@ fun TodoListItemText(
     itemUi: TodoItemUi,
 ) {
     // Если элемент помечен как выполненный, то стиль будет содержать зачеркивание
-    val textStyle =
-        LocalTextStyle.current.copy(textDecoration = if (itemUi.isDone) TextDecoration.LineThrough else null)
+    val (textStyle, textColor) = if (itemUi.isDone) {
+        LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough) to MaterialTheme.colorScheme.surfaceContainerLowest
+    } else {
+        LocalTextStyle.current.copy(textDecoration = null) to Color.Unspecified
+
+    }
 
     Column(
         modifier = modifier.padding(vertical = 12.dp)
@@ -351,12 +356,14 @@ fun TodoListItemText(
                 text = itemUi.text,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                style = textStyle
+                style = textStyle,
+                color = textColor
             )
         }
         itemUi.deadlineTs?.let { deadline ->
             Text(
-                text = deadline
+                text = deadline,
+                color = textColor
             )
         }
     }

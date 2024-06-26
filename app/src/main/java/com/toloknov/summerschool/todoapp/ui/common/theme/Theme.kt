@@ -2,13 +2,8 @@ package com.toloknov.summerschool.todoapp.ui.common.theme
 
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.CheckboxColors
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -19,7 +14,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 
 // Paddings
 val PADDING_LARGE = 32.dp
@@ -53,8 +47,8 @@ private val LightColorScheme = lightColorScheme(
     surfaceVariant = LightSurfaceVariant,
     onSurfaceVariant = Color.Black,
     outline = Color(0xFFB3B3B3),
-    surfaceContainerLow = LightSurfaceContainer
-
+    surfaceContainerLow = LightSurfaceContainer,
+    surfaceContainerLowest = LightGreyForText
 )
 
 //private val DarkColorScheme = darkColorScheme(
@@ -84,13 +78,12 @@ private val DarkColorScheme = darkColorScheme(
     surfaceVariant = DarkSurfaceVariant,
     onSurfaceVariant = Color.White,
     outline = Color(0xFF7C7C7E),
-    surfaceContainerLow = DarkSurfaceContainer
+    surfaceContainerLow = DarkSurfaceContainer,
+    surfaceContainerLowest = DarkGreyForText
+)
 
 
-    )
-
-
-private val ColorScheme.checkBoxCheckedColor: Color
+val ColorScheme.TodoGreen: Color
     @Composable
     get() {
         return if (!isSystemInDarkTheme()) {
@@ -100,7 +93,7 @@ private val ColorScheme.checkBoxCheckedColor: Color
         }
     }
 
-private val ColorScheme.checkBoxUnCheckedHightImportanceColor: Color
+val ColorScheme.TodoRed: Color
     @Composable
     get() {
         return if (!isSystemInDarkTheme()) {
@@ -110,7 +103,7 @@ private val ColorScheme.checkBoxUnCheckedHightImportanceColor: Color
         }
     }
 
-private val ColorScheme.checkBoxUnCheckedNormalImportanceColor: Color
+val ColorScheme.checkBoxUnCheckedNormalImportanceColor: Color
     @Composable
     get() {
         return if (!isSystemInDarkTheme()) {
@@ -121,81 +114,7 @@ private val ColorScheme.checkBoxUnCheckedNormalImportanceColor: Color
     }
 
 
-val ColorScheme.importanceCheckBoxTheme: @Composable (ItemImportance) -> CheckboxColors
-    @Composable get() = { importance ->
-        when (importance) {
-            ItemImportance.HIGH -> {
-                CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.checkBoxCheckedColor,
-                    uncheckedColor = MaterialTheme.colorScheme.checkBoxUnCheckedHightImportanceColor,
-                    checkmarkColor = MaterialTheme.colorScheme.surfaceContainer
-                )
-            }
 
-            else -> {
-                CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.checkBoxCheckedColor,
-                    uncheckedColor = MaterialTheme.colorScheme.checkBoxUnCheckedNormalImportanceColor,
-                    checkmarkColor = MaterialTheme.colorScheme.surfaceContainer
-                )
-            }
-        }
-    }
-
-val ColorScheme.plainImportancecheckBoxTheme: CheckboxColors
-    @Composable get() =
-        if (!isSystemInDarkTheme()) {
-            CheckboxDefaults.colors(
-                checkedColor = LightAcceptGreen,
-                uncheckedColor = Color(0xFFcccccc),
-                checkmarkColor = White,
-                disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                disabledUncheckedColor = MaterialTheme.colorScheme.primary,
-                disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
-            )
-        } else {
-            CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary,
-                uncheckedColor = MaterialTheme.colorScheme.primary,
-                checkmarkColor = MaterialTheme.colorScheme.primary,
-                disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                disabledUncheckedColor = MaterialTheme.colorScheme.primary,
-                disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
-            )
-        }
-
-val ColorScheme.hightImportancecheckBoxTheme: CheckboxColors
-    @Composable get() =
-        if (!isSystemInDarkTheme()) {
-            CheckboxDefaults.colors(
-                checkedColor = LightAcceptGreen,
-                uncheckedColor = LightRejectRed,
-                checkmarkColor = White,
-                disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                disabledUncheckedColor = MaterialTheme.colorScheme.primary,
-                disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
-            )
-        } else {
-            CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary,
-                uncheckedColor = MaterialTheme.colorScheme.primary,
-                checkmarkColor = MaterialTheme.colorScheme.primary,
-                disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                disabledUncheckedColor = MaterialTheme.colorScheme.primary,
-                disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
-            )
-        }
-
-
-val ColorScheme.textFieldTheme: TextFieldColors
-    @Composable
-    get() = OutlinedTextFieldDefaults.colors(
-        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-        focusedBorderColor = MaterialTheme.colorScheme.surfaceContainer,
-        unfocusedBorderColor = MaterialTheme.colorScheme.surfaceContainer,
-        cursorColor = MaterialTheme.colorScheme.surfaceVariant
-    )
 
 // С цветами в макете жесть конечно, не соотносится в палетку Material3, чтобы compose автоматически всё тянул
 // подбирал на глаз и эмпирически
@@ -229,5 +148,7 @@ fun ToDoAppTheme(
 @Preview
 @Composable
 private fun AppThemePreview() {
+    ToDoAppTheme {
 
+    }
 }

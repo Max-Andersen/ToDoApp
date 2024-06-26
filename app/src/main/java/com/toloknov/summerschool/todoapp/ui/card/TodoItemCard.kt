@@ -1,5 +1,6 @@
 package com.toloknov.summerschool.todoapp.ui.card
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,11 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -31,7 +32,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -51,7 +51,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,6 +62,7 @@ import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_LARGE
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
 import com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme
+import com.toloknov.summerschool.todoapp.ui.common.theme.TodoRed
 import com.toloknov.summerschool.todoapp.ui.common.theme.textFieldTheme
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.rememberToolbarScrollBehavior
@@ -194,9 +194,9 @@ private fun DeleteSection(
     reduce: (TodoItemCardItent) -> Unit
 ) {
     val deleteSectionColor = if (uiState.isNewItem) {
-        Color.LightGray
+        MaterialTheme.colorScheme.surfaceContainerLowest
     } else {
-        Color.Red
+        MaterialTheme.colorScheme.TodoRed
     }
 
     Row(
@@ -228,7 +228,9 @@ private fun SelectDeadline(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = stringResource(id = R.string.do_before))
+        Text(
+            text = stringResource(id = R.string.do_before)
+        )
         Switch(checked = uiState.deadline != null, onCheckedChange = { newState ->
             if (newState) {
                 openDialog()
@@ -238,7 +240,10 @@ private fun SelectDeadline(
         })
     }
     if (uiState.deadline != null) {
-        Text(text = uiState.deadline.convertToReadable() ?: "")
+        Text(
+            text = uiState.deadline.convertToReadable() ?: "",
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }
 
@@ -255,20 +260,41 @@ private fun ImportanceBlock(
     Box(modifier = Modifier.clickable { dropDownExpanded = true }) {
         Column {
             Text(text = stringResource(id = R.string.importance))
-            Text(text = uiState.importance.nameRu)
+            Text(
+                text = uiState.importance.nameRu,
+                color = if (uiState.importance == ItemImportance.HIGH) MaterialTheme.colorScheme.TodoRed else Color.Unspecified
+            )
         }
         DropdownMenu(
+            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer),
             expanded = dropDownExpanded,
             onDismissRequest = { dropDownExpanded = false }) {
             importanceItems.forEach { item ->
-                DropdownMenuItem(
-                    text = {
-                        Text(text = item.nameRu)
-                    },
-                    onClick = {
-                        reduce(TodoItemCardItent.SetImportance(item))
-                        dropDownExpanded = false
-                    })
+                if (item == ItemImportance.HIGH) {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = "!! ${item.nameRu}",
+                                color = Color.Red
+                            )
+                        },
+                        onClick = {
+                            reduce(TodoItemCardItent.SetImportance(item))
+                            dropDownExpanded = false
+                        })
+                } else {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = item.nameRu,
+                            )
+                        },
+                        onClick = {
+                            reduce(TodoItemCardItent.SetImportance(item))
+                            dropDownExpanded = false
+                        })
+                }
+
             }
         }
     }
@@ -288,28 +314,10 @@ private fun InputTodoText(
         onValueChange = { reduce(TodoItemCardItent.SetText(it)) },
         shape = RoundedCornerShape(PADDING_MEDIUM),
         colors = MaterialTheme.colorScheme.textFieldTheme,
-//        OutlinedTextFieldDefaults.colors(
-//            focusedTextColor = Color.Black,
-//            unfocusedTextColor = Color.Black,
-//            disabledTextColor = Color.Gray,
-//            errorTextColor = Color.Red,
-//            focusedContainerColor = Color.White,
-//            unfocusedContainerColor = Color.White,
-//            disabledContainerColor = Color.White,
-//            errorContainerColor = Color.White,
-//            cursorColor = Color.Black,
-//            errorCursorColor = Color.Red,
-//            focusedBorderColor = Color.Transparent,
-//            unfocusedBorderColor = Color.Transparent,
-//            disabledBorderColor = Color.Transparent,
-//            errorBorderColor = Color.Red,
-//            focusedLabelColor = Color.Gray,
-//            unfocusedLabelColor = Color.Gray
-//        ),
         placeholder = {
             Text(
                 text = stringResource(id = R.string.what_need_to_do),
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.surfaceContainerLowest,
                 fontSize = 16.sp
             )
         }
