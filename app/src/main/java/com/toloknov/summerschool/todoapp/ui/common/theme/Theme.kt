@@ -40,19 +40,6 @@ val PADDING_BIG = 16.dp
 val PADDING_MEDIUM = 8.dp
 val PADDING_SMALL = 4.dp
 
-
-//private val LightColorScheme = lightColorScheme(
-//    primary = LightPrimary,
-//    secondary = PurpleGrey40,
-//    tertiary = Pink40,
-//    surface = LightSurface,
-//    surfaceContainer = LightSurfaceContainer,
-//    primaryContainer = LightPrimary,
-//    onPrimaryContainer = White,
-//    outline = LightOutline,
-//    surfaceVariant = LightSurfaceVariant
-//)
-
 private val LightColorScheme = lightColorScheme(
     primary = LightPrimary,
     onPrimary = Color.White,
@@ -60,7 +47,7 @@ private val LightColorScheme = lightColorScheme(
     onPrimaryContainer = White,
     surface = LightSurface,
     onSurface = Color.Black,
-    background = Color(0xFFF7F6F2),
+    background = LightGreyForText,
     surfaceContainer = LightSurfaceContainer,
     onBackground = Color.Black,
     surfaceVariant = LightSurfaceVariant,
@@ -69,20 +56,6 @@ private val LightColorScheme = lightColorScheme(
     surfaceContainerLow = LightSurfaceContainer,
     surfaceContainerLowest = LightGreyForText
 )
-
-//private val DarkColorScheme = darkColorScheme(
-//    primary = DarkPrimary,
-//    secondary = PurpleGrey80,
-//    tertiary = Pink80,
-//
-//    surface = DarkSurface,
-//    surfaceContainer = DarkSurfaceContainer,
-//    primaryContainer = DarkPrimary,
-//    onPrimaryContainer = White,
-//    outline = DarkOutline,
-//    surfaceVariant = DarkSurfaceVariant
-//)
-
 
 private val DarkColorScheme = darkColorScheme(
     primary = DarkPrimary,
@@ -181,122 +154,18 @@ private fun TypographyPreview() {
 }
 
 @OptIn(ExperimentalLayoutApi::class)
-@Preview(showBackground = true, device = "spec:width=1080px,height=2340px,dpi=320")
-@Composable
-private fun ColorThemeLightPreview() {
-    ToDoAppTheme {
-        val scrollState = rememberScrollState()
-        Surface {
-            FlowRow(
-                modifier = Modifier
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Center,
-                maxItemsInEachRow = 3,
-            ) {
-                val itemSmallModifier = Modifier
-                    .padding(horizontal = PADDING_MEDIUM, vertical = PADDING_SMALL)
-                    .widthIn(0.dp, 128.dp)
-                    .weight(1f)
-
-                val itemBigModifier = Modifier
-                    .padding(horizontal = PADDING_MEDIUM, vertical = PADDING_SMALL)
-                    .fillMaxWidth()
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.primary,
-                    "Primary"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.onPrimary,
-                    "onPrimary"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.primaryContainer,
-                    "primaryContainer"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.onPrimaryContainer,
-                    "onPrimaryContainer"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.surface,
-                    "surface"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.onSurface,
-                    "onSurface"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.background,
-                    "background"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.onBackground,
-                    "onBackground"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.surfaceContainer,
-                    "background"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.surfaceVariant,
-                    "surfaceVariant"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.onSurfaceVariant,
-                    "onSurfaceVariant"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.outline,
-                    "outline"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.surfaceContainerLow,
-                    "surfaceContainerLow"
-                )
-
-                ColoredBoxWithText(
-                    itemSmallModifier,
-                    MaterialTheme.colorScheme.surfaceContainerLowest,
-                    "surfaceContainerLowest"
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
 @Preview(
+    name = "light",
+    showBackground = true,
+    device = "spec:width=1080px,height=2340px,dpi=320"
+)
+@Preview(
+    name = "dark",
     showBackground = true, device = "spec:width=1080px,height=2340px,dpi=320",
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 @Composable
-private fun ColorThemeDarkPreview() {
+private fun ColorThemePreview() {
     ToDoAppTheme {
         val scrollState = rememberScrollState()
         Surface {
@@ -366,7 +235,7 @@ private fun ColorThemeDarkPreview() {
                 ColoredBoxWithText(
                     itemSmallModifier,
                     MaterialTheme.colorScheme.surfaceContainer,
-                    "surfaceContainer"
+                    "background"
                 )
 
                 ColoredBoxWithText(
