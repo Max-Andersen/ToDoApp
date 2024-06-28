@@ -23,6 +23,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -102,6 +103,7 @@ private val DarkColorScheme = darkColorScheme(
 
 
 val ColorScheme.TodoGreen: Color
+    @ReadOnlyComposable
     @Composable
     get() {
         return if (!isSystemInDarkTheme()) {
@@ -112,6 +114,7 @@ val ColorScheme.TodoGreen: Color
     }
 
 val ColorScheme.TodoRed: Color
+    @ReadOnlyComposable
     @Composable
     get() {
         return if (!isSystemInDarkTheme()) {
@@ -122,6 +125,7 @@ val ColorScheme.TodoRed: Color
     }
 
 val ColorScheme.checkBoxUnCheckedNormalImportanceColor: Color
+    @ReadOnlyComposable
     @Composable
     get() {
         return if (!isSystemInDarkTheme()) {
@@ -362,7 +366,7 @@ private fun ColorThemeDarkPreview() {
                 ColoredBoxWithText(
                     itemSmallModifier,
                     MaterialTheme.colorScheme.surfaceContainer,
-                    "background"
+                    "surfaceContainer"
                 )
 
                 ColoredBoxWithText(

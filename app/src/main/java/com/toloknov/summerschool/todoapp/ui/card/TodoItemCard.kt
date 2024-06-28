@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -34,6 +35,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -70,6 +75,7 @@ import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.rememberToolbarScrollBehavior
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToReadable
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToZonedDateTime
+import com.toloknov.summerschool.todoapp.ui.list.TodoItemsListEffect
 import java.time.ZonedDateTime
 
 @Composable
@@ -80,10 +86,15 @@ fun TodoItemCard(
 
     val uiState by viewModel.uiState.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(key1 = Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 TodoItemCardEffect.NavigateBack -> onBackClick()
+                is TodoItemCardEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
             }
         }
     }
@@ -91,7 +102,8 @@ fun TodoItemCard(
     TodoItemCardStateless(
         uiState = uiState,
         onBackClick = onBackClick,
-        reduce = viewModel::reduce
+        reduce = viewModel::reduce,
+        snackbarHostState = snackbarHostState
     )
 
 }
@@ -104,7 +116,8 @@ fun TodoItemCard(
 fun TodoItemCardStateless(
     uiState: TodoItemCardUiState,
     onBackClick: () -> Unit,
-    reduce: (TodoItemCardItent) -> Unit
+    reduce: (TodoItemCardItent) -> Unit,
+    snackbarHostState: SnackbarHostState = SnackbarHostState()
 ) {
 
     val scrollBehavior = rememberToolbarScrollBehavior()
@@ -142,6 +155,15 @@ fun TodoItemCardStateless(
             )
         },
         containerColor = MaterialTheme.colorScheme.surface,
+        snackbarHost = {
+            Box(modifier = Modifier.safeDrawingPadding()) {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    snackbar = { snackbarData: SnackbarData ->
+                        Snackbar(snackbarData = snackbarData)
+                    })
+            }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +31,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -37,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -54,7 +60,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
-import com.toloknov.summerschool.todoapp.ui.card.TodoItemCardViewModel
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightAcceptGreen
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightRejectRed
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTitle
@@ -77,12 +82,25 @@ fun TodoItemsList(
 
     val uiState by viewModel.uiState.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is TodoItemsListEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
+            }
+        }
+    }
+
     TodoItemsStateless(
         items = uiState.items,
         showDoneItems = uiState.showDoneItems,
         reduce = viewModel::reduce,
         clickOnItem = clickOnItem,
         clickOnCreate = clickOnCreate,
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -93,7 +111,8 @@ private fun TodoItemsStateless(
     showDoneItems: Boolean,
     reduce: (TodoItemsListIntent) -> Unit,
     clickOnItem: (itemId: String) -> Unit,
-    clickOnCreate: () -> Unit
+    clickOnCreate: () -> Unit,
+    snackbarHostState: SnackbarHostState = SnackbarHostState()
 ) {
     val scrollBehavior = rememberToolbarScrollBehavior()
 
@@ -138,8 +157,18 @@ private fun TodoItemsStateless(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_plus_24),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
+            }
+        },
+        snackbarHost = {
+            Box(modifier = Modifier.safeDrawingPadding()) {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    snackbar = { snackbarData: SnackbarData ->
+                        Snackbar(snackbarData = snackbarData)
+                    })
             }
         }
     ) { paddingValues ->
@@ -407,7 +436,7 @@ private fun TodoListPreviewLight() {
             showDoneItems = true,
             reduce = {},
             clickOnItem = {},
-            clickOnCreate = {}
+            clickOnCreate = {},
         )
     }
 }
