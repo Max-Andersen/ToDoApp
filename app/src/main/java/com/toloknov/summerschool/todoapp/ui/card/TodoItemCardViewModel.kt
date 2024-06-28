@@ -17,12 +17,14 @@ import com.toloknov.summerschool.todoapp.ui.list.TodoItemsListViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -41,17 +43,22 @@ class TodoItemCardViewModel(
     private val _effect: MutableSharedFlow<TodoItemCardEffect> = MutableSharedFlow()
     val effect: SharedFlow<TodoItemCardEffect> = _effect
 
-    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, exception ->
-        CoroutineScope(coroutineContext).launch {
-            Log.e(TAG, exception.stackTrace.toString())
-            // По хорошему нужно понять что за исключение
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        viewModelScope.launch {
+            Log.e(TAG, "caught  " + exception.stackTraceToString())
+            // По-хорошему нужно понять что за исключение
             _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка загрузки данных"))
         }
     }
 
-    init {
+    // Если не сделать тут delay, то из-за очень быстрой работы с мок-данными, effect на отображение снекбара улетит до подписки экраном на shared flow
+    // есть решение replay = 1, чтобы дублировать пропущенные события, но выглядит больше костылём
+    // так что в будущем добавлю progres bar
+    init{
         viewModelScope.launch(Dispatchers.Default + exceptionHandler) {
             itemId?.let {
+                // Имитируем загрузку с БД/сети
+                delay(1000L)
                 val itemData = todoItemsRepository.getById(itemId)
                 itemData?.let { data ->
                     _uiState.update { lastState ->

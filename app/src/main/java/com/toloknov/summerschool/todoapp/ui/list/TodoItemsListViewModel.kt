@@ -37,11 +37,10 @@ class TodoItemsListViewModel(
     private val _uiState: MutableStateFlow<TodoItemsListUiState> =
         MutableStateFlow(TodoItemsListUiState())
 
-
-    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, exception ->
-        CoroutineScope(coroutineContext).launch {
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        viewModelScope.launch {
             Log.e(TAG, exception.stackTrace.toString())
-            // По хорошему нужно понять что за исключение
+            // По-хорошему нужно понять что за исключение
             _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка загрузки данных"))
         }
     }
@@ -49,6 +48,9 @@ class TodoItemsListViewModel(
     val uiState: StateFlow<TodoItemsListUiState> =
         combine(allItems, _uiState) { items, uiState ->
             val itemsToShow = if (uiState.showDoneItems) items else items.filter { !it.isDone }
+
+            // Имитируем загрузку с БД/сети
+            delay(1000L)
 
             TodoItemsListUiState(
                 items = itemsToShow.map { it.toUiModel() },

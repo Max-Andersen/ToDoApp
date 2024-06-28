@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
+import com.toloknov.summerschool.todoapp.ui.common.snackbar.SnackbarError
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightAcceptGreen
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightRejectRed
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTitle
@@ -167,7 +168,10 @@ private fun TodoItemsStateless(
                 SnackbarHost(
                     hostState = snackbarHostState,
                     snackbar = { snackbarData: SnackbarData ->
-                        Snackbar(snackbarData = snackbarData)
+                        SnackbarError(
+                            text = snackbarData.visuals.message,
+                            onClick = { snackbarHostState.currentSnackbarData?.dismiss() }
+                        )
                     })
             }
         }

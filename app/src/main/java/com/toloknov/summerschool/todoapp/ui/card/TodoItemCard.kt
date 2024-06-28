@@ -1,6 +1,7 @@
 package com.toloknov.summerschool.todoapp.ui.card
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -65,6 +66,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
+import com.toloknov.summerschool.todoapp.ui.common.snackbar.SnackbarError
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_LARGE
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
@@ -160,7 +162,10 @@ fun TodoItemCardStateless(
                 SnackbarHost(
                     hostState = snackbarHostState,
                     snackbar = { snackbarData: SnackbarData ->
-                        Snackbar(snackbarData = snackbarData)
+                        SnackbarError(
+                            text = snackbarData.visuals.message,
+                            onClick = { snackbarHostState.currentSnackbarData?.dismiss() }
+                        )
                     })
             }
         }
