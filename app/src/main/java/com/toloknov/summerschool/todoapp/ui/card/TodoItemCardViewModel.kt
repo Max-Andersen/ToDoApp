@@ -21,7 +21,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -35,10 +37,10 @@ class TodoItemCardViewModel(
 
     private val itemId = savedStateHandle.get<String>("itemId")
 
-
     private val _uiState: MutableStateFlow<TodoItemCardUiState> =
         MutableStateFlow(TodoItemCardUiState())
-    val uiState: StateFlow<TodoItemCardUiState> = _uiState
+    val uiState: StateFlow<TodoItemCardUiState> =
+        _uiState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), _uiState.value)
 
     private val _effect: MutableSharedFlow<TodoItemCardEffect> = MutableSharedFlow()
     val effect: SharedFlow<TodoItemCardEffect> = _effect
@@ -54,7 +56,7 @@ class TodoItemCardViewModel(
     // Если не сделать тут delay, то из-за очень быстрой работы с мок-данными, effect на отображение снекбара улетит до подписки экраном на shared flow
     // есть решение replay = 1, чтобы дублировать пропущенные события, но выглядит больше костылём
     // так что в будущем добавлю progres bar
-    init{
+    init {
         viewModelScope.launch(Dispatchers.Default + exceptionHandler) {
             itemId?.let {
                 // Имитируем загрузку с БД/сети
