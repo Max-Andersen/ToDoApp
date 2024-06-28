@@ -30,9 +30,9 @@ fun AppNavGraph(
         }
 
         composable(
-            route = "card/{isNewItem}",
+            route = "card/{itemId}",
             arguments = listOf(
-                navArgument("isNewItem") {
+                navArgument("itemId") {
                     type = NavType.StringType
                 }
             )
