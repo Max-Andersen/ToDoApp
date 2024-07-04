@@ -1,22 +1,23 @@
 package com.toloknov.summerschool.todoapp.data.repository
 
-import android.util.Log
-import com.toloknov.summerschool.todoapp.data.mapper.toDomain
-import com.toloknov.summerschool.todoapp.data.mapper.toEntity
-import com.toloknov.summerschool.todoapp.data.model.TodoItemEntity
+import com.toloknov.summerschool.todoapp.data.local.db.model.toDomain
+import com.toloknov.summerschool.todoapp.data.local.db.model.toEntity
+import com.toloknov.summerschool.todoapp.data.local.db.model.TodoItemEntity
+import com.toloknov.summerschool.todoapp.data.remote.TodoApi
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 
-class TodoItemsRepositoryImpl : TodoItemsRepository {
+class TodoItemsRepositoryImpl(
+    private val api: TodoApi
+) : TodoItemsRepository {
 
     private val items = mutableListOf(
         TodoItemEntity(

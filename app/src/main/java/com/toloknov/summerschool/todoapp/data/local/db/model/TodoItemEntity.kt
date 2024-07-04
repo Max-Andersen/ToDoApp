@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.data.model
+package com.toloknov.summerschool.todoapp.data.local.db.model
 
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import java.time.ZonedDateTime
