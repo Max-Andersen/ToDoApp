@@ -1,5 +1,6 @@
 [versions]
 agp = "8.3.1"
+authsdk = "3.1.0"
 converterGson = "2.11.0"
 datastorePreferences = "1.1.1"
 kotlin = "1.9.24"
@@ -15,6 +16,8 @@ navigationRuntimeKtx = "2.7.7"
 okhttp = "5.0.0-alpha.2"
 protobufJavalite = "4.26.1"
 retrofit = "2.11.0"
+coreSplashscreen = "1.0.1"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -22,6 +25,7 @@ androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "d
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+authsdk = { module = "com.yandex.android:authsdk", version.ref = "authsdk" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "converterGson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -42,6 +46,7 @@ logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", ver
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobufJavalite" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

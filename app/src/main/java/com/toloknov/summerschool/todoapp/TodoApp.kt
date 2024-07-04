@@ -8,7 +8,11 @@ import com.toloknov.summerschool.todoapp.data.local.datastore.AuthorizationPrefe
 import com.toloknov.summerschool.todoapp.data.remote.TodoApi
 import com.toloknov.summerschool.todoapp.data.remote.utils.ErrorInterceptor
 import com.toloknov.summerschool.todoapp.data.remote.utils.OAuthInterceptor
+import com.toloknov.summerschool.todoapp.data.repository.AuthRepositoryImpl
 import com.toloknov.summerschool.todoapp.data.repository.TodoItemsRepositoryImpl
+import com.toloknov.summerschool.todoapp.di.DIContainer
+import com.toloknov.summerschool.todoapp.di.InnerDIDependencies
+import com.toloknov.summerschool.todoapp.domain.api.AuthRepository
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -25,6 +29,7 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
     )
 
     private lateinit var todoItemsRepository: TodoItemsRepository
+    private lateinit var authRepository: AuthRepository
     private lateinit var oAuthInterceptor: OAuthInterceptor
     private lateinit var errorInterceptor: ErrorInterceptor
     private lateinit var retrofit: Retrofit
@@ -39,6 +44,9 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
 
         todoItemsRepository = TodoItemsRepositoryImpl(
             this.getTodoApi()
+        )
+        authRepository = AuthRepositoryImpl(
+            oauthDataStore
         )
     }
 
@@ -55,7 +63,7 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
     }
 
     private fun initRetrofit() {
-        var serverUrl = ""
+        var serverUrl = "https://hive.mrdekk.ru/todo/"
 
         val retrofitBuilder = Retrofit.Builder()
             .baseUrl(serverUrl)
@@ -87,6 +95,8 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
 
     override fun getTodoItemsRepository(): TodoItemsRepository = todoItemsRepository
 
+    override fun getAuthRepository(): AuthRepository = authRepository
+
     override fun getOAuthDataStore(): DataStore<AuthorizationPreferences> = oauthDataStore
 
     override fun getOAuthInterceptor(): OAuthInterceptor = oAuthInterceptor
@@ -98,25 +108,4 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
     override fun getRetrofit(): Retrofit = retrofit
 
     override fun getTodoApi(): TodoApi = this.retrofit.create(TodoApi::class.java)
-}
-
-interface DIContainer {
-
-    fun getTodoItemsRepository(): TodoItemsRepository
-
-}
-
-interface InnerDIDependencies {
-
-    fun getOAuthDataStore(): DataStore<AuthorizationPreferences>
-
-    fun getOAuthInterceptor(): OAuthInterceptor
-
-    fun getErrorInterceptor(): ErrorInterceptor
-
-    fun getClient(): OkHttpClient
-
-    fun getRetrofit(): Retrofit
-
-    fun getTodoApi(): TodoApi
 }

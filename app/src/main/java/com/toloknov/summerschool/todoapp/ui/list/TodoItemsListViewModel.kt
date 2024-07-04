@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
 
 class TodoItemsListViewModel(
-    private val todoItemsRepository: TodoItemsRepository = TodoItemsRepositoryImpl()
+    private val todoItemsRepository: TodoItemsRepository
 ) : ViewModel() {
     private val allItems = todoItemsRepository.getAllItems()
 

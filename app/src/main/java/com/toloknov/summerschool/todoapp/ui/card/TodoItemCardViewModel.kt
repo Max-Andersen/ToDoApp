@@ -31,7 +31,7 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 class TodoItemCardViewModel(
-    private val todoItemsRepository: TodoItemsRepository = TodoItemsRepositoryImpl(),
+    private val todoItemsRepository: TodoItemsRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
