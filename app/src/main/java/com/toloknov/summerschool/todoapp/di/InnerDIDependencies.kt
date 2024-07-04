@@ -1,7 +1,7 @@
 package com.toloknov.summerschool.todoapp.di
 
 import androidx.datastore.core.DataStore
-import com.toloknov.summerschool.todoapp.AuthorizationPreferences
+import com.toloknov.summerschool.todoapp.NetworkPreferences
 import com.toloknov.summerschool.todoapp.data.remote.TodoApi
 import com.toloknov.summerschool.todoapp.data.remote.utils.ErrorInterceptor
 import com.toloknov.summerschool.todoapp.data.remote.utils.OAuthInterceptor
@@ -10,7 +10,7 @@ import retrofit2.Retrofit
 
 interface InnerDIDependencies {
 
-    fun getOAuthDataStore(): DataStore<AuthorizationPreferences>
+    fun getNetworkDataStore(): DataStore<NetworkPreferences>
 
     fun getOAuthInterceptor(): OAuthInterceptor
 

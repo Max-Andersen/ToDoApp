@@ -1,28 +1,46 @@
 package com.toloknov.summerschool.todoapp.data.remote
 
+import com.toloknov.summerschool.todoapp.data.remote.model.ItemTransmitModel
+import com.toloknov.summerschool.todoapp.data.remote.model.ItemsListTransmitModel
+import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
-
+import retrofit2.http.Path
 
 interface TodoApi {
-    @GET("")
-    suspend fun getAllItems()
+    @GET("list")
+    suspend fun getAllItems(): Response<ItemsListTransmitModel>
 
-    @GET("")
-    suspend fun getItemById()
+    @GET("list/{id}")
+    suspend fun getItemById(
+        @Path("id") id: String
+    ): Response<ItemTransmitModel>
 
-    @PATCH("")
-    suspend fun updateItems()
+    @PATCH("list")
+    suspend fun updateItems(
+        @Header("X-Last-Known-Revision:") revision: Int,
+        @Body body: ItemsListTransmitModel
+    ): Response<ItemsListTransmitModel>
 
-    @POST("")
-    suspend fun addItem()
+    @POST("list")
+    suspend fun addItem(
+        @Header("X-Last-Known-Revision:") revision: Int,
+        @Body body: ItemTransmitModel
+    ): Response<ItemTransmitModel>
 
-    @PUT("")
-    suspend fun updateItemById()
+    @PUT("list/{id}")
+    suspend fun updateItemById(
+        @Path("id") id: String,
+        @Body body: ItemTransmitModel
+    ): Response<ItemTransmitModel>
 
-    @DELETE("")
-    suspend fun deleteItemById()
+    @DELETE("list/{id}")
+    suspend fun deleteItemById(
+        @Path("id") id: String
+    ): Response<ItemTransmitModel>
 }

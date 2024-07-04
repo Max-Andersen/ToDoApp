@@ -1,5 +1,6 @@
 package com.toloknov.summerschool.todoapp.data.repository
 
+import android.util.Log
 import com.toloknov.summerschool.todoapp.data.local.db.model.toDomain
 import com.toloknov.summerschool.todoapp.data.local.db.model.toEntity
 import com.toloknov.summerschool.todoapp.data.local.db.model.TodoItemEntity
@@ -7,10 +8,12 @@ import com.toloknov.summerschool.todoapp.data.remote.TodoApi
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
@@ -154,6 +157,8 @@ class TodoItemsRepositoryImpl(
 
     // У Room свой воркер с встроенной логикой переключения на IO, но пока всё в моках, переключу явно :)
     override suspend fun getById(itemId: String): TodoItem? = withContext(Dispatchers.IO) {
+        val resp = api.getAllItems()
+
         dataFlow.value.find { entity -> entity.id == itemId }?.toDomain()
     }
 
@@ -187,5 +192,11 @@ class TodoItemsRepositoryImpl(
         if (index == -1) return@withContext
         items.removeAt(index)
         dataFlow.emit(items)
+    }
+
+    override fun syncItems() {
+        CoroutineScope(Dispatchers.IO).launch {
+
+        }
     }
 }

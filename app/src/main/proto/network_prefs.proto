@@ -3,6 +3,7 @@ syntax = "proto3";
 option java_package = "com.toloknov.summerschool.todoapp";
 option java_multiple_files = true;
 
-message AuthorizationPreferences {
+message NetworkPreferences {
   string token = 1;
+  int32 revision = 2;
 }

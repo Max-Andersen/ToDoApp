@@ -15,4 +15,6 @@ interface TodoItemsRepository {
     suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean)
 
     suspend fun removeItem(itemId: String)
+
+    fun syncItems()
 }

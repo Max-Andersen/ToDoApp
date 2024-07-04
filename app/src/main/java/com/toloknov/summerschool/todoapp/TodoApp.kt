@@ -1,10 +1,15 @@
 package com.toloknov.summerschool.todoapp
 
 import android.app.Application
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import com.google.gson.Gson
-import com.toloknov.summerschool.todoapp.data.local.datastore.AuthorizationPreferencesSerializer
+import com.toloknov.summerschool.todoapp.data.local.datastore.NetworkPreferencesSerializer
 import com.toloknov.summerschool.todoapp.data.remote.TodoApi
 import com.toloknov.summerschool.todoapp.data.remote.utils.ErrorInterceptor
 import com.toloknov.summerschool.todoapp.data.remote.utils.OAuthInterceptor
@@ -13,19 +18,19 @@ import com.toloknov.summerschool.todoapp.data.repository.TodoItemsRepositoryImpl
 import com.toloknov.summerschool.todoapp.di.DIContainer
 import com.toloknov.summerschool.todoapp.di.InnerDIDependencies
 import com.toloknov.summerschool.todoapp.domain.api.AuthRepository
+import com.toloknov.summerschool.todoapp.NetworkPreferences
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import java.util.concurrent.TimeUnit
 
 class TodoApp : Application(), DIContainer, InnerDIDependencies {
 
-    private val oauthDataStore: DataStore<AuthorizationPreferences> by dataStore(
-        fileName = "auth_prefs.pb",
-        serializer = AuthorizationPreferencesSerializer(),
+    private val networkDatastore: DataStore<NetworkPreferences> by dataStore(
+        fileName = "network_prefs.pb",
+        serializer = NetworkPreferencesSerializer(),
     )
 
     private lateinit var todoItemsRepository: TodoItemsRepository
@@ -37,7 +42,6 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
 
     private val gson = Gson()
 
-
     override fun onCreate() {
         super.onCreate()
         initInternet()
@@ -46,8 +50,10 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
             this.getTodoApi()
         )
         authRepository = AuthRepositoryImpl(
-            oauthDataStore
+            this.getNetworkDataStore()
         )
+
+        initInternetAvailableWork()
     }
 
 
@@ -57,8 +63,29 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
         initRetrofit()
     }
 
+    private fun initInternetAvailableWork() {
+        // Интернет через Wi-fi или мобильную связь
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+            .build()
+
+        val networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                // Если интернет появился, триггерим синхронизацию
+                super.onAvailable(network)
+                this@TodoApp.getTodoItemsRepository().syncItems()
+            }
+        }
+
+        val connectivityManager =
+            getSystemService(ConnectivityManager::class.java) as ConnectivityManager
+        connectivityManager.requestNetwork(networkRequest, networkCallback)
+    }
+
     private fun initUtils() {
-        oAuthInterceptor = OAuthInterceptor(this.getOAuthDataStore())
+        oAuthInterceptor = OAuthInterceptor(this.getNetworkDataStore())
         errorInterceptor = ErrorInterceptor(gson)
     }
 
@@ -97,7 +124,7 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
 
     override fun getAuthRepository(): AuthRepository = authRepository
 
-    override fun getOAuthDataStore(): DataStore<AuthorizationPreferences> = oauthDataStore
+    override fun getNetworkDataStore(): DataStore<NetworkPreferences> = networkDatastore
 
     override fun getOAuthInterceptor(): OAuthInterceptor = oAuthInterceptor
 

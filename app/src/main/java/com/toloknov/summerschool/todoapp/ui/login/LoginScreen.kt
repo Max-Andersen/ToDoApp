@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yandex.authsdk.YandexAuthLoginOptions
 import com.yandex.authsdk.YandexAuthOptions
@@ -24,8 +25,8 @@ fun LoginScreen(
     loginSuccess: () -> Unit
 ) {
     val viewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory)
-    val errorMessage by viewModel.errorMessage.collectAsState()
-    val authSuccess by viewModel.authSuccess.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val authSuccess by viewModel.authSuccess.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = authSuccess) {
         if (authSuccess) {

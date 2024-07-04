@@ -26,6 +26,26 @@ import androidx.compose.ui.unit.sp
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
 import kotlin.math.roundToInt
 
+private fun lerp(a: Float, b: Float, fraction: Float): Float {
+    return a + fraction * (b - a)
+}
+
+data class CollapsingTitle(
+    val titleText: String,
+    val expandedTextStyle: TextStyle,
+)
+
+private val MinCollapsedHeight = 46.dp
+private val HorizontalPadding = 16.dp
+private val ExpandedTitleBottomPadding = 8.dp
+private val CollapsedTitleLineHeight = 28.sp
+private val DefaultCollapsedElevation = 4.dp
+
+private const val ExpandedTitleId = "expandedTitle"
+private const val CollapsedTitleId = "collapsedTitle"
+private const val NavigationIconId = "navigationIcon"
+private const val ActionsId = "actions"
+private const val AdditionalContentId = "additionalContent"
 
 /**
  * [Статья на хабре](https://habr.com/ru/companies/hh/articles/703192)
@@ -73,73 +93,20 @@ fun CollapsingTopbar(
     ) {
         Layout(
             content = {
-                if (collapsingTitle != null) {
-                    Text(
-                        modifier = Modifier
-                            .layoutId(ExpandedTitleId)
-                            .wrapContentHeight(align = Alignment.Top)
-                            .graphicsLayer(
-                                scaleX = collapsingTitleScale,
-                                scaleY = collapsingTitleScale,
-                                transformOrigin = TransformOrigin(0f, 0f)
-                            ),
-                        text = collapsingTitle.titleText,
-                        style = collapsingTitle.expandedTextStyle
-                    )
-                    Text(
-                        modifier = Modifier
-                            .layoutId(CollapsedTitleId)
-                            .wrapContentHeight(align = Alignment.Top)
-                            .graphicsLayer(
-                                scaleX = collapsingTitleScale,
-                                scaleY = collapsingTitleScale,
-                                transformOrigin = TransformOrigin(0f, 0f)
-                            ),
-                        text = collapsingTitle.titleText,
-                        style = collapsingTitle.expandedTextStyle,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                if (navigationIcon != null) {
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .layoutId(NavigationIconId)
-                    ) {
-                        navigationIcon()
-                    }
-                }
-
-                if (actions != null) {
-                    Row(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .layoutId(ActionsId)
-                    ) {
-                        actions()
-                    }
-                }
-
-                if (statisticContent != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .layoutId(AdditionalContentId)
-                    ) {
-                        statisticContent()
-                    }
-                }
+                TopbarContent(
+                    collapsingTitle,
+                    navigationIcon,
+                    actions,
+                    statisticContent,
+                    collapsingTitleScale
+                )
             },
             modifier = modifier.then(Modifier.heightIn(min = MinCollapsedHeight))
         ) { measurables, constraints ->
             val horizontalPaddingPx = HorizontalPadding.toPx()
             val expandedTitleBottomPaddingPx = ExpandedTitleBottomPadding.toPx()
 
-
             // Measuring widgets inside toolbar:
-
             val navigationIconPlaceable =
                 measurables.firstOrNull { it.layoutId == NavigationIconId }
                     ?.measure(constraints.copy(minWidth = 0))
@@ -277,28 +244,73 @@ fun CollapsingTopbar(
                 )
             }
         }
-
     }
 }
 
+@Composable
+fun TopbarContent(
+    collapsingTitle: CollapsingTitle?,
+    navigationIcon: @Composable() (() -> Unit)?,
+    actions: @Composable() (RowScope.() -> Unit)?,
+    statisticContent: @Composable() (() -> Unit)?,
+    collapsingTitleScale: Float
+) {
+    if (collapsingTitle != null) {
+        Text(
+            modifier = Modifier
+                .layoutId(ExpandedTitleId)
+                .wrapContentHeight(align = Alignment.Top)
+                .graphicsLayer(
+                    scaleX = collapsingTitleScale,
+                    scaleY = collapsingTitleScale,
+                    transformOrigin = TransformOrigin(0f, 0f)
+                ),
+            text = collapsingTitle.titleText,
+            style = collapsingTitle.expandedTextStyle
+        )
+        Text(
+            modifier = Modifier
+                .layoutId(CollapsedTitleId)
+                .wrapContentHeight(align = Alignment.Top)
+                .graphicsLayer(
+                    scaleX = collapsingTitleScale,
+                    scaleY = collapsingTitleScale,
+                    transformOrigin = TransformOrigin(0f, 0f)
+                ),
+            text = collapsingTitle.titleText,
+            style = collapsingTitle.expandedTextStyle,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
 
-private fun lerp(a: Float, b: Float, fraction: Float): Float {
-    return a + fraction * (b - a)
+    if (navigationIcon != null) {
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .layoutId(NavigationIconId)
+        ) {
+            navigationIcon()
+        }
+    }
+
+    if (actions != null) {
+        Row(
+            modifier = Modifier
+                .wrapContentSize()
+                .layoutId(ActionsId)
+        ) {
+            actions()
+        }
+    }
+
+    if (statisticContent != null) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .layoutId(AdditionalContentId)
+        ) {
+            statisticContent()
+        }
+    }
 }
-
-data class CollapsingTitle(
-    val titleText: String,
-    val expandedTextStyle: TextStyle,
-)
-
-private val MinCollapsedHeight = 46.dp
-private val HorizontalPadding = 16.dp
-private val ExpandedTitleBottomPadding = 8.dp
-private val CollapsedTitleLineHeight = 28.sp
-private val DefaultCollapsedElevation = 4.dp
-
-private const val ExpandedTitleId = "expandedTitle"
-private const val CollapsedTitleId = "collapsedTitle"
-private const val NavigationIconId = "navigationIcon"
-private const val ActionsId = "actions"
-private const val AdditionalContentId = "additionalContent"

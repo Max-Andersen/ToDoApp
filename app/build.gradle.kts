@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.protobuf") version "0.9.0"
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -104,6 +105,7 @@ dependencies {
     implementation(libs.converter.scalars)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+    implementation(libs.kotlinx.serialization.json)
 
     // Debug
     debugImplementation(libs.androidx.ui.tooling)

@@ -1,5 +1,6 @@
 package com.toloknov.summerschool.todoapp.ui.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -29,6 +30,7 @@ class LoginViewModel(
         viewModelScope.launch {
             when (result) {
                 is YandexAuthResult.Success -> {
+                    Log.d(TAG, "Success -> token: ${result.token.value}")
                     authRepository.saveToken(result.token.value)
                     _authSuccess.emit(true)
                 }
