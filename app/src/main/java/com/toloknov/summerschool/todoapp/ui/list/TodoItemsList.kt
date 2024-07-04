@@ -1,5 +1,6 @@
 package com.toloknov.summerschool.todoapp.ui.list
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,11 +31,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -48,10 +57,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
-import com.toloknov.summerschool.todoapp.ui.card.TodoItemCardViewModel
+import com.toloknov.summerschool.todoapp.ui.common.snackbar.SnackbarError
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightAcceptGreen
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightRejectRed
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTitle
@@ -72,7 +82,19 @@ fun TodoItemsList(
 ) {
     val viewModel: TodoItemsListViewModel = viewModel(factory = TodoItemsListViewModel.Factory)
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is TodoItemsListEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
+            }
+        }
+    }
 
     TodoItemsStateless(
         items = uiState.items,
@@ -80,6 +102,7 @@ fun TodoItemsList(
         reduce = viewModel::reduce,
         clickOnItem = clickOnItem,
         clickOnCreate = clickOnCreate,
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -90,7 +113,8 @@ private fun TodoItemsStateless(
     showDoneItems: Boolean,
     reduce: (TodoItemsListIntent) -> Unit,
     clickOnItem: (itemId: String) -> Unit,
-    clickOnCreate: () -> Unit
+    clickOnCreate: () -> Unit,
+    snackbarHostState: SnackbarHostState = SnackbarHostState()
 ) {
     val scrollBehavior = rememberToolbarScrollBehavior()
 
@@ -104,7 +128,7 @@ private fun TodoItemsStateless(
                 scrollBehavior = scrollBehavior,
                 collapsingTitle = CollapsingTitle(
                     titleText = stringResource(id = R.string.my_todo_items),
-                    expandedTextStyle = MaterialTheme.typography.headlineLarge
+                    expandedTextStyle = MaterialTheme.typography.titleLarge
                 ),
                 actions = {
                     ShowDoneItemsIcon(showDoneItems) {
@@ -120,7 +144,8 @@ private fun TodoItemsStateless(
                                 R.string.count_done_items,
                                 "${items.filter { it.isDone }.size}"
                             ),
-                            modifier = Modifier.padding(start = PADDING_BIG)
+                            modifier = Modifier.padding(start = PADDING_BIG),
+                            color = MaterialTheme.colorScheme.surfaceContainerLowest
                         )
                     }
                 } else null,
@@ -134,8 +159,21 @@ private fun TodoItemsStateless(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_plus_24),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
+            }
+        },
+        snackbarHost = {
+            Box(modifier = Modifier.safeDrawingPadding()) {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    snackbar = { snackbarData: SnackbarData ->
+                        SnackbarError(
+                            text = snackbarData.visuals.message,
+                            onClick = { snackbarHostState.currentSnackbarData?.dismiss() }
+                        )
+                    })
             }
         }
     ) { paddingValues ->
@@ -284,7 +322,9 @@ private fun LazyItemScope.TodoListItem(
                 )
             }
         },
-        modifier = Modifier.animateItemPlacement().clickable { clickOnItem() }
+        modifier = Modifier
+            .animateItemPlacement()
+            .clickable { clickOnItem() }
     ) {
         Row(
             modifier = modifier
@@ -302,12 +342,11 @@ private fun LazyItemScope.TodoListItem(
                 itemUi = itemUi,
             )
 
-            IconButton(onClick = clickOnItem) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_info_24),
-                    contentDescription = null
-                )
-            }
+            Icon(
+                modifier = Modifier.minimumInteractiveComponentSize(),
+                painter = painterResource(id = R.drawable.ic_info_24),
+                contentDescription = null
+            )
         }
     }
 
@@ -319,8 +358,12 @@ fun TodoListItemText(
     itemUi: TodoItemUi,
 ) {
     // Если элемент помечен как выполненный, то стиль будет содержать зачеркивание
-    val textStyle =
-        LocalTextStyle.current.copy(textDecoration = if (itemUi.isDone) TextDecoration.LineThrough else null)
+    val (textStyle, textColor) = if (itemUi.isDone) {
+        LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough) to MaterialTheme.colorScheme.surfaceContainerLowest
+    } else {
+        LocalTextStyle.current.copy(textDecoration = null) to Color.Unspecified
+
+    }
 
     Column(
         modifier = modifier.padding(vertical = 12.dp)
@@ -349,12 +392,14 @@ fun TodoListItemText(
                 text = itemUi.text,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                style = textStyle
+                style = textStyle,
+                color = textColor
             )
         }
         itemUi.deadlineTs?.let { deadline ->
             Text(
-                text = deadline
+                text = deadline,
+                color = textColor
             )
         }
     }
@@ -363,7 +408,48 @@ fun TodoListItemText(
 
 @Preview
 @Composable
-private fun TodoItemListPreview() {
+private fun TodoListPreviewLight() {
+    ToDoAppTheme {
+        TodoItemsStateless(
+            items = listOf(
+                TodoItemUi(
+                    id = "1",
+                    text = "Купить хлеб",
+                    importance = ItemImportance.LOW,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    isDone = false,
+                    updateTs = null
+                ),
+                TodoItemUi(
+                    id = "2",
+                    text = "Купить хлеб",
+                    importance = ItemImportance.LOW,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    isDone = false,
+                    updateTs = null
+                ),
+                TodoItemUi(
+                    id = "3",
+                    text = "Купить хлеб важно!",
+                    importance = ItemImportance.HIGH,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = "2022-01-01",
+                    isDone = false,
+                    updateTs = null
+                ),
+            ),
+            showDoneItems = true,
+            reduce = {},
+            clickOnItem = {},
+            clickOnCreate = {},
+        )
+    }
+}
+
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Composable
+private fun TodoListPreviewDark() {
     ToDoAppTheme {
         TodoItemsStateless(
             items = listOf(
@@ -400,3 +486,101 @@ private fun TodoItemListPreview() {
         )
     }
 }
+
+
+@Preview
+@Composable
+private fun TodoItemListPreviewLight() {
+    ToDoAppTheme {
+        Surface {
+            val list = listOf(
+                TodoItemUi(
+                    id = "1",
+                    text = "Купить хлеб",
+                    importance = ItemImportance.COMMON,
+                    isDone = false,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                ),
+                TodoItemUi(
+                    id = "2",
+                    text = "Купить много хлеба",
+                    importance = ItemImportance.HIGH,
+                    isDone = false,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
+                ),
+                TodoItemUi(
+                    id = "3",
+                    text = "Купить много хлеба",
+                    importance = ItemImportance.HIGH,
+                    isDone = true,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
+                )
+            )
+
+            LazyColumn() {
+                items(list, key = { it.id }) { item ->
+                    TodoListItem(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = 48.dp)
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        itemUi = item,
+                        clickOnItem = { },
+                        onChangeStatus = { },
+                        onDelete = { }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Composable
+private fun TodoItemListPreviewDark() {
+    ToDoAppTheme {
+        Surface {
+            val list = listOf(
+                TodoItemUi(
+                    id = "1",
+                    text = "Купить хлеб",
+                    importance = ItemImportance.COMMON,
+                    isDone = false,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                ),
+                TodoItemUi(
+                    id = "2",
+                    text = "Купить много хлеба",
+                    importance = ItemImportance.HIGH,
+                    isDone = false,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
+                ),
+                TodoItemUi(
+                    id = "3",
+                    text = "Купить много хлеба",
+                    importance = ItemImportance.HIGH,
+                    isDone = true,
+                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
+                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
+                )
+            )
+
+            LazyColumn() {
+                items(list, key = { it.id }) { item ->
+                    TodoListItem(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = 48.dp)
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        itemUi = item,
+                        clickOnItem = { },
+                        onChangeStatus = { },
+                        onDelete = { }
+                    )
+                }
+            }
+        }
+    }
+}
+
