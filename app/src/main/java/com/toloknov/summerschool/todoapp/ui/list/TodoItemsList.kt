@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -31,7 +32,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -43,7 +43,6 @@ import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -101,6 +100,7 @@ fun TodoItemsList(
     }
 
     TodoItemsStateless(
+        isLoading = uiState.isLoading,
         items = uiState.items,
         showDoneItems = uiState.showDoneItems,
         reduce = viewModel::reduce,
@@ -113,12 +113,13 @@ fun TodoItemsList(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TodoItemsStateless(
+    isLoading: Boolean = false,
     items: List<TodoItemUi>,
     showDoneItems: Boolean,
     reduce: (TodoItemsListIntent) -> Unit,
     clickOnItem: (itemId: String) -> Unit,
     clickOnCreate: () -> Unit,
-    snackbarHostState: SnackbarHostState = SnackbarHostState()
+    snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) {
     val scrollBehavior = rememberToolbarScrollBehavior()
 
@@ -181,54 +182,68 @@ private fun TodoItemsStateless(
             }
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(
-                top = paddingValues.calculateTopPadding() + PADDING_MEDIUM,
-                bottom = PADDING_BIG * 2
-            )
-        ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-            if (items.isEmpty()) {
-                item {
-                    Box(modifier = Modifier.fillParentMaxSize()) {
-                        Text(
-                            text = stringResource(id = R.string.list_is_empty),
-                            modifier = Modifier.align(Alignment.Center)
+            if (isLoading) {
+                CircularProgressIndicator()
+            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp),
+                contentPadding = PaddingValues(
+                    top = paddingValues.calculateTopPadding() + PADDING_MEDIUM,
+                    bottom = PADDING_BIG * 2
+                )
+            ) {
+                if (items.isEmpty() && !isLoading) {
+                    item {
+                        Box(modifier = Modifier.fillParentMaxSize()) {
+                            Text(
+                                text = stringResource(id = R.string.list_is_empty),
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
+                } else {
+                    item {
+                        if (items.isNotEmpty()){
+                            CornerItem(
+                                clipShape = RoundedCornerShape(
+                                    topStart = PADDING_MEDIUM, topEnd = PADDING_MEDIUM
+                                )
+                            )
+                        }
+                    }
+
+                    items(items, key = { it.id }) { itemUi ->
+                        TodoListItem(
+                            modifier = Modifier
+                                .defaultMinSize(minHeight = 48.dp)
+                                .background(MaterialTheme.colorScheme.surfaceContainer),
+                            itemUi = itemUi,
+                            clickOnItem = { clickOnItem(itemUi.id) },
+                            onChangeStatus = { newStatus ->
+                                reduce(
+                                    TodoItemsListIntent.ChangeItemStatus(
+                                        itemUi.id,
+                                        newStatus
+                                    )
+                                )
+                            },
+                            onDelete = { reduce(TodoItemsListIntent.DeleteItem(itemUi.id)) }
                         )
                     }
-                }
-            } else {
-                item {
-                    CornerItem(
-                        clipShape = RoundedCornerShape(
-                            topStart = PADDING_MEDIUM, topEnd = PADDING_MEDIUM
-                        )
-                    )
-                }
 
-                items(items, key = { it.id }) { itemUi ->
-                    TodoListItem(
-                        modifier = Modifier
-                            .defaultMinSize(minHeight = 48.dp)
-                            .background(MaterialTheme.colorScheme.surfaceContainer),
-                        itemUi = itemUi,
-                        clickOnItem = { clickOnItem(itemUi.id) },
-                        onChangeStatus = { newStatus ->
-                            reduce(TodoItemsListIntent.ChangeItemStatus(itemUi.id, newStatus))
-                        },
-                        onDelete = { reduce(TodoItemsListIntent.DeleteItem(itemUi.id)) }
-                    )
-                }
-
-                item {
-                    CornerItem(
-                        clipShape = RoundedCornerShape(
-                            bottomStart = PADDING_MEDIUM, bottomEnd = PADDING_MEDIUM
-                        )
-                    )
+                    item {
+                        if (items.isNotEmpty()){
+                            CornerItem(
+                                clipShape = RoundedCornerShape(
+                                    bottomStart = PADDING_MEDIUM, bottomEnd = PADDING_MEDIUM
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -366,7 +381,6 @@ fun TodoListItemText(
         LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough) to MaterialTheme.colorScheme.surfaceContainerLowest
     } else {
         LocalTextStyle.current.copy(textDecoration = null) to Color.Unspecified
-
     }
 
     Column(
@@ -446,6 +460,7 @@ private fun TodoListPreviewLight() {
             reduce = {},
             clickOnItem = {},
             clickOnCreate = {},
+            isLoading = false,
         )
     }
 }
@@ -486,7 +501,8 @@ private fun TodoListPreviewDark() {
             showDoneItems = true,
             reduce = {},
             clickOnItem = {},
-            clickOnCreate = {}
+            clickOnCreate = {},
+            isLoading = false
         )
     }
 }

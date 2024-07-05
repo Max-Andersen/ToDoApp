@@ -1,9 +1,7 @@
 package com.toloknov.summerschool.todoapp.data.repository
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
-import com.google.gson.Gson
 import com.toloknov.summerschool.todoapp.NetworkPreferences
 import com.toloknov.summerschool.todoapp.data.local.db.model.toDomain
 import com.toloknov.summerschool.todoapp.data.local.db.model.toEntity
@@ -13,7 +11,6 @@ import com.toloknov.summerschool.todoapp.data.remote.model.ItemTransmitModel
 import com.toloknov.summerschool.todoapp.data.remote.model.toDomain
 import com.toloknov.summerschool.todoapp.data.remote.model.toRest
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
-import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +20,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
-import java.time.Instant
-import java.time.ZoneId
 
 class TodoItemsRepositoryImpl(
     private val api: TodoApi,
@@ -34,13 +28,13 @@ class TodoItemsRepositoryImpl(
 
     private val items = mutableListOf<TodoItemEntity>()
 
-    private val dataFlow: MutableStateFlow<List<TodoItemEntity>> = MutableStateFlow(items)
+    private val localData: MutableStateFlow<List<TodoItemEntity>> = MutableStateFlow(items)
 
     override suspend fun getRemoteItems(): List<TodoItem> = withContext(Dispatchers.IO) {
         val remoteState = api.getAllItems()
         val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
 
-        dataFlow.emit(remoteItems.map { it.toEntity() })
+        localData.emit(remoteItems.map { it.toEntity() })
 
         // save to local
         return@withContext remoteItems
@@ -48,7 +42,7 @@ class TodoItemsRepositoryImpl(
 
     override fun getLocalItems(): Flow<List<TodoItem>> {
         return flow {
-            dataFlow.collect {
+            localData.collect {
                 emit(it.map { it.toDomain() })
             }
         }
@@ -108,11 +102,11 @@ class TodoItemsRepositoryImpl(
                 Result.failure(Exception("Неудачный запрос"))
             }
 
-//            val items = dataFlow.value.toMutableList()
+//            val items = localData.value.toMutableList()
 //            val index = items.indexOfFirst { it.id == item.id }
 //            if (index == -1) return@withContext Result.failure(Exception())
 //            items[index] = item.toEntity()
-//            dataFlow.emit(items)
+//            localData.emit(items)
 //            Result.success(Unit)
 
 
@@ -125,7 +119,7 @@ class TodoItemsRepositoryImpl(
     override suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean): Result<Unit> =
         withContext(Dispatchers.IO) {
             return@withContext try {
-                val items = dataFlow.value.toMutableList()
+                val items = localData.value.toMutableList()
                 val index = items.indexOfFirst { it.id == itemId }
                 if (index == -1) return@withContext Result.failure(Exception("Элемент не найден"))
                 val item = items[index]
@@ -144,7 +138,7 @@ class TodoItemsRepositoryImpl(
                         prefs.toBuilder().setRevision(revision + 1).build()
                     }
                     items[index] = items[index].copy(isDone = isDone)
-                    dataFlow.emit(items)
+                    localData.emit(items)
                     Result.success(Unit)
                 } else {
                     Result.failure(Exception("Неудачный запрос"))
@@ -160,11 +154,11 @@ class TodoItemsRepositoryImpl(
             val revision = networkDataStore.data.first().revision
             val response = api.deleteItemById(id = itemId, revision = revision)
             if (response.isSuccessful) {
-                val items = dataFlow.value.toMutableList()
+                val items = localData.value.toMutableList()
                 val index = items.indexOfFirst { it.id == itemId }
                 if (index == -1) return@withContext Result.failure(Exception("Элемент не найден"))
                 items.removeAt(index)
-                dataFlow.emit(items)
+                localData.emit(items)
                 networkDataStore.updateData { prefs ->
                     prefs.toBuilder().setRevision(revision + 1).build()
                 }
@@ -185,7 +179,28 @@ class TodoItemsRepositoryImpl(
             }
             val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
 
-            dataFlow.emit(remoteItems.map { it.toEntity() })
+            localData.emit(remoteItems.map { it.toEntity() })
+        }
+    }
+
+    override suspend fun syncItemsWithResult(): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            val remoteState = api.getAllItems()
+
+
+            return@withContext if (remoteState.isSuccessful) {
+                remoteState.body()?.revision?.let {
+                    networkDataStore.updateData { prefs ->
+                        prefs.toBuilder().setRevision(it).build()
+                    }
+                }
+                val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
+
+                localData.emit(remoteItems.map { it.toEntity() })
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Ошибка получения данных"))
+            }
         }
     }
 

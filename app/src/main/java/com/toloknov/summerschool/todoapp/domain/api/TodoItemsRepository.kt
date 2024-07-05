@@ -20,6 +20,8 @@ interface TodoItemsRepository {
 
     fun syncItems()
 
+    suspend fun syncItemsWithResult(): Result<Unit>
+
     suspend fun isRemoteRevisionLarger(): Boolean
 
     suspend fun overrideLocalChanges()

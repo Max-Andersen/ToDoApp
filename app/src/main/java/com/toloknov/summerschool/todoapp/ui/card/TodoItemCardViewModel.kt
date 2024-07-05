@@ -1,6 +1,7 @@
 package com.toloknov.summerschool.todoapp.ui.card
 
 import android.util.Log
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -188,6 +189,8 @@ class TodoItemCardViewModel(
 
 
 data class TodoItemCardUiState(
+    val isLoading: Boolean = false,
+
     val isNewItem: Boolean = true,
 
     val text: String = "",
