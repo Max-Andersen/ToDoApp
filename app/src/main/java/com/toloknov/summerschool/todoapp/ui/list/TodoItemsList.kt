@@ -87,6 +87,10 @@ fun TodoItemsList(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = Unit) {
+        viewModel.reduce(TodoItemsListIntent.SyncData)
+    }
+
+    LaunchedEffect(key1 = Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is TodoItemsListEffect.ShowSnackbar -> {

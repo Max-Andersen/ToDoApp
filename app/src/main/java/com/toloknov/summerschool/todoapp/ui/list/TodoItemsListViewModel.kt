@@ -32,7 +32,7 @@ import kotlin.coroutines.coroutineContext
 class TodoItemsListViewModel(
     private val todoItemsRepository: TodoItemsRepository
 ) : ViewModel() {
-    private val allItems = todoItemsRepository.getAllItems()
+//    private val allItems = todoItemsRepository.getRemoteItems()
 
     private val _uiState: MutableStateFlow<TodoItemsListUiState> =
         MutableStateFlow(TodoItemsListUiState())
@@ -46,11 +46,8 @@ class TodoItemsListViewModel(
     }
 
     val uiState: StateFlow<TodoItemsListUiState> =
-        combine(allItems, _uiState) { items, uiState ->
+        combine(todoItemsRepository.getLocalItems(), _uiState) { items, uiState ->
             val itemsToShow = if (uiState.showDoneItems) items else items.filter { !it.isDone }
-
-            // Имитируем загрузку с БД/сети
-            delay(1000L)
 
             TodoItemsListUiState(
                 items = itemsToShow.map { it.toUiModel() },
@@ -81,6 +78,10 @@ class TodoItemsListViewModel(
 
                 is TodoItemsListIntent.ChangeItemStatus -> {
                     todoItemsRepository.setDoneStatusForItem(intent.itemId, intent.newStatus)
+                }
+
+                TodoItemsListIntent.SyncData -> {
+                    todoItemsRepository.syncItems()
                 }
             }
         }
@@ -115,6 +116,7 @@ sealed class TodoItemsListEffect {
 }
 
 sealed class TodoItemsListIntent {
+    data object SyncData: TodoItemsListIntent()
     data object ClickOnShowDoneItems : TodoItemsListIntent()
     data class ChangeItemStatus(val itemId: String, val newStatus: Boolean) : TodoItemsListIntent()
     data class DeleteItem(val itemId: String) : TodoItemsListIntent()

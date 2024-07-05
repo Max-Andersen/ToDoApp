@@ -12,14 +12,8 @@ class ErrorInterceptor(private val gson: Gson) : Interceptor {
         if (response.isSuccessful) {
             return response
         } else {
-            val bodyJson = response.body?.string()
-            val errorMessage =
-                try {
-                    gson.fromJson(bodyJson, ExceptionJson::class.java).message
-                } catch (e: JsonSyntaxException) {
-                    Log.d("JsonParseException", "${e.message}")
-                    null
-                } ?: "JsonParseException! Body: $bodyJson"
+            val message = response.body?.string()
+            Log.d("ErrorInterceptor", message.toString())
             val exception =
                 when (response.code) {
 
@@ -36,11 +30,11 @@ class ErrorInterceptor(private val gson: Gson) : Interceptor {
                     }
 
                     500 -> {
-                        RestException.InternalServerError(errorMessage.ifBlank { "Ошибка сервера" })
+                        RestException.InternalServerError(message?.ifBlank { "Ошибка сервера" })
                     }
 
                     else -> {
-                        RestException.UnexpectedRest(errorMessage.ifBlank { "Пустой ответ" })
+                        RestException.UnexpectedRest(message?.ifBlank { "Пустой ответ" })
                     }
                 }
             response.close()

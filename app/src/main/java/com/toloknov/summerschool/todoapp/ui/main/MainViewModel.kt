@@ -6,16 +6,14 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.toloknov.summerschool.todoapp.TodoApp
-import com.toloknov.summerschool.todoapp.domain.api.AuthRepository
-import com.toloknov.summerschool.todoapp.ui.login.LoginViewModel
-import com.toloknov.summerschool.todoapp.ui.navigation.AppScreen
+import com.toloknov.summerschool.todoapp.domain.api.NetworkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val authRepository: AuthRepository
+    private val networkRepository: NetworkRepository
 ) : ViewModel() {
 
     private val _startDestination: MutableStateFlow<StartDestination?> = MutableStateFlow(null)
@@ -23,7 +21,7 @@ class MainViewModel(
 
     init {
         viewModelScope.launch {
-            val oauthToken = authRepository.getToken()
+            val oauthToken = networkRepository.getToken()
             if (oauthToken.isNotBlank()){
                 _startDestination.emit(StartDestination.LIST)
             } else{

@@ -9,15 +9,11 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.toloknov.summerschool.todoapp.TodoApp
-import com.toloknov.summerschool.todoapp.data.repository.TodoItemsRepositoryImpl
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
-import com.toloknov.summerschool.todoapp.ui.list.TodoItemsListViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -26,7 +22,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -59,20 +54,23 @@ class TodoItemCardViewModel(
     init {
         viewModelScope.launch(Dispatchers.Default + exceptionHandler) {
             itemId?.let {
-                // Имитируем загрузку с БД/сети
-                delay(1000L)
-                val itemData = todoItemsRepository.getById(itemId)
-                itemData?.let { data ->
-                    _uiState.update { lastState ->
-                        lastState.copy(
-                            isNewItem = false,
-                            text = data.text,
-                            isDone = data.isDone,
-                            importance = data.importance,
-                            deadline = data.deadlineTs,
-                            creationTime = data.creationDate
-                        )
+                val itemResult = todoItemsRepository.getById(itemId)
+
+                itemResult.onSuccess { item ->
+                    item?.let { data ->
+                        _uiState.update { lastState ->
+                            lastState.copy(
+                                isNewItem = false,
+                                text = data.text,
+                                isDone = data.isDone,
+                                importance = data.importance,
+                                deadline = data.deadlineTs,
+                                creationTime = data.creationDate
+                            )
+                        }
                     }
+                }.onFailure {
+                    _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка получения напоминания"))
                 }
             }
         }
@@ -108,9 +106,13 @@ class TodoItemCardViewModel(
 
                 is TodoItemCardItent.DeleteTodoItem -> {
                     if (itemId != null) {
-                        todoItemsRepository.removeItem(itemId)
+                        todoItemsRepository.removeItem(itemId).onSuccess {
+                            _effect.emit(TodoItemCardEffect.NavigateBack)
+                        }.onFailure {
+                            _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка удаления"))
+                            Log.d(TAG, "UI GET FAILDE :(((")
+                        }
                     }
-                    _effect.emit(TodoItemCardEffect.NavigateBack)
                 }
 
                 is TodoItemCardItent.SaveTodoItem -> {
@@ -127,7 +129,14 @@ class TodoItemCardViewModel(
                                     deadlineTs = deadline,
                                     updateTs = ZonedDateTime.now(),
                                 )
-                            )
+                            ).onSuccess {
+                                Log.d(TAG, "UI GET SUCCESS!!!")
+                                _effect.emit(TodoItemCardEffect.NavigateBack)
+                            }.onFailure {
+                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Произошла ошибка"))
+                                Log.d(TAG, "UI GET FAILDE :(((")
+                                Log.d(TAG, it.stackTraceToString())
+                            }
                         } else {
                             // Невозможное состояние, но кто его знает
                             val currentItemId = requireNotNull(itemId)
@@ -142,11 +151,13 @@ class TodoItemCardViewModel(
                                     deadlineTs = deadline,
                                     updateTs = ZonedDateTime.now(),
                                 )
-                            )
+                            ).onSuccess {
+                                _effect.emit(TodoItemCardEffect.NavigateBack)
+                            }.onFailure {
+                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка обновления напоминания"))
+                            }
                         }
-
                     }
-                    _effect.emit(TodoItemCardEffect.NavigateBack)
                 }
             }
         }

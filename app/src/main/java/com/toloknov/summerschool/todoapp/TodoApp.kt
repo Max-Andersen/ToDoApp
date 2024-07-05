@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import com.google.gson.Gson
@@ -13,12 +12,11 @@ import com.toloknov.summerschool.todoapp.data.local.datastore.NetworkPreferences
 import com.toloknov.summerschool.todoapp.data.remote.TodoApi
 import com.toloknov.summerschool.todoapp.data.remote.utils.ErrorInterceptor
 import com.toloknov.summerschool.todoapp.data.remote.utils.OAuthInterceptor
-import com.toloknov.summerschool.todoapp.data.repository.AuthRepositoryImpl
+import com.toloknov.summerschool.todoapp.data.repository.NetworkRepositoryImpl
 import com.toloknov.summerschool.todoapp.data.repository.TodoItemsRepositoryImpl
 import com.toloknov.summerschool.todoapp.di.DIContainer
 import com.toloknov.summerschool.todoapp.di.InnerDIDependencies
-import com.toloknov.summerschool.todoapp.domain.api.AuthRepository
-import com.toloknov.summerschool.todoapp.NetworkPreferences
+import com.toloknov.summerschool.todoapp.domain.api.NetworkRepository
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -34,7 +32,7 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
     )
 
     private lateinit var todoItemsRepository: TodoItemsRepository
-    private lateinit var authRepository: AuthRepository
+    private lateinit var networkRepository: NetworkRepository
     private lateinit var oAuthInterceptor: OAuthInterceptor
     private lateinit var errorInterceptor: ErrorInterceptor
     private lateinit var retrofit: Retrofit
@@ -47,9 +45,10 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
         initInternet()
 
         todoItemsRepository = TodoItemsRepositoryImpl(
-            this.getTodoApi()
+            this.getTodoApi(),
+            this.getNetworkDataStore()
         )
-        authRepository = AuthRepositoryImpl(
+        networkRepository = NetworkRepositoryImpl(
             this.getNetworkDataStore()
         )
 
@@ -122,7 +121,7 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
 
     override fun getTodoItemsRepository(): TodoItemsRepository = todoItemsRepository
 
-    override fun getAuthRepository(): AuthRepository = authRepository
+    override fun getAuthRepository(): NetworkRepository = networkRepository
 
     override fun getNetworkDataStore(): DataStore<NetworkPreferences> = networkDatastore
 

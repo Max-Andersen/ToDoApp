@@ -1,11 +1,12 @@
 package com.toloknov.summerschool.todoapp.data.remote.model
 
-import kotlinx.serialization.SerialName
+import com.google.gson.annotations.SerializedName
+import com.toloknov.summerschool.todoapp.data.remote.utils.NullableIntSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ItemTransmitModel(
-    @SerialName("ok") val ok: Boolean,
-    @SerialName("element") val element: ItemData,
-    @SerialName("revision") val revision: Int? = null
+    @SerializedName("ok") val ok: Boolean,
+    @SerializedName("element") val element: ItemData,
+    @SerializedName("revision") @Serializable(with = NullableIntSerializer::class) val revision: Int? = null
 )

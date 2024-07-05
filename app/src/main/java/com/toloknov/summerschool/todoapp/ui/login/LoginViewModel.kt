@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.toloknov.summerschool.todoapp.TodoApp
-import com.toloknov.summerschool.todoapp.domain.api.AuthRepository
+import com.toloknov.summerschool.todoapp.domain.api.NetworkRepository
 import com.yandex.authsdk.YandexAuthResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val authRepository: AuthRepository
+    private val networkRepository: NetworkRepository
 ) : ViewModel() {
 
     // Решил не гороздить тут полноценный MVI (как во всё проекте), т.к. этот экран простой и расти не будет
@@ -31,7 +31,7 @@ class LoginViewModel(
             when (result) {
                 is YandexAuthResult.Success -> {
                     Log.d(TAG, "Success -> token: ${result.token.value}")
-                    authRepository.saveToken(result.token.value)
+                    networkRepository.saveToken(result.token.value)
                     _authSuccess.emit(true)
                 }
                 is YandexAuthResult.Failure -> {

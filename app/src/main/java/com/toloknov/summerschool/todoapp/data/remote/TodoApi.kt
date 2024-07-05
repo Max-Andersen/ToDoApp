@@ -13,6 +13,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface TodoApi {
+
     @GET("list")
     suspend fun getAllItems(): Response<ItemsListTransmitModel>
 
@@ -23,24 +24,26 @@ interface TodoApi {
 
     @PATCH("list")
     suspend fun updateItems(
-        @Header("X-Last-Known-Revision:") revision: Int,
+        @Header("X-Last-Known-Revision") revision: Int,
         @Body body: ItemsListTransmitModel
     ): Response<ItemsListTransmitModel>
 
     @POST("list")
     suspend fun addItem(
-        @Header("X-Last-Known-Revision:") revision: Int,
+        @Header("X-Last-Known-Revision") revision: Int,
         @Body body: ItemTransmitModel
     ): Response<ItemTransmitModel>
 
     @PUT("list/{id}")
     suspend fun updateItemById(
         @Path("id") id: String,
+        @Header("X-Last-Known-Revision") revision: Int,
         @Body body: ItemTransmitModel
     ): Response<ItemTransmitModel>
 
     @DELETE("list/{id}")
     suspend fun deleteItemById(
-        @Path("id") id: String
+        @Path("id") id: String,
+        @Header("X-Last-Known-Revision") revision: Int,
     ): Response<ItemTransmitModel>
 }
