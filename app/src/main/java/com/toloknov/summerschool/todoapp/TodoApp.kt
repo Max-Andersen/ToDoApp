@@ -69,6 +69,7 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
             .build()
 
         // Создаем запрос на периодическую работу
+        // Api WorkManager не обещает выполнить ровно через 8 часов, но обещается когда-нибудь точно выполнить
         val workRequest = PeriodicWorkRequestBuilder<SyncWorker>(8, TimeUnit.HOURS)
             .setConstraints(constraints)
             .build()

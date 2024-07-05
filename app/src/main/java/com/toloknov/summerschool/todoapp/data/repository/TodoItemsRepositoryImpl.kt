@@ -21,6 +21,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Вся жесть и манипулирование [localData] в этом репозитории - зашлушка работы с БД
+ * Как подключу Room код станет очевидно лакониченее, но в этом ТЗ БД не обязательна
+ *
+ * то что тут в зависимостях и DataStore<NetworkPreferences> ещё не ломает Single reponsibility
+ * нельзя, чтобы репозиторий использовал репозиторий, а вот если оба имеют доступ к одному ресурсу, то нормально
+ */
 class TodoItemsRepositoryImpl(
     private val api: TodoApi,
     private val networkDataStore: DataStore<NetworkPreferences>
@@ -72,9 +79,7 @@ class TodoItemsRepositoryImpl(
             val response = api.addItem(revision, model)
 
             if (response.isSuccessful) {
-                networkDataStore.updateData { prefs ->
-                    prefs.toBuilder().setRevision(revision + 1).build()
-                }
+                updateRevisionInDataStore(revision + 1)
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("неудачный запрос"))
@@ -96,26 +101,14 @@ class TodoItemsRepositoryImpl(
             val response = api.updateItemById(id = item.id, revision = revision, body = model)
 
             if (response.isSuccessful) {
-                networkDataStore.updateData { prefs ->
-                    prefs.toBuilder().setRevision(revision + 1).build()
-                }
+                updateRevisionInDataStore(revision + 1)
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("Неудачный запрос"))
             }
-
-//            val items = localData.value.toMutableList()
-//            val index = items.indexOfFirst { it.id == item.id }
-//            if (index == -1) return@withContext Result.failure(Exception())
-//            items[index] = item.toEntity()
-//            localData.emit(items)
-//            Result.success(Unit)
-
-
         } catch (e: IOException) {
             Result.failure(e)
         }
-
     }
 
     override suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean): Result<Unit> =
@@ -136,9 +129,7 @@ class TodoItemsRepositoryImpl(
                 val response = api.updateItemById(id = item.id, revision = revision, body = model)
 
                 if (response.isSuccessful) {
-                    networkDataStore.updateData { prefs ->
-                        prefs.toBuilder().setRevision(revision + 1).build()
-                    }
+                    updateRevisionInDataStore(revision + 1)
                     items[index] = items[index].copy(isDone = isDone)
                     localData.emit(items)
                     Result.success(Unit)
@@ -161,9 +152,7 @@ class TodoItemsRepositoryImpl(
                 if (index == -1) return@withContext Result.failure(Exception("Элемент не найден"))
                 items.removeAt(index)
                 localData.emit(items)
-                networkDataStore.updateData { prefs ->
-                    prefs.toBuilder().setRevision(revision + 1).build()
-                }
+                updateRevisionInDataStore(revision + 1)
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("Неудачный запрос"))
@@ -177,7 +166,7 @@ class TodoItemsRepositoryImpl(
         CoroutineScope(Dispatchers.IO).launch {
             val remoteState = api.getAllItems()
             remoteState.body()?.revision?.let {
-                networkDataStore.updateData { prefs -> prefs.toBuilder().setRevision(it).build() }
+                updateRevisionInDataStore(it)
             }
             val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
 
@@ -191,9 +180,7 @@ class TodoItemsRepositoryImpl(
 
             return@withContext if (remoteState.isSuccessful) {
                 remoteState.body()?.revision?.let {
-                    networkDataStore.updateData { prefs ->
-                        prefs.toBuilder().setRevision(it).build()
-                    }
+                    updateRevisionInDataStore(it)
                 }
                 val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
 
@@ -205,11 +192,19 @@ class TodoItemsRepositoryImpl(
         }
     }
 
+    private suspend fun updateRevisionInDataStore(revision: Int){
+        networkDataStore.updateData { prefs ->
+            prefs.toBuilder().setRevision(revision).build()
+        }
+    }
+
     override suspend fun isRemoteRevisionLarger(): Boolean {
+        // задел на будущее
         TODO("Not yet implemented")
     }
 
     override suspend fun overrideLocalChanges() {
+        // задел на будущее
         TODO("Not yet implemented")
     }
 }

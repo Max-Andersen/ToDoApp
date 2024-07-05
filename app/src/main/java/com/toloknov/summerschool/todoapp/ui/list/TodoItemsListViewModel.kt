@@ -48,9 +48,6 @@ class TodoItemsListViewModel(
         combine(todoItemsRepository.getLocalItems(), _uiState) { items, uiState ->
             val itemsToShow = if (uiState.showDoneItems) items else items.filter { !it.isDone }
 
-            Log.d(TAG, uiState.isLoading.toString())
-            Log.d(TAG, items.size.toString())
-
             TodoItemsListUiState(
                 isLoading = uiState.isLoading,
                 items = itemsToShow.map { it.toUiModel() },
@@ -138,5 +135,4 @@ sealed class TodoItemsListIntent {
     data object ClickOnShowDoneItems : TodoItemsListIntent()
     data class ChangeItemStatus(val itemId: String, val newStatus: Boolean) : TodoItemsListIntent()
     data class DeleteItem(val itemId: String) : TodoItemsListIntent()
-
 }

@@ -18,7 +18,7 @@ class LoginViewModel(
     private val networkRepository: NetworkRepository
 ) : ViewModel() {
 
-    // Решил не гороздить тут полноценный MVI (как во всё проекте), т.к. этот экран простой и расти не будет
+    // Решил не гороздить тут полноценный MVI (как во всём проекте), т.к. этот экран простой и расти не будет
 
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
     val errorMessage = _errorMessage.asStateFlow()

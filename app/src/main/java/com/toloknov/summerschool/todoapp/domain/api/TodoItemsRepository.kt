@@ -18,6 +18,8 @@ interface TodoItemsRepository {
 
     suspend fun removeItem(itemId: String): Result<Unit>
 
+    // Отдельные методы, т.к. не suspend будет вызываться при переодической синхронизации
+    // а от suspend нужен результат
     fun syncItems()
 
     suspend fun syncItemsWithResult(): Result<Unit>

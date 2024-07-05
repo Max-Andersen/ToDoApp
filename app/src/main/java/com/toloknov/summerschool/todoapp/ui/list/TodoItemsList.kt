@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
@@ -182,8 +183,8 @@ private fun TodoItemsStateless(
             }
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             if (isLoading) {
                 CircularProgressIndicator()
             }
@@ -197,24 +198,14 @@ private fun TodoItemsStateless(
                 )
             ) {
                 if (items.isEmpty() && !isLoading) {
-                    item {
-                        Box(modifier = Modifier.fillParentMaxSize()) {
-                            Text(
-                                text = stringResource(id = R.string.list_is_empty),
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    }
+                    ListEmpty()
                 } else {
-                    item {
-                        if (items.isNotEmpty()){
-                            CornerItem(
-                                clipShape = RoundedCornerShape(
-                                    topStart = PADDING_MEDIUM, topEnd = PADDING_MEDIUM
-                                )
-                            )
-                        }
-                    }
+                    ConterItem(
+                        isListEmpty = items.isEmpty(),
+                        roundedCornerShape = RoundedCornerShape(
+                            topStart = PADDING_MEDIUM, topEnd = PADDING_MEDIUM
+                        )
+                    )
 
                     items(items, key = { it.id }) { itemUi ->
                         TodoListItem(
@@ -235,17 +226,44 @@ private fun TodoItemsStateless(
                         )
                     }
 
-                    item {
-                        if (items.isNotEmpty()){
-                            CornerItem(
-                                clipShape = RoundedCornerShape(
-                                    bottomStart = PADDING_MEDIUM, bottomEnd = PADDING_MEDIUM
-                                )
-                            )
-                        }
-                    }
+                    ConterItem(
+                        isListEmpty = items.isEmpty(),
+                        roundedCornerShape = RoundedCornerShape(
+                            bottomStart = PADDING_MEDIUM, bottomEnd = PADDING_MEDIUM
+                        )
+                    )
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+private fun LazyListScope.ConterItem(
+    isListEmpty: Boolean,
+    roundedCornerShape: RoundedCornerShape
+) {
+    item {
+        if (!isListEmpty) {
+            Box(
+                modifier = Modifier
+                    .height(PADDING_SMALL)
+                    .fillMaxWidth()
+                    .clip(roundedCornerShape)
+                    .animateItemPlacement()
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+            )
+        }
+    }
+}
+
+private fun LazyListScope.ListEmpty() {
+    item {
+        Box(modifier = Modifier.fillParentMaxSize()) {
+            Text(
+                text = stringResource(id = R.string.list_is_empty),
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
     }
 }
@@ -265,21 +283,6 @@ private fun ShowDoneItemsIcon(
             tint = MaterialTheme.colorScheme.primaryContainer
         )
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun LazyItemScope.CornerItem(
-    clipShape: RoundedCornerShape
-) {
-    Box(
-        modifier = Modifier
-            .height(PADDING_SMALL)
-            .fillMaxWidth()
-            .clip(clipShape)
-            .animateItemPlacement()
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -368,7 +371,6 @@ private fun LazyItemScope.TodoListItem(
             )
         }
     }
-
 }
 
 @Composable

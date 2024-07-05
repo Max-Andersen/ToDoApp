@@ -12,7 +12,7 @@ class SyncWorker(
 ) : Worker(appContext, workerParams) {
 
     override fun doWork(): Result {
-        val diContainer = (applicationContext as TodoApp) as DIContainer
+        val diContainer = applicationContext as DIContainer
         val repository = diContainer.getTodoItemsRepository()
         repository.syncItems()
         return Result.success()
