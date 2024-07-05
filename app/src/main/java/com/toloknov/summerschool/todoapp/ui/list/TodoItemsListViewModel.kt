@@ -124,7 +124,7 @@ class TodoItemsListViewModel(
 }
 
 data class TodoItemsListUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val items: List<TodoItemUi> = emptyList(),
     val showDoneItems: Boolean = true
 )

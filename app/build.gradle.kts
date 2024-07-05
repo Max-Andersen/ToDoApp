@@ -107,6 +107,9 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
 
+    // WorkManager for periodic or single work
+    implementation(libs.androidx.work.runtime.ktx)
+
     // Debug
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
@@ -118,11 +121,9 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
-
     // OAuth
     implementation(libs.authsdk)
 
     // Splash Screen API
     implementation(libs.androidx.core.splashscreen)
-
 }

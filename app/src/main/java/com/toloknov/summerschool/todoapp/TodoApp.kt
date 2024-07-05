@@ -7,11 +7,17 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.toloknov.summerschool.todoapp.data.local.datastore.NetworkPreferencesSerializer
 import com.toloknov.summerschool.todoapp.data.remote.TodoApi
 import com.toloknov.summerschool.todoapp.data.remote.utils.ErrorInterceptor
 import com.toloknov.summerschool.todoapp.data.remote.utils.OAuthInterceptor
+import com.toloknov.summerschool.todoapp.data.remote.utils.SyncWorker
 import com.toloknov.summerschool.todoapp.data.repository.NetworkRepositoryImpl
 import com.toloknov.summerschool.todoapp.data.repository.TodoItemsRepositoryImpl
 import com.toloknov.summerschool.todoapp.di.DIContainer
@@ -53,6 +59,26 @@ class TodoApp : Application(), DIContainer, InnerDIDependencies {
         )
 
         initInternetAvailableWork()
+        schedulePeriodicWork()
+    }
+
+    private fun schedulePeriodicWork() {
+        // Создаем ограничения
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        // Создаем запрос на периодическую работу
+        val workRequest = PeriodicWorkRequestBuilder<SyncWorker>(8, TimeUnit.HOURS)
+            .setConstraints(constraints)
+            .build()
+
+        // Запускаем работу
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            "SyncPeriodicWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
     }
 
 

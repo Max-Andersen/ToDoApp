@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -103,6 +104,7 @@ fun TodoItemCard(
     }
 
     TodoItemCardStateless(
+        isLoading = uiState.isLoading,
         uiState = uiState,
         onBackClick = onBackClick,
         reduce = viewModel::reduce,
@@ -117,6 +119,7 @@ fun TodoItemCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoItemCardStateless(
+    isLoading: Boolean,
     uiState: TodoItemCardUiState,
     onBackClick: () -> Unit,
     reduce: (TodoItemCardItent) -> Unit,
@@ -171,49 +174,59 @@ fun TodoItemCardStateless(
             }
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())
-                .padding(horizontal = PADDING_BIG)
-                .verticalScroll(rememberScrollState())
-
+                .padding(top = paddingValues.calculateTopPadding()),
+            contentAlignment = Alignment.Center
         ) {
-            Spacer(modifier = Modifier.size(PADDING_MEDIUM))
-            // Чтобы при каждой рекомпозиции мы этот список снова не собирали
-            val importanceItems = remember {
-                ItemImportance.values()
+
+            if (isLoading) {
+                CircularProgressIndicator()
             }
 
-            InputTodoText(
-                uiState = uiState,
-                reduce = reduce
-            )
-            Spacer(modifier = Modifier.size(PADDING_BIG))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = PADDING_BIG)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Spacer(modifier = Modifier.size(PADDING_MEDIUM))
+                // Чтобы при каждой рекомпозиции мы этот список снова не собирали
+                val importanceItems = remember {
+                    ItemImportance.values()
+                }
 
-            ImportanceBlock(
-                uiState = uiState,
-                importanceItems = importanceItems,
-                reduce = reduce
-            )
-            Spacer(modifier = Modifier.size(PADDING_BIG))
-            HorizontalDivider()
+                InputTodoText(
+                    uiState = uiState,
+                    reduce = reduce
+                )
+                Spacer(modifier = Modifier.size(PADDING_BIG))
 
-            Spacer(modifier = Modifier.size(PADDING_BIG))
-            SelectDeadline(
-                uiState = uiState,
-                openDialog = { firstDateDialogState = true },
-                reduce = reduce
-            )
+                ImportanceBlock(
+                    uiState = uiState,
+                    importanceItems = importanceItems,
+                    reduce = reduce
+                )
+                Spacer(modifier = Modifier.size(PADDING_BIG))
+                HorizontalDivider()
 
-            Spacer(modifier = Modifier.size(PADDING_BIG))
-            HorizontalDivider()
-            Spacer(modifier = Modifier.size(PADDING_BIG))
+                Spacer(modifier = Modifier.size(PADDING_BIG))
+                SelectDeadline(
+                    uiState = uiState,
+                    openDialog = { firstDateDialogState = true },
+                    reduce = reduce
+                )
+
+                Spacer(modifier = Modifier.size(PADDING_BIG))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.size(PADDING_BIG))
 
 
-            DeleteSection(uiState, reduce)
+                DeleteSection(uiState, reduce)
 
-            Spacer(modifier = Modifier.size(PADDING_BIG * 2))
+                Spacer(modifier = Modifier.size(PADDING_BIG * 2))
+            }
         }
     }
 }
@@ -415,7 +428,8 @@ private fun TodoItemCardPreviewLight() {
         TodoItemCardStateless(
             uiState = TodoItemCardUiState(),
             onBackClick = { },
-            reduce = {}
+            reduce = {},
+            isLoading = false
         )
     }
 }
@@ -427,7 +441,8 @@ private fun TodoItemCardPreviewDark() {
         TodoItemCardStateless(
             uiState = TodoItemCardUiState(),
             onBackClick = { },
-            reduce = {}
+            reduce = {},
+            isLoading = false
         )
     }
 }

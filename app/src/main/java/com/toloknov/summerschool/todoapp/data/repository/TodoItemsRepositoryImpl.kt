@@ -50,9 +50,11 @@ class TodoItemsRepositoryImpl(
 
     override suspend fun getById(itemId: String): Result<TodoItem?> = withContext(Dispatchers.IO) {
         return@withContext try {
-            val remoteItem = api.getItemById(itemId)
-            remoteItem.body().let {
-                return@withContext Result.success(it?.element?.toDomain())
+            val remoteItemResponse = api.getItemById(itemId)
+            if (remoteItemResponse.isSuccessful) {
+                Result.success(remoteItemResponse.body()?.element?.toDomain())
+            } else {
+                Result.failure(Exception("Ошибка получения напоминания"))
             }
         } catch (e: IOException) {
             Result.failure(e)
@@ -186,7 +188,6 @@ class TodoItemsRepositoryImpl(
     override suspend fun syncItemsWithResult(): Result<Unit> {
         return withContext(Dispatchers.IO) {
             val remoteState = api.getAllItems()
-
 
             return@withContext if (remoteState.isSuccessful) {
                 remoteState.body()?.revision?.let {
