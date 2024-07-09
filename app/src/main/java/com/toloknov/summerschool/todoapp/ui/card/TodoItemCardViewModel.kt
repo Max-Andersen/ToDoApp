@@ -1,6 +1,7 @@
 package com.toloknov.summerschool.todoapp.ui.card
 
 import android.util.Log
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,15 +10,11 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.toloknov.summerschool.todoapp.TodoApp
-import com.toloknov.summerschool.todoapp.data.repository.TodoItemsRepositoryImpl
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
-import com.toloknov.summerschool.todoapp.ui.list.TodoItemsListViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -26,12 +23,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import java.time.ZonedDateTime
 import java.util.UUID
 
 class TodoItemCardViewModel(
-    private val todoItemsRepository: TodoItemsRepository = TodoItemsRepositoryImpl(),
+    private val todoItemsRepository: TodoItemsRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -53,28 +49,30 @@ class TodoItemCardViewModel(
         }
     }
 
-    // Если не сделать тут delay, то из-за очень быстрой работы с мок-данными, effect на отображение снекбара улетит до подписки экраном на shared flow
-    // есть решение replay = 1, чтобы дублировать пропущенные события, но выглядит больше костылём
-    // так что в будущем добавлю progres bar
     init {
         viewModelScope.launch(Dispatchers.Default + exceptionHandler) {
             itemId?.let {
-                // Имитируем загрузку с БД/сети
-                delay(1000L)
-                val itemData = todoItemsRepository.getById(itemId)
-                itemData?.let { data ->
-                    _uiState.update { lastState ->
-                        lastState.copy(
-                            isNewItem = false,
-                            text = data.text,
-                            isDone = data.isDone,
-                            importance = data.importance,
-                            deadline = data.deadlineTs,
-                            creationTime = data.creationDate
-                        )
+                _uiState.update { prevState -> prevState.copy(isLoading = true) }
+                val itemResult = todoItemsRepository.getById(itemId)
+
+                itemResult.onSuccess { item ->
+                    item?.let { data ->
+                        _uiState.update { lastState ->
+                            lastState.copy(
+                                isNewItem = false,
+                                text = data.text,
+                                isDone = data.isDone,
+                                importance = data.importance,
+                                deadline = data.deadlineTs,
+                                creationTime = data.creationDate
+                            )
+                        }
                     }
+                }.onFailure {
+                    _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка получения информации"))
                 }
             }
+            _uiState.update { prevState -> prevState.copy(isLoading = false) }
         }
     }
 
@@ -108,14 +106,19 @@ class TodoItemCardViewModel(
 
                 is TodoItemCardItent.DeleteTodoItem -> {
                     if (itemId != null) {
-                        todoItemsRepository.removeItem(itemId)
+                        _uiState.update { prevState -> prevState.copy(isLoading = true) }
+                        todoItemsRepository.removeItem(itemId).onSuccess {
+                            _effect.emit(TodoItemCardEffect.NavigateBack)
+                        }.onFailure {
+                            _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка удаления"))
+                        }
+                        _uiState.update { prevState -> prevState.copy(isLoading = false) }
                     }
-                    _effect.emit(TodoItemCardEffect.NavigateBack)
                 }
 
                 is TodoItemCardItent.SaveTodoItem -> {
-
                     with(_uiState.value) {
+                        _uiState.update { prevState -> prevState.copy(isLoading = true) }
                         if (isNewItem) {
                             todoItemsRepository.addItem(
                                 TodoItem(
@@ -127,10 +130,13 @@ class TodoItemCardViewModel(
                                     deadlineTs = deadline,
                                     updateTs = ZonedDateTime.now(),
                                 )
-                            )
+                            ).onSuccess {
+                                _effect.emit(TodoItemCardEffect.NavigateBack)
+                            }.onFailure {
+                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Произошла ошибка"))
+                            }
                         } else {
-                            // Невозможное состояние, но кто его знает
-                            val currentItemId = requireNotNull(itemId)
+                            val currentItemId = requireNotNull(itemId) // Невозможное состояние, но кто его знает
                             val currentItemCreationDate = requireNotNull(creationTime)
                             todoItemsRepository.updateItem(
                                 TodoItem(
@@ -142,11 +148,14 @@ class TodoItemCardViewModel(
                                     deadlineTs = deadline,
                                     updateTs = ZonedDateTime.now(),
                                 )
-                            )
+                            ).onSuccess {
+                                _effect.emit(TodoItemCardEffect.NavigateBack)
+                            }.onFailure {
+                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка обновления напоминания"))
+                            }
                         }
-
+                        _uiState.update { prevState -> prevState.copy(isLoading = false) }
                     }
-                    _effect.emit(TodoItemCardEffect.NavigateBack)
                 }
             }
         }
@@ -177,6 +186,8 @@ class TodoItemCardViewModel(
 
 
 data class TodoItemCardUiState(
+    val isLoading: Boolean = true,
+
     val isNewItem: Boolean = true,
 
     val text: String = "",

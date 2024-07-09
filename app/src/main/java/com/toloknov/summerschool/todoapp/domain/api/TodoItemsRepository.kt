@@ -4,15 +4,27 @@ import com.toloknov.summerschool.todoapp.domain.model.TodoItem
 import kotlinx.coroutines.flow.Flow
 
 interface TodoItemsRepository {
-    fun getAllItems(): Flow<List<TodoItem>>
+    suspend fun getRemoteItems(): List<TodoItem>
 
-    suspend fun getById(itemId: String): TodoItem?
+    fun getLocalItems(): Flow<List<TodoItem>>
 
-    suspend fun addItem(item: TodoItem)
+    suspend fun getById(itemId: String): Result<TodoItem?>
 
-    suspend fun updateItem(item: TodoItem)
+    suspend fun addItem(item: TodoItem): Result<Unit>
 
-    suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean)
+    suspend fun updateItem(item: TodoItem): Result<Unit>
 
-    suspend fun removeItem(itemId: String)
+    suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean): Result<Unit>
+
+    suspend fun removeItem(itemId: String): Result<Unit>
+
+    // Отдельные методы, т.к. не suspend будет вызываться при переодической синхронизации
+    // а от suspend нужен результат
+    fun syncItems()
+
+    suspend fun syncItemsWithResult(): Result<Unit>
+
+    suspend fun isRemoteRevisionLarger(): Boolean
+
+    suspend fun overrideLocalChanges()
 }

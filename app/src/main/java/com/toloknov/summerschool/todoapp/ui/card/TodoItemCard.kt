@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -103,6 +104,7 @@ fun TodoItemCard(
     }
 
     TodoItemCardStateless(
+        isLoading = uiState.isLoading,
         uiState = uiState,
         onBackClick = onBackClick,
         reduce = viewModel::reduce,
@@ -117,6 +119,7 @@ fun TodoItemCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoItemCardStateless(
+    isLoading: Boolean,
     uiState: TodoItemCardUiState,
     onBackClick: () -> Unit,
     reduce: (TodoItemCardItent) -> Unit,
@@ -129,19 +132,16 @@ fun TodoItemCardStateless(
 
 
     if (firstDateDialogState) {
-        DateDialog(
-            currPickedDate = uiState.deadline,
+        DateDialog(currPickedDate = uiState.deadline,
             onConfirmButtonClick = { reduce(TodoItemCardItent.SetDeadline(it)) },
             onDismissRequest = {
                 firstDateDialogState = false
-            }
-        )
+            })
     }
 
-    Scaffold(
-        modifier = Modifier
-            .systemBarsPadding()
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+    Scaffold(modifier = Modifier
+        .systemBarsPadding()
+        .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             CollapsingTopbar(
                 modifier = Modifier,
@@ -160,68 +160,68 @@ fun TodoItemCardStateless(
         containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = {
             Box(modifier = Modifier.safeDrawingPadding()) {
-                SnackbarHost(
-                    hostState = snackbarHostState,
+                SnackbarHost(hostState = snackbarHostState,
                     snackbar = { snackbarData: SnackbarData ->
-                        SnackbarError(
-                            text = snackbarData.visuals.message,
-                            onClick = { snackbarHostState.currentSnackbarData?.dismiss() }
-                        )
+                        SnackbarError(text = snackbarData.visuals.message,
+                            onClick = { snackbarHostState.currentSnackbarData?.dismiss() })
                     })
             }
-        }
-    ) { paddingValues ->
-        Column(
+        }) { paddingValues ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())
-                .padding(horizontal = PADDING_BIG)
-                .verticalScroll(rememberScrollState())
-
+                .padding(top = paddingValues.calculateTopPadding()),
+            contentAlignment = Alignment.Center
         ) {
-            Spacer(modifier = Modifier.size(PADDING_MEDIUM))
-            // Чтобы при каждой рекомпозиции мы этот список снова не собирали
-            val importanceItems = remember {
-                ItemImportance.values()
+
+            if (isLoading) {
+                CircularProgressIndicator()
             }
 
-            InputTodoText(
-                uiState = uiState,
-                reduce = reduce
-            )
-            Spacer(modifier = Modifier.size(PADDING_BIG))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = PADDING_BIG)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Spacer(modifier = Modifier.size(PADDING_MEDIUM))
+                // Чтобы при каждой рекомпозиции мы этот список снова не собирали
+                val importanceItems = remember {
+                    ItemImportance.values()
+                }
 
-            ImportanceBlock(
-                uiState = uiState,
-                importanceItems = importanceItems,
-                reduce = reduce
-            )
-            Spacer(modifier = Modifier.size(PADDING_BIG))
-            HorizontalDivider()
+                InputTodoText(
+                    uiState = uiState, reduce = reduce
+                )
+                Spacer(modifier = Modifier.size(PADDING_BIG))
 
-            Spacer(modifier = Modifier.size(PADDING_BIG))
-            SelectDeadline(
-                uiState = uiState,
-                openDialog = { firstDateDialogState = true },
-                reduce = reduce
-            )
+                ImportanceBlock(
+                    uiState = uiState, importanceItems = importanceItems, reduce = reduce
+                )
+                Spacer(modifier = Modifier.size(PADDING_BIG))
+                HorizontalDivider()
 
-            Spacer(modifier = Modifier.size(PADDING_BIG))
-            HorizontalDivider()
-            Spacer(modifier = Modifier.size(PADDING_BIG))
+                Spacer(modifier = Modifier.size(PADDING_BIG))
+                SelectDeadline(
+                    uiState = uiState, openDialog = { firstDateDialogState = true }, reduce = reduce
+                )
+
+                Spacer(modifier = Modifier.size(PADDING_BIG))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.size(PADDING_BIG))
 
 
-            DeleteSection(uiState, reduce)
+                DeleteSection(uiState, reduce)
 
-            Spacer(modifier = Modifier.size(PADDING_BIG * 2))
+                Spacer(modifier = Modifier.size(PADDING_BIG * 2))
+            }
         }
     }
 }
 
 @Composable
 private fun DeleteSection(
-    uiState: TodoItemCardUiState,
-    reduce: (TodoItemCardItent) -> Unit
+    uiState: TodoItemCardUiState, reduce: (TodoItemCardItent) -> Unit
 ) {
     val deleteSectionColor = if (uiState.isNewItem) {
         MaterialTheme.colorScheme.surfaceContainerLowest
@@ -233,15 +233,11 @@ private fun DeleteSection(
         modifier = Modifier
             .defaultMinSize(minHeight = PADDING_LARGE)
             .clip(RoundedCornerShape(PADDING_MEDIUM))
-            .clickable(enabled = !uiState.isNewItem) {
-                reduce(TodoItemCardItent.DeleteTodoItem)
-            },
+            .clickable(enabled = !uiState.isNewItem) { reduce(TodoItemCardItent.DeleteTodoItem) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Default.Delete,
-            contentDescription = null,
-            tint = deleteSectionColor
+            imageVector = Icons.Default.Delete, contentDescription = null, tint = deleteSectionColor
         )
         Text(text = stringResource(id = R.string.delete), color = deleteSectionColor)
     }
@@ -249,9 +245,7 @@ private fun DeleteSection(
 
 @Composable
 private fun SelectDeadline(
-    uiState: TodoItemCardUiState,
-    openDialog: () -> Unit,
-    reduce: (TodoItemCardItent) -> Unit
+    uiState: TodoItemCardUiState, openDialog: () -> Unit, reduce: (TodoItemCardItent) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -295,34 +289,28 @@ private fun ImportanceBlock(
                 color = if (uiState.importance == ItemImportance.HIGH) MaterialTheme.colorScheme.TodoRed else Color.Unspecified
             )
         }
-        DropdownMenu(
-            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer),
+        DropdownMenu(modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer),
             expanded = dropDownExpanded,
             onDismissRequest = { dropDownExpanded = false }) {
             importanceItems.forEach { item ->
                 if (item == ItemImportance.HIGH) {
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = "!! ${item.nameRu}",
-                                color = Color.Red
-                            )
-                        },
-                        onClick = {
-                            reduce(TodoItemCardItent.SetImportance(item))
-                            dropDownExpanded = false
-                        })
+                    DropdownMenuItem(text = {
+                        Text(
+                            text = "!! ${item.nameRu}", color = Color.Red
+                        )
+                    }, onClick = {
+                        reduce(TodoItemCardItent.SetImportance(item))
+                        dropDownExpanded = false
+                    })
                 } else {
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = item.nameRu,
-                            )
-                        },
-                        onClick = {
-                            reduce(TodoItemCardItent.SetImportance(item))
-                            dropDownExpanded = false
-                        })
+                    DropdownMenuItem(text = {
+                        Text(
+                            text = item.nameRu,
+                        )
+                    }, onClick = {
+                        reduce(TodoItemCardItent.SetImportance(item))
+                        dropDownExpanded = false
+                    })
                 }
 
             }
@@ -332,8 +320,7 @@ private fun ImportanceBlock(
 
 @Composable
 private fun InputTodoText(
-    uiState: TodoItemCardUiState,
-    reduce: (TodoItemCardItent) -> Unit
+    uiState: TodoItemCardUiState, reduce: (TodoItemCardItent) -> Unit
 ) {
     OutlinedTextField(
         modifier = Modifier
@@ -350,8 +337,7 @@ private fun InputTodoText(
                 color = MaterialTheme.colorScheme.surfaceContainerLowest,
                 fontSize = 16.sp
             )
-        }
-    )
+        })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -415,7 +401,8 @@ private fun TodoItemCardPreviewLight() {
         TodoItemCardStateless(
             uiState = TodoItemCardUiState(),
             onBackClick = { },
-            reduce = {}
+            reduce = {},
+            isLoading = false
         )
     }
 }
@@ -427,7 +414,8 @@ private fun TodoItemCardPreviewDark() {
         TodoItemCardStateless(
             uiState = TodoItemCardUiState(),
             onBackClick = { },
-            reduce = {}
+            reduce = {},
+            isLoading = false
         )
     }
 }
@@ -440,11 +428,9 @@ private fun DatePickerLight() {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
-            DateDialog(
-                currPickedDate = ZonedDateTime.now(),
+            DateDialog(currPickedDate = ZonedDateTime.now(),
                 onConfirmButtonClick = { },
-                onDismissRequest = { }
-            )
+                onDismissRequest = { })
         }
     }
 }
@@ -456,11 +442,9 @@ private fun DatePickerDark() {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
-            DateDialog(
-                currPickedDate = ZonedDateTime.now(),
+            DateDialog(currPickedDate = ZonedDateTime.now(),
                 onConfirmButtonClick = { },
-                onDismissRequest = { }
-            )
+                onDismissRequest = { })
         }
     }
 }

@@ -8,6 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.toloknov.summerschool.todoapp.ui.card.TodoItemCard
 import com.toloknov.summerschool.todoapp.ui.list.TodoItemsList
+import com.toloknov.summerschool.todoapp.ui.login.LoginScreen
+import com.toloknov.summerschool.todoapp.ui.navigation.AppScreen
 
 @Composable
 fun AppNavGraph(
@@ -18,22 +20,30 @@ fun AppNavGraph(
         navController = navController,
         startDestination = startDestination
     ) {
-        composable("list") {
+
+        composable(AppScreen.Login.route) {
+            LoginScreen(
+                loginSuccess = { navController.navigate(AppScreen.List.route) }
+            )
+        }
+
+        composable(AppScreen.List.route) {
             TodoItemsList(
                 clickOnItem = { itemId ->
-                    navController.navigate("card/${itemId}")
+                    navController.navigate(AppScreen.ItemCard(itemId).getRoute())
                 },
                 clickOnCreate = {
-                    navController.navigate("card/-1")
+                    navController.navigate(AppScreen.ItemCard().getRoute())
                 },
             )
         }
 
         composable(
-            route = "card/{itemId}",
+            route = AppScreen.ItemCard().getMask(),
             arguments = listOf(
                 navArgument("itemId") {
                     type = NavType.StringType
+                    nullable = true
                 }
             )
         ) {

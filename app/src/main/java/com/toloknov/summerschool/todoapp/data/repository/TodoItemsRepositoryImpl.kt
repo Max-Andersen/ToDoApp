@@ -1,190 +1,210 @@
 package com.toloknov.summerschool.todoapp.data.repository
 
-import android.util.Log
-import com.toloknov.summerschool.todoapp.data.mapper.toDomain
-import com.toloknov.summerschool.todoapp.data.mapper.toEntity
-import com.toloknov.summerschool.todoapp.data.model.TodoItemEntity
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.IOException
+import com.toloknov.summerschool.todoapp.NetworkPreferences
+import com.toloknov.summerschool.todoapp.data.local.db.model.toDomain
+import com.toloknov.summerschool.todoapp.data.local.db.model.toEntity
+import com.toloknov.summerschool.todoapp.data.local.db.model.TodoItemEntity
+import com.toloknov.summerschool.todoapp.data.remote.TodoApi
+import com.toloknov.summerschool.todoapp.data.remote.model.ItemTransmitModel
+import com.toloknov.summerschool.todoapp.data.remote.model.toDomain
+import com.toloknov.summerschool.todoapp.data.remote.model.toRest
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
-import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.Instant
-import java.time.ZoneId
 
-class TodoItemsRepositoryImpl : TodoItemsRepository {
+/**
+ * Вся жесть и манипулирование [localData] в этом репозитории - зашлушка работы с БД
+ * Как подключу Room код станет очевидно лакониченее, но в этом ТЗ БД не обязательна
+ *
+ * то что тут в зависимостях и DataStore<NetworkPreferences> ещё не ломает Single reponsibility
+ * нельзя, чтобы репозиторий использовал репозиторий, а вот если оба имеют доступ к одному ресурсу, то нормально
+ */
+class TodoItemsRepositoryImpl(
+    private val api: TodoApi,
+    private val networkDataStore: DataStore<NetworkPreferences>
+) : TodoItemsRepository {
 
-    private val items = mutableListOf(
-        TodoItemEntity(
-            id = "1",
-            text = "Buy groceries",
-            importance = ItemImportance.LOW,
-            isDone = false,
-            creationDate = Instant.now().atZone(ZoneId.systemDefault()),
-            deadlineTs = Instant.now().plusSeconds(3600 * 24).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "2",
-            text = "Pay bills",
-            importance = ItemImportance.HIGH,
-            isDone = true,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 2).atZone(ZoneId.systemDefault()),
-            deadlineTs = Instant.now().minusSeconds(3600 * 24).atZone(ZoneId.systemDefault()),
-            updateTs = Instant.now().minusSeconds(3600 * 12).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "3",
-            text = "Schedule meeting",
-            importance = ItemImportance.COMMON,
-            isDone = false,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 3).atZone(ZoneId.systemDefault()),
-            deadlineTs = Instant.now().plusSeconds(3600 * 48).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "4",
-            text = "Visit doctor",
-            importance = ItemImportance.HIGH,
-            isDone = true,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 5).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "5",
-            text = "Read book",
-            importance = ItemImportance.LOW,
-            isDone = false,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 10)
-                .atZone(ZoneId.systemDefault()),
-            updateTs = Instant.now().minusSeconds(3600 * 24 * 3).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "6",
-            text = "Exercise",
-            importance = ItemImportance.COMMON,
-            isDone = true,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 7).atZone(ZoneId.systemDefault()),
-            deadlineTs = Instant.now().minusSeconds(3600 * 24 * 6).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "7",
-            text = "Write report",
-            importance = ItemImportance.HIGH,
-            isDone = false,
-            creationDate = Instant.now().minusSeconds(3600 * 24).atZone(ZoneId.systemDefault()),
-            deadlineTs = Instant.now().plusSeconds(3600 * 24 * 3).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "8",
-            text = "Plan vacation",
-            importance = ItemImportance.LOW,
-            isDone = false,
-            creationDate = Instant.now().atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "9",
-            text = "Clean house",
-            importance = ItemImportance.COMMON,
-            isDone = true,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 12)
-                .atZone(ZoneId.systemDefault()),
-            deadlineTs = Instant.now().minusSeconds(3600 * 24 * 2).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "10",
-            text = "Organize files",
-            importance = ItemImportance.LOW,
-            isDone = false,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 15)
-                .atZone(ZoneId.systemDefault()),
-            updateTs = Instant.now().minusSeconds(3600 * 24 * 7).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "11",
-            text = "Organize files",
-            importance = ItemImportance.LOW,
-            isDone = false,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 15)
-                .atZone(ZoneId.systemDefault()),
-            updateTs = Instant.now().minusSeconds(3600 * 24 * 7).atZone(ZoneId.systemDefault())
-        ),
-        TodoItemEntity(
-            id = "12",
-            text = "Organize files",
-            importance = ItemImportance.LOW,
-            isDone = false,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 15)
-                .atZone(ZoneId.systemDefault()),
-            updateTs = Instant.now().minusSeconds(3600 * 24 * 7).atZone(ZoneId.systemDefault())
-        ),
+    private val items = mutableListOf<TodoItemEntity>()
 
-        TodoItemEntity(
-            id = "13",
-            text = "Organize files",
-            importance = ItemImportance.LOW,
-            isDone = false,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 15)
-                .atZone(ZoneId.systemDefault()),
-            updateTs = Instant.now().minusSeconds(3600 * 24 * 7).atZone(ZoneId.systemDefault())
-        ),
+    private val localData: MutableStateFlow<List<TodoItemEntity>> = MutableStateFlow(items)
 
-        TodoItemEntity(
-            id = "14",
-            text = "Organize files",
-            importance = ItemImportance.LOW,
-            isDone = false,
-            creationDate = Instant.now().minusSeconds(3600 * 24 * 15)
-                .atZone(ZoneId.systemDefault()),
-            updateTs = Instant.now().minusSeconds(3600 * 24 * 7).atZone(ZoneId.systemDefault())
-        ),
+    override suspend fun getRemoteItems(): List<TodoItem> = withContext(Dispatchers.IO) {
+        val remoteState = api.getAllItems()
+        val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
 
-        )
+        localData.emit(remoteItems.map { it.toEntity() })
 
-    private val dataFlow: MutableStateFlow<List<TodoItemEntity>> = MutableStateFlow(items)
+        // save to local
+        return@withContext remoteItems
+    }
 
-    override fun getAllItems(): Flow<List<TodoItem>> =
-        flow {
-            dataFlow.collect {
+    override fun getLocalItems(): Flow<List<TodoItem>> {
+        return flow {
+            localData.collect {
                 emit(it.map { it.toDomain() })
             }
         }
-
-    // У Room свой воркер с встроенной логикой переключения на IO, но пока всё в моках, переключу явно :)
-    override suspend fun getById(itemId: String): TodoItem? = withContext(Dispatchers.IO) {
-        dataFlow.value.find { entity -> entity.id == itemId }?.toDomain()
     }
 
-
-    override suspend fun addItem(item: TodoItem) = withContext(Dispatchers.IO) {
-        val newList = dataFlow.value.toMutableList()
-        newList.add(item.toEntity())
-        dataFlow.emit(newList)
+    override suspend fun getById(itemId: String): Result<TodoItem?> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val remoteItemResponse = api.getItemById(itemId)
+            if (remoteItemResponse.isSuccessful) {
+                Result.success(remoteItemResponse.body()?.element?.toDomain())
+            } else {
+                Result.failure(Exception("Ошибка получения напоминания"))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        }
     }
 
-    override suspend fun updateItem(item: TodoItem) = withContext(Dispatchers.IO) {
-        val items = dataFlow.value.toMutableList()
-        val index = items.indexOfFirst { it.id == item.id }
-        if (index == -1) return@withContext
-        items[index] = item.toEntity()
-        dataFlow.emit(items)
+    override suspend fun addItem(item: TodoItem): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val revision = networkDataStore.data.first().revision
+            val model =
+                ItemTransmitModel(
+                    ok = true,
+                    element = item.toRest()
+                )
+            val response = api.addItem(revision, model)
+
+            if (response.isSuccessful) {
+                updateRevisionInDataStore(revision + 1)
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("неудачный запрос"))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        }
     }
 
-    override suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean) =
+    override suspend fun updateItem(item: TodoItem): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val revision = networkDataStore.data.first().revision
+            val model =
+                ItemTransmitModel(
+                    ok = true,
+                    element = item.toRest()
+                )
+
+            val response = api.updateItemById(id = item.id, revision = revision, body = model)
+
+            if (response.isSuccessful) {
+                updateRevisionInDataStore(revision + 1)
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Неудачный запрос"))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean): Result<Unit> =
         withContext(Dispatchers.IO) {
-            val items = dataFlow.value.toMutableList()
-            val index = items.indexOfFirst { it.id == itemId }
-            if (index == -1) return@withContext
-            items[index] = items[index].copy(isDone = isDone)
-            dataFlow.emit(items)
+            return@withContext try {
+                val items = localData.value.toMutableList()
+                val index = items.indexOfFirst { it.id == itemId }
+                if (index == -1) return@withContext Result.failure(Exception("Элемент не найден"))
+                val item = items[index]
+
+                val revision = networkDataStore.data.first().revision
+                val model =
+                    ItemTransmitModel(
+                        ok = true,
+                        element = item.copy(isDone = isDone).toRest()
+                    )
+
+                val response = api.updateItemById(id = item.id, revision = revision, body = model)
+
+                if (response.isSuccessful) {
+                    updateRevisionInDataStore(revision + 1)
+                    items[index] = items[index].copy(isDone = isDone)
+                    localData.emit(items)
+                    Result.success(Unit)
+                } else {
+                    Result.failure(Exception("Неудачный запрос"))
+                }
+
+            } catch (e: IOException) {
+                Result.failure(e)
+            }
         }
 
-    override suspend fun removeItem(itemId: String) = withContext(Dispatchers.IO) {
-        val items = dataFlow.value.toMutableList()
-        val index = items.indexOfFirst { it.id == itemId }
-        if (index == -1) return@withContext
-        items.removeAt(index)
-        dataFlow.emit(items)
+    override suspend fun removeItem(itemId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val revision = networkDataStore.data.first().revision
+            val response = api.deleteItemById(id = itemId, revision = revision)
+            if (response.isSuccessful) {
+                val items = localData.value.toMutableList()
+                val index = items.indexOfFirst { it.id == itemId }
+                if (index == -1) return@withContext Result.failure(Exception("Элемент не найден"))
+                items.removeAt(index)
+                localData.emit(items)
+                updateRevisionInDataStore(revision + 1)
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Неудачный запрос"))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        }
+    }
+
+    override fun syncItems() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val remoteState = api.getAllItems()
+            remoteState.body()?.revision?.let {
+                updateRevisionInDataStore(it)
+            }
+            val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
+
+            localData.emit(remoteItems.map { it.toEntity() })
+        }
+    }
+
+    override suspend fun syncItemsWithResult(): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            val remoteState = api.getAllItems()
+
+            return@withContext if (remoteState.isSuccessful) {
+                remoteState.body()?.revision?.let {
+                    updateRevisionInDataStore(it)
+                }
+                val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
+
+                localData.emit(remoteItems.map { it.toEntity() })
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Ошибка получения данных"))
+            }
+        }
+    }
+
+    private suspend fun updateRevisionInDataStore(revision: Int){
+        networkDataStore.updateData { prefs ->
+            prefs.toBuilder().setRevision(revision).build()
+        }
+    }
+
+    override suspend fun isRemoteRevisionLarger(): Boolean {
+        // задел на будущее
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun overrideLocalChanges() {
+        // задел на будущее
+        TODO("Not yet implemented")
     }
 }

@@ -30,9 +30,8 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
 
 class TodoItemsListViewModel(
-    private val todoItemsRepository: TodoItemsRepository = TodoItemsRepositoryImpl()
+    private val todoItemsRepository: TodoItemsRepository
 ) : ViewModel() {
-    private val allItems = todoItemsRepository.getAllItems()
 
     private val _uiState: MutableStateFlow<TodoItemsListUiState> =
         MutableStateFlow(TodoItemsListUiState())
@@ -46,13 +45,11 @@ class TodoItemsListViewModel(
     }
 
     val uiState: StateFlow<TodoItemsListUiState> =
-        combine(allItems, _uiState) { items, uiState ->
+        combine(todoItemsRepository.getLocalItems(), _uiState) { items, uiState ->
             val itemsToShow = if (uiState.showDoneItems) items else items.filter { !it.isDone }
 
-            // Имитируем загрузку с БД/сети
-            delay(1000L)
-
             TodoItemsListUiState(
+                isLoading = uiState.isLoading,
                 items = itemsToShow.map { it.toUiModel() },
                 showDoneItems = uiState.showDoneItems
             )
@@ -76,11 +73,29 @@ class TodoItemsListViewModel(
                 }
 
                 is TodoItemsListIntent.DeleteItem -> {
-                    todoItemsRepository.removeItem(intent.itemId)
+                    _uiState.update { prevState -> prevState.copy(isLoading = true) }
+                    todoItemsRepository.removeItem(intent.itemId).onFailure {
+                        _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка удаления"))
+                    }
+                    _uiState.update { prevState -> prevState.copy(isLoading = false) }
                 }
 
                 is TodoItemsListIntent.ChangeItemStatus -> {
+                    _uiState.update { prevState -> prevState.copy(isLoading = true) }
                     todoItemsRepository.setDoneStatusForItem(intent.itemId, intent.newStatus)
+                        .onFailure {
+                            _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка изменения статуса"))
+                        }
+                    _uiState.update { prevState -> prevState.copy(isLoading = false) }
+
+                }
+
+                TodoItemsListIntent.SyncData -> {
+                    _uiState.update { prevState -> prevState.copy(isLoading = true) }
+                    todoItemsRepository.syncItemsWithResult().onFailure {
+                        _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка получения данных"))
+                    }
+                    _uiState.update { prevState -> prevState.copy(isLoading = false) }
                 }
             }
         }
@@ -106,6 +121,7 @@ class TodoItemsListViewModel(
 }
 
 data class TodoItemsListUiState(
+    val isLoading: Boolean = true,
     val items: List<TodoItemUi> = emptyList(),
     val showDoneItems: Boolean = true
 )
@@ -115,8 +131,8 @@ sealed class TodoItemsListEffect {
 }
 
 sealed class TodoItemsListIntent {
+    data object SyncData : TodoItemsListIntent()
     data object ClickOnShowDoneItems : TodoItemsListIntent()
     data class ChangeItemStatus(val itemId: String, val newStatus: Boolean) : TodoItemsListIntent()
     data class DeleteItem(val itemId: String) : TodoItemsListIntent()
-
 }

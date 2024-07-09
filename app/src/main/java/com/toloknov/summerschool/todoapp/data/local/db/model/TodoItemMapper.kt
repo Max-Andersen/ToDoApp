@@ -1,6 +1,5 @@
-package com.toloknov.summerschool.todoapp.data.mapper
+package com.toloknov.summerschool.todoapp.data.local.db.model
 
-import com.toloknov.summerschool.todoapp.data.model.TodoItemEntity
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
 
 fun TodoItem.toEntity(): TodoItemEntity {
