@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.protobuf") version "0.9.0"
     kotlin("plugin.serialization") version "1.9.0"
+    id("com.google.devtools.ksp")
+    id("androidx.room")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -23,6 +26,10 @@ android {
 
         // Выписан ручками на oauth.yandex.ru
         manifestPlaceholders["YANDEX_CLIENT_ID"] = "e81a1ac8f52f4a6fbe4980692627dc0e"
+    }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 
     buildTypes {
@@ -126,4 +133,14 @@ dependencies {
 
     // Splash Screen API
     implementation(libs.androidx.core.splashscreen)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+    ksp(libs.room.compiler)
+
+    // DI
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    kspAndroidTest(libs.google.hilt.android.compiler)
 }
