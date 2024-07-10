@@ -3,9 +3,9 @@ package com.toloknov.summerschool.todoapp.data.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import com.toloknov.summerschool.todoapp.NetworkPreferences
+import com.toloknov.summerschool.todoapp.data.local.db.model.TodoItemEntity
 import com.toloknov.summerschool.todoapp.data.local.db.model.toDomain
 import com.toloknov.summerschool.todoapp.data.local.db.model.toEntity
-import com.toloknov.summerschool.todoapp.data.local.db.model.TodoItemEntity
 import com.toloknov.summerschool.todoapp.data.remote.TodoApi
 import com.toloknov.summerschool.todoapp.data.remote.model.ItemTransmitModel
 import com.toloknov.summerschool.todoapp.data.remote.model.toDomain
@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * Вся жесть и манипулирование [localData] в этом репозитории - зашлушка работы с БД
@@ -28,7 +29,7 @@ import kotlinx.coroutines.withContext
  * то что тут в зависимостях и DataStore<NetworkPreferences> ещё не ломает Single reponsibility
  * нельзя, чтобы репозиторий использовал репозиторий, а вот если оба имеют доступ к одному ресурсу, то нормально
  */
-class TodoItemsRepositoryImpl(
+class TodoItemsRepositoryImpl @Inject constructor(
     private val api: TodoApi,
     private val networkDataStore: DataStore<NetworkPreferences>
 ) : TodoItemsRepository {

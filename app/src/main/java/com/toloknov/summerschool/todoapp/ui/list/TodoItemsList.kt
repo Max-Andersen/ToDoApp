@@ -58,29 +58,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.ui.common.snackbar.SnackbarError
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightAcceptGreen
 import com.toloknov.summerschool.todoapp.ui.common.theme.LightRejectRed
-import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTitle
-import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
-import com.toloknov.summerschool.todoapp.ui.common.toolbar.rememberToolbarScrollBehavior
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_SMALL
 import com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme
 import com.toloknov.summerschool.todoapp.ui.common.theme.importanceCheckBoxTheme
+import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTitle
+import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
+import com.toloknov.summerschool.todoapp.ui.common.toolbar.rememberToolbarScrollBehavior
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToReadable
 import java.time.ZonedDateTime
 
 @Composable
 fun TodoItemsList(
+    viewModel: TodoItemsListViewModel,
     clickOnItem: (itemId: String) -> Unit,
     clickOnCreate: () -> Unit
 ) {
-    val viewModel: TodoItemsListViewModel = viewModel(factory = TodoItemsListViewModel.Factory)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

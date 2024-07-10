@@ -9,8 +9,8 @@ fun TodoItem.toEntity(): TodoItemEntity {
         importance = importance,
         isDone = isDone,
         creationDate = creationDate,
-        deadlineTs = deadlineTs,
-        updateTs = updateTs,
+        deadlineDate = deadlineTs,
+        updateDate = updateTs,
     )
 }
 
@@ -21,7 +21,7 @@ fun TodoItemEntity.toDomain(): TodoItem {
         importance = importance,
         isDone = isDone,
         creationDate = creationDate,
-        deadlineTs = deadlineTs,
-        updateTs = updateTs,
+        deadlineTs = deadlineDate,
+        updateTs = updateDate,
     )
 }

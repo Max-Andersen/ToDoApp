@@ -1,18 +1,13 @@
 package com.toloknov.summerschool.todoapp.ui.card
 
 import android.util.Log
-import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.toloknov.summerschool.todoapp.TodoApp
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,8 +20,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 import java.util.UUID
+import javax.inject.Inject
 
-class TodoItemCardViewModel(
+@HiltViewModel
+class TodoItemCardViewModel @Inject constructor(
     private val todoItemsRepository: TodoItemsRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -161,23 +158,23 @@ class TodoItemCardViewModel(
         }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                // Получаем инстанс приложения (а он один, поэтому и di контейнер будет один)
-                val application = checkNotNull(extras[APPLICATION_KEY])
-                // Создаём SavedStateHandle для чтения навигационных аргументов
-                val savedStateHandle = extras.createSavedStateHandle()
-
-                return TodoItemCardViewModel(
-                    (application as TodoApp).getTodoItemsRepository(),
-                    savedStateHandle
-                ) as T
-            }
-        }
+//        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+//            @Suppress("UNCHECKED_CAST")
+//            override fun <T : ViewModel> create(
+//                modelClass: Class<T>,
+//                extras: CreationExtras
+//            ): T {
+//                // Получаем инстанс приложения (а он один, поэтому и di контейнер будет один)
+//                val application = checkNotNull(extras[APPLICATION_KEY])
+//                // Создаём SavedStateHandle для чтения навигационных аргументов
+//                val savedStateHandle = extras.createSavedStateHandle()
+//
+//                return TodoItemCardViewModel(
+//                    (application as TodoApp).getTodoItemsRepository(),
+//                    savedStateHandle
+//                ) as T
+//            }
+//        }
 
         private val TAG = TodoItemCardViewModel::class.simpleName
     }

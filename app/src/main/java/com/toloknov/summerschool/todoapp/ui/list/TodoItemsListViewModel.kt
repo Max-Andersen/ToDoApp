@@ -2,20 +2,11 @@ package com.toloknov.summerschool.todoapp.ui.list
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.toloknov.summerschool.todoapp.TodoApp
-import com.toloknov.summerschool.todoapp.data.repository.TodoItemsRepositoryImpl
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
-import com.toloknov.summerschool.todoapp.ui.card.TodoItemCardEffect
-import com.toloknov.summerschool.todoapp.ui.card.TodoItemCardViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -27,9 +18,10 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
+import javax.inject.Inject
 
-class TodoItemsListViewModel(
+@HiltViewModel
+class TodoItemsListViewModel @Inject constructor(
     private val todoItemsRepository: TodoItemsRepository
 ) : ViewModel() {
 
@@ -38,7 +30,7 @@ class TodoItemsListViewModel(
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
         viewModelScope.launch {
-            Log.e(TAG, exception.stackTrace.toString())
+            Log.e(TAG, exception.stackTraceToString())
             // По-хорошему нужно понять что за исключение
             _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка загрузки данных"))
         }
@@ -101,20 +93,20 @@ class TodoItemsListViewModel(
         }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                // Получаем инстанс приложения (а он один, поэтому и di контейнер будет один)
-                val application = checkNotNull(extras[APPLICATION_KEY])
-
-                return TodoItemsListViewModel(
-                    (application as TodoApp).getTodoItemsRepository(),
-                ) as T
-            }
-        }
+//        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+//            @Suppress("UNCHECKED_CAST")
+//            override fun <T : ViewModel> create(
+//                modelClass: Class<T>,
+//                extras: CreationExtras
+//            ): T {
+//                // Получаем инстанс приложения (а он один, поэтому и di контейнер будет один)
+//                val application = checkNotNull(extras[APPLICATION_KEY])
+//
+//                return TodoItemsListViewModel(
+//                    (application as TodoApp).getTodoItemsRepository(),
+//                ) as T
+//            }
+//        }
 
         private val TAG = TodoItemsListViewModel::class.simpleName
     }

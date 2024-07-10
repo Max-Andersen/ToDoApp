@@ -40,13 +40,13 @@ fun ItemData.toEntity() = TodoItemEntity(
         Instant.ofEpochSecond(createdAt),
         ZoneId.systemDefault()
     ),
-    deadlineTs = deadline?.let {
+    deadlineDate = deadline?.let {
         ZonedDateTime.ofInstant(
             Instant.ofEpochSecond(it),
             ZoneId.systemDefault()
         )
     },
-    updateTs = ZonedDateTime.ofInstant(Instant.ofEpochSecond(changedAt), ZoneId.systemDefault()),
+    updateDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(changedAt), ZoneId.systemDefault()),
 )
 
 fun TodoItemEntity.toRest() = ItemData(
@@ -55,8 +55,8 @@ fun TodoItemEntity.toRest() = ItemData(
     importance = importance.toRest(),
     done = isDone,
     createdAt = creationDate.toEpochSecond(),
-    deadline = deadlineTs?.toEpochSecond(),
-    changedAt = updateTs?.toEpochSecond() ?: ZonedDateTime.now().toEpochSecond(),
+    deadline = deadlineDate?.toEpochSecond(),
+    changedAt = updateDate?.toEpochSecond() ?: ZonedDateTime.now().toEpochSecond(),
     lastUpdatedBy = "пу пу пу",
 )
 

@@ -7,13 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.toloknov.summerschool.todoapp.ui.AppNavGraph
 import com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme
 import com.toloknov.summerschool.todoapp.ui.navigation.AppScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var splashScreen: SplashScreen
 
@@ -23,7 +25,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val viewModel: MainViewModel = viewModel(factory = MainViewModel.Factory)
+            val viewModel: MainViewModel = hiltViewModel()
             val startDestination by viewModel.startDestination.collectAsStateWithLifecycle()
 
             startDestination?.let { destination ->

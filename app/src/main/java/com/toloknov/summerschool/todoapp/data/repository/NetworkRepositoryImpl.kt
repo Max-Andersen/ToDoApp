@@ -4,8 +4,9 @@ import androidx.datastore.core.DataStore
 import com.toloknov.summerschool.todoapp.NetworkPreferences
 import com.toloknov.summerschool.todoapp.domain.api.NetworkRepository
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
-class NetworkRepositoryImpl(
+class NetworkRepositoryImpl @Inject constructor(
     private val networkDataStore: DataStore<NetworkPreferences>
 ) : NetworkRepository {
 

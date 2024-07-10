@@ -1,7 +1,6 @@
 package com.toloknov.summerschool.todoapp.ui.card
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +21,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -37,7 +35,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -48,7 +45,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +61,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.ui.common.snackbar.SnackbarError
@@ -79,14 +74,13 @@ import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.rememberToolbarScrollBehavior
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToReadable
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToZonedDateTime
-import com.toloknov.summerschool.todoapp.ui.list.TodoItemsListEffect
 import java.time.ZonedDateTime
 
 @Composable
 fun TodoItemCard(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: TodoItemCardViewModel
 ) {
-    val viewModel: TodoItemCardViewModel = viewModel(factory = TodoItemCardViewModel.Factory)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
