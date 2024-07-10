@@ -10,5 +10,5 @@ data class TodoItem(
     val creationDate: ZonedDateTime,
 
     val deadlineTs: ZonedDateTime? = null,
-    val updateTs: ZonedDateTime? = null
+    val updateTs: ZonedDateTime = ZonedDateTime.now()
 )

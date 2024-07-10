@@ -2,7 +2,7 @@ package com.toloknov.summerschool.todoapp.data.remote.utils
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import dagger.assisted.Assisted
@@ -13,9 +13,9 @@ class SyncWorker @AssistedInject constructor(
     private val todoItemsRepository: TodoItemsRepository,
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters
-) : Worker(appContext, workerParams) {
+) : CoroutineWorker(appContext, workerParams) {
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         todoItemsRepository.syncItems()
         return Result.success()
     }

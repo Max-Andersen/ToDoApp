@@ -37,7 +37,7 @@ class TodoItemsListViewModel @Inject constructor(
     }
 
     val uiState: StateFlow<TodoItemsListUiState> =
-        combine(todoItemsRepository.getLocalItems(), _uiState) { items, uiState ->
+        combine(todoItemsRepository.getItems(), _uiState) { items, uiState ->
             val itemsToShow = if (uiState.showDoneItems) items else items.filter { !it.isDone }
 
             TodoItemsListUiState(
@@ -66,48 +66,34 @@ class TodoItemsListViewModel @Inject constructor(
 
                 is TodoItemsListIntent.DeleteItem -> {
                     _uiState.update { prevState -> prevState.copy(isLoading = true) }
-                    todoItemsRepository.removeItem(intent.itemId).onFailure {
-                        _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка удаления"))
-                    }
+                    todoItemsRepository.removeItem(intent.itemId)
+//                        .onFailure {
+//                        _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка удаления"))
+//                    }
                     _uiState.update { prevState -> prevState.copy(isLoading = false) }
                 }
 
                 is TodoItemsListIntent.ChangeItemStatus -> {
                     _uiState.update { prevState -> prevState.copy(isLoading = true) }
                     todoItemsRepository.setDoneStatusForItem(intent.itemId, intent.newStatus)
-                        .onFailure {
-                            _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка изменения статуса"))
-                        }
+//                        .onFailure {
+//                            _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка изменения статуса"))
+//                        }
                     _uiState.update { prevState -> prevState.copy(isLoading = false) }
 
                 }
 
                 TodoItemsListIntent.SyncData -> {
                     _uiState.update { prevState -> prevState.copy(isLoading = true) }
-                    todoItemsRepository.syncItemsWithResult().onFailure {
-                        _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка получения данных"))
-                    }
+//                    todoItemsRepository.syncItemsWithResult().onFailure {
+//                        _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка получения данных"))
+//                    }
                     _uiState.update { prevState -> prevState.copy(isLoading = false) }
                 }
             }
         }
 
     companion object {
-//        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-//            @Suppress("UNCHECKED_CAST")
-//            override fun <T : ViewModel> create(
-//                modelClass: Class<T>,
-//                extras: CreationExtras
-//            ): T {
-//                // Получаем инстанс приложения (а он один, поэтому и di контейнер будет один)
-//                val application = checkNotNull(extras[APPLICATION_KEY])
-//
-//                return TodoItemsListViewModel(
-//                    (application as TodoApp).getTodoItemsRepository(),
-//                ) as T
-//            }
-//        }
-
         private val TAG = TodoItemsListViewModel::class.simpleName
     }
 }

@@ -116,7 +116,7 @@ fun TodoItemCardStateless(
     isLoading: Boolean,
     uiState: TodoItemCardUiState,
     onBackClick: () -> Unit,
-    reduce: (TodoItemCardItent) -> Unit,
+    reduce: (TodoItemCardIntent) -> Unit,
     snackbarHostState: SnackbarHostState = SnackbarHostState()
 ) {
 
@@ -127,7 +127,7 @@ fun TodoItemCardStateless(
 
     if (firstDateDialogState) {
         DateDialog(currPickedDate = uiState.deadline,
-            onConfirmButtonClick = { reduce(TodoItemCardItent.SetDeadline(it)) },
+            onConfirmButtonClick = { reduce(TodoItemCardIntent.SetDeadline(it)) },
             onDismissRequest = {
                 firstDateDialogState = false
             })
@@ -144,7 +144,7 @@ fun TodoItemCardStateless(
                     CloseButton(onClick = onBackClick)
                 },
                 actions = {
-                    TextButton(onClick = { reduce(TodoItemCardItent.SaveTodoItem) }) {
+                    TextButton(onClick = { reduce(TodoItemCardIntent.SaveTodoItem) }) {
                         Text(text = stringResource(id = R.string.save))
                     }
                 },
@@ -181,7 +181,7 @@ fun TodoItemCardStateless(
                 Spacer(modifier = Modifier.size(PADDING_MEDIUM))
                 // Чтобы при каждой рекомпозиции мы этот список снова не собирали
                 val importanceItems = remember {
-                    ItemImportance.values()
+                    ItemImportance.entries.toTypedArray()
                 }
 
                 InputTodoText(
@@ -215,7 +215,7 @@ fun TodoItemCardStateless(
 
 @Composable
 private fun DeleteSection(
-    uiState: TodoItemCardUiState, reduce: (TodoItemCardItent) -> Unit
+    uiState: TodoItemCardUiState, reduce: (TodoItemCardIntent) -> Unit
 ) {
     val deleteSectionColor = if (uiState.isNewItem) {
         MaterialTheme.colorScheme.surfaceContainerLowest
@@ -227,7 +227,7 @@ private fun DeleteSection(
         modifier = Modifier
             .defaultMinSize(minHeight = PADDING_LARGE)
             .clip(RoundedCornerShape(PADDING_MEDIUM))
-            .clickable(enabled = !uiState.isNewItem) { reduce(TodoItemCardItent.DeleteTodoItem) },
+            .clickable(enabled = !uiState.isNewItem) { reduce(TodoItemCardIntent.DeleteTodoItem) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -239,7 +239,7 @@ private fun DeleteSection(
 
 @Composable
 private fun SelectDeadline(
-    uiState: TodoItemCardUiState, openDialog: () -> Unit, reduce: (TodoItemCardItent) -> Unit
+    uiState: TodoItemCardUiState, openDialog: () -> Unit, reduce: (TodoItemCardIntent) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -253,7 +253,7 @@ private fun SelectDeadline(
             if (newState) {
                 openDialog()
             } else {
-                reduce(TodoItemCardItent.SetDeadline(null))
+                reduce(TodoItemCardIntent.SetDeadline(null))
             }
         })
     }
@@ -269,7 +269,7 @@ private fun SelectDeadline(
 private fun ImportanceBlock(
     uiState: TodoItemCardUiState,
     importanceItems: Array<ItemImportance>,
-    reduce: (TodoItemCardItent) -> Unit
+    reduce: (TodoItemCardIntent) -> Unit
 ) {
     var dropDownExpanded by remember {
         mutableStateOf(false)
@@ -293,7 +293,7 @@ private fun ImportanceBlock(
                             text = "!! ${item.nameRu}", color = Color.Red
                         )
                     }, onClick = {
-                        reduce(TodoItemCardItent.SetImportance(item))
+                        reduce(TodoItemCardIntent.SetImportance(item))
                         dropDownExpanded = false
                     })
                 } else {
@@ -302,7 +302,7 @@ private fun ImportanceBlock(
                             text = item.nameRu,
                         )
                     }, onClick = {
-                        reduce(TodoItemCardItent.SetImportance(item))
+                        reduce(TodoItemCardIntent.SetImportance(item))
                         dropDownExpanded = false
                     })
                 }
@@ -314,7 +314,7 @@ private fun ImportanceBlock(
 
 @Composable
 private fun InputTodoText(
-    uiState: TodoItemCardUiState, reduce: (TodoItemCardItent) -> Unit
+    uiState: TodoItemCardUiState, reduce: (TodoItemCardIntent) -> Unit
 ) {
     OutlinedTextField(
         modifier = Modifier
@@ -322,7 +322,7 @@ private fun InputTodoText(
             .shadow(2.dp, RoundedCornerShape(PADDING_MEDIUM))
             .defaultMinSize(minHeight = 100.dp),
         value = uiState.text,
-        onValueChange = { reduce(TodoItemCardItent.SetText(it)) },
+        onValueChange = { reduce(TodoItemCardIntent.SetText(it)) },
         shape = RoundedCornerShape(PADDING_MEDIUM),
         colors = MaterialTheme.colorScheme.textFieldTheme,
         placeholder = {

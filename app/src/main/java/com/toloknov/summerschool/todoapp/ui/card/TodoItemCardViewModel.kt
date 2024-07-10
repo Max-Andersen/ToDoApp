@@ -50,34 +50,32 @@ class TodoItemCardViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default + exceptionHandler) {
             itemId?.let {
                 _uiState.update { prevState -> prevState.copy(isLoading = true) }
-                val itemResult = todoItemsRepository.getById(itemId)
+                val item = todoItemsRepository.getById(itemId)
 
-                itemResult.onSuccess { item ->
-                    item?.let { data ->
-                        _uiState.update { lastState ->
-                            lastState.copy(
-                                isNewItem = false,
-                                text = data.text,
-                                isDone = data.isDone,
-                                importance = data.importance,
-                                deadline = data.deadlineTs,
-                                creationTime = data.creationDate
-                            )
-                        }
+
+                item?.let { data ->
+                    _uiState.update { lastState ->
+                        lastState.copy(
+                            isNewItem = false,
+                            text = data.text,
+                            isDone = data.isDone,
+                            importance = data.importance,
+                            deadline = data.deadlineTs,
+                            creationTime = data.creationDate
+                        )
                     }
-                }.onFailure {
-                    _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка получения информации"))
                 }
+
             }
             _uiState.update { prevState -> prevState.copy(isLoading = false) }
         }
     }
 
 
-    fun reduce(intent: TodoItemCardItent) =
+    fun reduce(intent: TodoItemCardIntent) =
         viewModelScope.launch(Dispatchers.Default + exceptionHandler) {
             when (intent) {
-                is TodoItemCardItent.SetText -> {
+                is TodoItemCardIntent.SetText -> {
                     _uiState.update { lastState ->
                         lastState.copy(
                             text = intent.text
@@ -85,7 +83,7 @@ class TodoItemCardViewModel @Inject constructor(
                     }
                 }
 
-                is TodoItemCardItent.SetImportance -> {
+                is TodoItemCardIntent.SetImportance -> {
                     _uiState.update { lastState ->
                         lastState.copy(
                             importance = intent.importance
@@ -93,7 +91,7 @@ class TodoItemCardViewModel @Inject constructor(
                     }
                 }
 
-                is TodoItemCardItent.SetDeadline -> {
+                is TodoItemCardIntent.SetDeadline -> {
                     _uiState.update { lastState ->
                         lastState.copy(
                             deadline = intent.deadline
@@ -101,19 +99,21 @@ class TodoItemCardViewModel @Inject constructor(
                     }
                 }
 
-                is TodoItemCardItent.DeleteTodoItem -> {
+                is TodoItemCardIntent.DeleteTodoItem -> {
                     if (itemId != null) {
                         _uiState.update { prevState -> prevState.copy(isLoading = true) }
-                        todoItemsRepository.removeItem(itemId).onSuccess {
-                            _effect.emit(TodoItemCardEffect.NavigateBack)
-                        }.onFailure {
-                            _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка удаления"))
-                        }
+                        todoItemsRepository.removeItem(itemId)
+
+//                            .onSuccess {
+//                                _effect.emit(TodoItemCardEffect.NavigateBack)
+//                            }.onFailure {
+//                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка удаления"))
+//                            }
                         _uiState.update { prevState -> prevState.copy(isLoading = false) }
                     }
                 }
 
-                is TodoItemCardItent.SaveTodoItem -> {
+                is TodoItemCardIntent.SaveTodoItem -> {
                     with(_uiState.value) {
                         _uiState.update { prevState -> prevState.copy(isLoading = true) }
                         if (isNewItem) {
@@ -127,13 +127,15 @@ class TodoItemCardViewModel @Inject constructor(
                                     deadlineTs = deadline,
                                     updateTs = ZonedDateTime.now(),
                                 )
-                            ).onSuccess {
-                                _effect.emit(TodoItemCardEffect.NavigateBack)
-                            }.onFailure {
-                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Произошла ошибка"))
-                            }
+                            )
+//                                .onSuccess {
+//                                _effect.emit(TodoItemCardEffect.NavigateBack)
+//                            }.onFailure {
+//                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Произошла ошибка"))
+//                            }
                         } else {
-                            val currentItemId = requireNotNull(itemId) // Невозможное состояние, но кто его знает
+                            val currentItemId =
+                                requireNotNull(itemId) // Невозможное состояние, но кто его знает
                             val currentItemCreationDate = requireNotNull(creationTime)
                             todoItemsRepository.updateItem(
                                 TodoItem(
@@ -145,11 +147,12 @@ class TodoItemCardViewModel @Inject constructor(
                                     deadlineTs = deadline,
                                     updateTs = ZonedDateTime.now(),
                                 )
-                            ).onSuccess {
-                                _effect.emit(TodoItemCardEffect.NavigateBack)
-                            }.onFailure {
-                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка обновления напоминания"))
-                            }
+                            )
+//                                .onSuccess {
+//                                _effect.emit(TodoItemCardEffect.NavigateBack)
+//                            }.onFailure {
+//                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка обновления напоминания"))
+//                            }
                         }
                         _uiState.update { prevState -> prevState.copy(isLoading = false) }
                     }
@@ -158,24 +161,6 @@ class TodoItemCardViewModel @Inject constructor(
         }
 
     companion object {
-//        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-//            @Suppress("UNCHECKED_CAST")
-//            override fun <T : ViewModel> create(
-//                modelClass: Class<T>,
-//                extras: CreationExtras
-//            ): T {
-//                // Получаем инстанс приложения (а он один, поэтому и di контейнер будет один)
-//                val application = checkNotNull(extras[APPLICATION_KEY])
-//                // Создаём SavedStateHandle для чтения навигационных аргументов
-//                val savedStateHandle = extras.createSavedStateHandle()
-//
-//                return TodoItemCardViewModel(
-//                    (application as TodoApp).getTodoItemsRepository(),
-//                    savedStateHandle
-//                ) as T
-//            }
-//        }
-
         private val TAG = TodoItemCardViewModel::class.simpleName
     }
 
@@ -200,16 +185,16 @@ sealed class TodoItemCardEffect {
     data class ShowSnackbar(val message: String) : TodoItemCardEffect()
 }
 
-sealed class TodoItemCardItent {
+sealed class TodoItemCardIntent {
 
-    data class SetText(val text: String) : TodoItemCardItent()
+    data class SetText(val text: String) : TodoItemCardIntent()
 
-    data class SetImportance(val importance: ItemImportance) : TodoItemCardItent()
+    data class SetImportance(val importance: ItemImportance) : TodoItemCardIntent()
 
-    data class SetDeadline(val deadline: ZonedDateTime?) : TodoItemCardItent()
+    data class SetDeadline(val deadline: ZonedDateTime?) : TodoItemCardIntent()
 
-    data object SaveTodoItem : TodoItemCardItent()
+    data object SaveTodoItem : TodoItemCardIntent()
 
-    data object DeleteTodoItem : TodoItemCardItent()
+    data object DeleteTodoItem : TodoItemCardIntent()
 
 }

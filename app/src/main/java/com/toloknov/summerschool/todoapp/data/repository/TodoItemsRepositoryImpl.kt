@@ -1,98 +1,83 @@
 package com.toloknov.summerschool.todoapp.data.repository
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.core.IOException
 import com.toloknov.summerschool.todoapp.NetworkPreferences
+import com.toloknov.summerschool.todoapp.data.local.db.dao.TodoDao
 import com.toloknov.summerschool.todoapp.data.local.db.model.TodoItemEntity
 import com.toloknov.summerschool.todoapp.data.local.db.model.toDomain
 import com.toloknov.summerschool.todoapp.data.local.db.model.toEntity
+import com.toloknov.summerschool.todoapp.data.local.db.utils.TransactionProvider
 import com.toloknov.summerschool.todoapp.data.remote.TodoApi
 import com.toloknov.summerschool.todoapp.data.remote.model.ItemTransmitModel
+import com.toloknov.summerschool.todoapp.data.remote.model.ItemsListTransmitModel
 import com.toloknov.summerschool.todoapp.data.remote.model.toDomain
 import com.toloknov.summerschool.todoapp.data.remote.model.toRest
+import com.toloknov.summerschool.todoapp.data.util.ItemListMerger
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import com.toloknov.summerschool.todoapp.domain.model.TodoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
-/**
- * Вся жесть и манипулирование [localData] в этом репозитории - зашлушка работы с БД
- * Как подключу Room код станет очевидно лакониченее, но в этом ТЗ БД не обязательна
- *
- * то что тут в зависимостях и DataStore<NetworkPreferences> ещё не ломает Single reponsibility
- * нельзя, чтобы репозиторий использовал репозиторий, а вот если оба имеют доступ к одному ресурсу, то нормально
- */
-class TodoItemsRepositoryImpl @Inject constructor(
+
+class TodoItemsRepositoryImpl
+@Inject constructor(
+    private val dao: TodoDao,
     private val api: TodoApi,
-    private val networkDataStore: DataStore<NetworkPreferences>
+    private val networkDataStore: DataStore<NetworkPreferences>,
+    private val transactionProvider: TransactionProvider,
+    private val itemListMerger: ItemListMerger
 ) : TodoItemsRepository {
 
-    private val items = mutableListOf<TodoItemEntity>()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val atomicDispatcher = Dispatchers.IO.limitedParallelism(1)
 
-    private val localData: MutableStateFlow<List<TodoItemEntity>> = MutableStateFlow(items)
+    private val localData: MutableStateFlow<List<TodoItemEntity>> = MutableStateFlow(emptyList())
 
-    override suspend fun getRemoteItems(): List<TodoItem> = withContext(Dispatchers.IO) {
-        val remoteState = api.getAllItems()
-        val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
-
-        localData.emit(remoteItems.map { it.toEntity() })
-
-        // save to local
-        return@withContext remoteItems
-    }
-
-    override fun getLocalItems(): Flow<List<TodoItem>> {
-        return flow {
-            localData.collect {
-                emit(it.map { it.toDomain() })
-            }
+    override fun getItems(): Flow<List<TodoItem>> {
+        CoroutineScope(atomicDispatcher).launch {
+            syncItems()
         }
+        return dao.selectAll().map { list -> list.map { it.toDomain() } }
     }
 
-    override suspend fun getById(itemId: String): Result<TodoItem?> = withContext(Dispatchers.IO) {
-        return@withContext try {
-            val remoteItemResponse = api.getItemById(itemId)
-            if (remoteItemResponse.isSuccessful) {
-                Result.success(remoteItemResponse.body()?.element?.toDomain())
-            } else {
-                Result.failure(Exception("Ошибка получения напоминания"))
-            }
-        } catch (e: IOException) {
-            Result.failure(e)
-        }
-    }
+    override suspend fun getById(itemId: String): TodoItem? = dao.getById(itemId)?.toDomain()
 
-    override suspend fun addItem(item: TodoItem): Result<Unit> = withContext(Dispatchers.IO) {
-        return@withContext try {
-            val revision = networkDataStore.data.first().revision
+    override suspend fun addItem(item: TodoItem) {
+        withContext(atomicDispatcher) {
+            dao.insert(item.toEntity())
+
+            val revision = getCurrentRevision()
+
             val model =
                 ItemTransmitModel(
                     ok = true,
                     element = item.toRest()
                 )
+
             val response = api.addItem(revision, model)
 
             if (response.isSuccessful) {
                 updateRevisionInDataStore(revision + 1)
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("неудачный запрос"))
             }
-        } catch (e: IOException) {
-            Result.failure(e)
         }
     }
 
-    override suspend fun updateItem(item: TodoItem): Result<Unit> = withContext(Dispatchers.IO) {
-        return@withContext try {
-            val revision = networkDataStore.data.first().revision
+    override suspend fun updateItem(item: TodoItem) {
+        withContext(atomicDispatcher) {
+            dao.update(item.toEntity())
+
+            val revision = getCurrentRevision()
             val model =
                 ItemTransmitModel(
                     ok = true,
@@ -103,80 +88,84 @@ class TodoItemsRepositoryImpl @Inject constructor(
 
             if (response.isSuccessful) {
                 updateRevisionInDataStore(revision + 1)
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Неудачный запрос"))
             }
-        } catch (e: IOException) {
-            Result.failure(e)
         }
     }
 
-    override suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            return@withContext try {
-                val items = localData.value.toMutableList()
-                val index = items.indexOfFirst { it.id == itemId }
-                if (index == -1) return@withContext Result.failure(Exception("Элемент не найден"))
-                val item = items[index]
+    override suspend fun setDoneStatusForItem(itemId: String, isDone: Boolean) =
+        withContext(atomicDispatcher) {
+            val item = dao.getById(itemId)
+            if (item != null) {
+                dao.update(item.copy(isDone = isDone))
 
-                val revision = networkDataStore.data.first().revision
+                val revision = getCurrentRevision()
                 val model =
                     ItemTransmitModel(
                         ok = true,
-                        element = item.copy(isDone = isDone).toRest()
+                        element = item.toRest()
                     )
 
                 val response = api.updateItemById(id = item.id, revision = revision, body = model)
 
                 if (response.isSuccessful) {
                     updateRevisionInDataStore(revision + 1)
-                    items[index] = items[index].copy(isDone = isDone)
-                    localData.emit(items)
-                    Result.success(Unit)
-                } else {
-                    Result.failure(Exception("Неудачный запрос"))
                 }
-
-            } catch (e: IOException) {
-                Result.failure(e)
             }
         }
 
-    override suspend fun removeItem(itemId: String): Result<Unit> = withContext(Dispatchers.IO) {
-        return@withContext try {
-            val revision = networkDataStore.data.first().revision
+    override suspend fun removeItem(itemId: String) {
+        withContext(atomicDispatcher) {
+
+            dao.deleteById(itemId)
+
+            val revision = getCurrentRevision()
+
             val response = api.deleteItemById(id = itemId, revision = revision)
+
             if (response.isSuccessful) {
-                val items = localData.value.toMutableList()
-                val index = items.indexOfFirst { it.id == itemId }
-                if (index == -1) return@withContext Result.failure(Exception("Элемент не найден"))
-                items.removeAt(index)
-                localData.emit(items)
                 updateRevisionInDataStore(revision + 1)
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Неудачный запрос"))
             }
-        } catch (e: IOException) {
-            Result.failure(e)
         }
     }
 
-    override fun syncItems() {
-        CoroutineScope(Dispatchers.IO).launch {
+    override suspend fun syncItems() {
+        CoroutineScope(atomicDispatcher).launch {
             val remoteState = api.getAllItems()
             remoteState.body()?.revision?.let {
                 updateRevisionInDataStore(it)
             }
             val remoteItems = remoteState.body()?.list?.map { it.toDomain() } ?: listOf()
+            val localItems = dao.selectAll().first().map { item -> item.toDomain() }
 
-            localData.emit(remoteItems.map { it.toEntity() })
+            val storeValue = networkDataStore.data.first()
+            val lastSyncTime = ZonedDateTime.ofInstant(
+                Instant.ofEpochSecond(storeValue.lastUpdateTime),
+                ZoneId.systemDefault()
+            )
+            val resultList = itemListMerger.merge(remoteItems, localItems, lastSyncTime)
+
+            val body = ItemsListTransmitModel(
+                ok = true,
+                list = resultList.map { it.toRest() }
+            )
+
+            dao.deleteAll()
+            dao.insertAll(resultList.map { it.toEntity() })
+
+            val response = api.updateItems(storeValue.revision, body)
+
+            response.body()?.revision?.let {
+                updateRevisionInDataStore(it)
+                networkDataStore.updateData { prevState ->
+                    prevState.toBuilder().setLastUpdateTime(ZonedDateTime.now().toEpochSecond())
+                        .build()
+                }
+            }
         }
     }
 
     override suspend fun syncItemsWithResult(): Result<Unit> {
-        return withContext(Dispatchers.IO) {
+        return withContext(atomicDispatcher) {
             val remoteState = api.getAllItems()
 
             return@withContext if (remoteState.isSuccessful) {
@@ -193,19 +182,11 @@ class TodoItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun updateRevisionInDataStore(revision: Int){
+    private suspend fun updateRevisionInDataStore(revision: Int) {
         networkDataStore.updateData { prefs ->
             prefs.toBuilder().setRevision(revision).build()
         }
     }
 
-    override suspend fun isRemoteRevisionLarger(): Boolean {
-        // задел на будущее
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun overrideLocalChanges() {
-        // задел на будущее
-        TODO("Not yet implemented")
-    }
+    private suspend fun getCurrentRevision(): Int = networkDataStore.data.first().revision
 }

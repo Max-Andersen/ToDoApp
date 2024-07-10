@@ -10,7 +10,7 @@ import java.time.ZonedDateTime
     tableName = "todo_item",
     indices = [
         Index(value = ["id"], unique = true),
-        Index(value = ["is_done"], unique = true),
+        Index(value = ["is_done"]),
     ]
 )
 data class TodoItemEntity(
@@ -29,5 +29,5 @@ data class TodoItemEntity(
     @ColumnInfo(name = "deadline_date")
     val deadlineDate: ZonedDateTime? = null,
     @ColumnInfo(name = "update_date")
-    val updateDate: ZonedDateTime? = null
+    val updateDate: ZonedDateTime
 )

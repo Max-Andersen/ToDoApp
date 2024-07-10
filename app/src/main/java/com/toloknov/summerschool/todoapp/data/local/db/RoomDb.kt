@@ -9,7 +9,7 @@ import com.toloknov.summerschool.todoapp.data.local.db.dao.TodoDao
 import com.toloknov.summerschool.todoapp.data.local.db.model.TodoItemEntity
 import com.toloknov.summerschool.todoapp.data.local.db.utils.DbConverter
 
-const val DB_VERSION = 1
+const val DB_VERSION = 2
 
 @Database(
     version = DB_VERSION,

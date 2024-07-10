@@ -16,12 +16,15 @@ class OAuthInterceptor(
             runBlocking {
                 networkDataStore.data.first()
             }
-        val originalRequest = chain.request()
-        val originalRequestWithAccessToken =
-            originalRequest.newBuilder()
-                .appendOAuthToken(preferences.token).build()
 
-        return chain.proceed(originalRequestWithAccessToken)
+        var request = chain.request()
+
+        if (preferences.token.isNotBlank()) {
+            request = request.newBuilder()
+                .appendOAuthToken(preferences.token).build()
+        }
+
+        return chain.proceed(request)
     }
 
     private fun Request.Builder.appendOAuthToken(token: String) =
