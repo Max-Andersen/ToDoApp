@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import java.io.IOException
 
 class OAuthInterceptor(
     private val networkDataStore: DataStore<NetworkPreferences>,
@@ -22,6 +23,8 @@ class OAuthInterceptor(
         if (preferences.token.isNotBlank()) {
             request = request.newBuilder()
                 .appendOAuthToken(preferences.token).build()
+        } else{
+            throw IOException("Missing OAuth token")
         }
 
         return chain.proceed(request)

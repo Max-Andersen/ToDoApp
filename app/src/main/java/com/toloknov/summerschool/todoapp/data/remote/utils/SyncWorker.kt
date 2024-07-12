@@ -16,7 +16,18 @@ class SyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
-        todoItemsRepository.syncItems()
-        return Result.success()
+
+        return when (runAttemptCount) {
+            in 0..3 -> {
+                val result = todoItemsRepository.syncItemsWithResult()
+                if (result.isSuccess) {
+                    Result.success()
+                } else {
+                    Result.retry()
+                }
+            }
+
+            else -> Result.failure()
+        }
     }
 }

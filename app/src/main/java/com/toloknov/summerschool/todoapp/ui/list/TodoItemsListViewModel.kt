@@ -3,6 +3,7 @@ package com.toloknov.summerschool.todoapp.ui.list
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.toloknov.summerschool.todoapp.data.remote.model.ResponseStatus
 import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -24,10 +25,6 @@ import javax.inject.Inject
 class TodoItemsListViewModel @Inject constructor(
     private val todoItemsRepository: TodoItemsRepository
 ) : ViewModel() {
-
-    private val _uiState: MutableStateFlow<TodoItemsListUiState> =
-        MutableStateFlow(TodoItemsListUiState())
-
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
         viewModelScope.launch {
             Log.e(TAG, exception.stackTraceToString())
@@ -36,6 +33,11 @@ class TodoItemsListViewModel @Inject constructor(
         }
     }
 
+    private val safeBackgroundCoroutineDispatcher = Dispatchers.Default + exceptionHandler
+
+    private val _uiState: MutableStateFlow<TodoItemsListUiState> =
+        MutableStateFlow(TodoItemsListUiState())
+
     val uiState: StateFlow<TodoItemsListUiState> =
         combine(todoItemsRepository.getItems(), _uiState) { items, uiState ->
             val itemsToShow = if (uiState.showDoneItems) items else items.filter { !it.isDone }
@@ -43,18 +45,58 @@ class TodoItemsListViewModel @Inject constructor(
             TodoItemsListUiState(
                 isLoading = uiState.isLoading,
                 items = itemsToShow.map { it.toUiModel() },
-                showDoneItems = uiState.showDoneItems
+                showDoneItems = uiState.showDoneItems,
+                networkAvailable = uiState.networkAvailable
             )
         }
-            .flowOn(Dispatchers.Default + exceptionHandler)
+            .flowOn(safeBackgroundCoroutineDispatcher)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), TodoItemsListUiState())
 
 
     private val _effect = MutableSharedFlow<TodoItemsListEffect>()
     val effect: SharedFlow<TodoItemsListEffect> = _effect.asSharedFlow()
 
+    init {
+        viewModelScope.launch {
+            todoItemsRepository.getActionStatusFlow().collect { status ->
+                when (status) {
+                    ResponseStatus.Error -> {
+                        _uiState.update { prevState -> prevState.copy(isLoading = false) }
+                        _effect.emit(TodoItemsListEffect.ShowSnackbar("Произошла ошибка, повторите попытку"))
+                    }
+
+                    ResponseStatus.InProgress -> {
+                        _uiState.update { prevState -> prevState.copy(isLoading = true) }
+                    }
+
+                    ResponseStatus.NetworkUnavailable -> {
+                        // Ok, дальше по приборам (в офлайн режиме)
+                        Log.d("TodoItemsListViewModel", "Network unavailable")
+                        _uiState.update { prevState ->
+                            prevState.copy(
+                                isLoading = false,
+                                networkAvailable = false
+                            )
+                        }
+                    }
+
+                    ResponseStatus.Success -> {
+                        _uiState.update { prevState ->
+                            prevState.copy(
+                                isLoading = false,
+                                networkAvailable = true
+                            )
+                        }
+                    }
+
+                    ResponseStatus.Idle -> {}
+                }
+            }
+        }
+    }
+
     fun reduce(intent: TodoItemsListIntent) =
-        viewModelScope.launch(Dispatchers.Default + exceptionHandler) {
+        viewModelScope.launch(safeBackgroundCoroutineDispatcher) {
             when (intent) {
                 is TodoItemsListIntent.ClickOnShowDoneItems -> {
                     _uiState.update { lastState ->
@@ -65,31 +107,15 @@ class TodoItemsListViewModel @Inject constructor(
                 }
 
                 is TodoItemsListIntent.DeleteItem -> {
-                    _uiState.update { prevState -> prevState.copy(isLoading = true) }
                     todoItemsRepository.removeItem(intent.itemId)
-//                        .onFailure {
-//                        _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка удаления"))
-//                    }
-                    _uiState.update { prevState -> prevState.copy(isLoading = false) }
                 }
 
                 is TodoItemsListIntent.ChangeItemStatus -> {
-                    _uiState.update { prevState -> prevState.copy(isLoading = true) }
                     todoItemsRepository.setDoneStatusForItem(intent.itemId, intent.newStatus)
-//                        .onFailure {
-//                            _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка изменения статуса"))
-//                        }
-                    _uiState.update { prevState -> prevState.copy(isLoading = false) }
 
                 }
 
-                TodoItemsListIntent.SyncData -> {
-                    _uiState.update { prevState -> prevState.copy(isLoading = true) }
-//                    todoItemsRepository.syncItemsWithResult().onFailure {
-//                        _effect.emit(TodoItemsListEffect.ShowSnackbar("Ошибка получения данных"))
-//                    }
-                    _uiState.update { prevState -> prevState.copy(isLoading = false) }
-                }
+                TodoItemsListIntent.SyncData -> {}
             }
         }
 
@@ -101,7 +127,8 @@ class TodoItemsListViewModel @Inject constructor(
 data class TodoItemsListUiState(
     val isLoading: Boolean = true,
     val items: List<TodoItemUi> = emptyList(),
-    val showDoneItems: Boolean = true
+    val showDoneItems: Boolean = true,
+    val networkAvailable: Boolean = true
 )
 
 sealed class TodoItemsListEffect {

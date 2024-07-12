@@ -1,6 +1,5 @@
 package com.toloknov.summerschool.todoapp.ui.list
 
-import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -55,7 +54,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toloknov.summerschool.todoapp.R
@@ -100,6 +99,7 @@ fun TodoItemsList(
     }
 
     TodoItemsStateless(
+        networkAvailable = uiState.networkAvailable,
         isLoading = uiState.isLoading,
         items = uiState.items,
         showDoneItems = uiState.showDoneItems,
@@ -110,9 +110,9 @@ fun TodoItemsList(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TodoItemsStateless(
+    networkAvailable: Boolean,
     isLoading: Boolean = false,
     items: List<TodoItemUi>,
     showDoneItems: Boolean,
@@ -136,6 +136,8 @@ private fun TodoItemsStateless(
                     expandedTextStyle = MaterialTheme.typography.titleLarge
                 ),
                 actions = {
+                    NetworkStatusIcon(networkAvailable)
+
                     ShowDoneItemsIcon(showDoneItems) {
                         reduce(TodoItemsListIntent.ClickOnShowDoneItems)
                     }
@@ -235,6 +237,15 @@ private fun TodoItemsStateless(
             }
         }
     }
+}
+
+@Composable
+private fun NetworkStatusIcon(networkAvailable: Boolean) {
+    Icon(
+        painter = painterResource(id = if (networkAvailable) R.drawable.connetion_on else R.drawable.connetion_off),
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.primaryContainer
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -425,9 +436,9 @@ fun TodoListItemText(
 }
 
 
-@Preview
+@PreviewLightDark
 @Composable
-private fun TodoListPreviewLight() {
+private fun TodoListPreview() {
     ToDoAppTheme {
         TodoItemsStateless(
             items = listOf(
@@ -462,54 +473,13 @@ private fun TodoListPreviewLight() {
             clickOnItem = {},
             clickOnCreate = {},
             isLoading = false,
+            networkAvailable = true
         )
     }
 }
 
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
-@Composable
-private fun TodoListPreviewDark() {
-    ToDoAppTheme {
-        TodoItemsStateless(
-            items = listOf(
-                TodoItemUi(
-                    id = "1",
-                    text = "Купить хлеб",
-                    importance = ItemImportance.LOW,
-                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
-                    isDone = false,
-                    updateTs = null
-                ),
-                TodoItemUi(
-                    id = "2",
-                    text = "Купить хлеб",
-                    importance = ItemImportance.LOW,
-                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
-                    isDone = false,
-                    updateTs = null
-                ),
-                TodoItemUi(
-                    id = "3",
-                    text = "Купить хлеб важно!",
-                    importance = ItemImportance.HIGH,
-                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
-                    deadlineTs = "2022-01-01",
-                    isDone = false,
-                    updateTs = null
-                ),
-            ),
-            showDoneItems = true,
-            reduce = {},
-            clickOnItem = {},
-            clickOnCreate = {},
-            isLoading = false
-        )
-    }
-}
-
-
-@Preview
+@PreviewLightDark
 @Composable
 private fun TodoItemListPreviewLight() {
     ToDoAppTheme {
@@ -556,52 +526,3 @@ private fun TodoItemListPreviewLight() {
         }
     }
 }
-
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
-@Composable
-private fun TodoItemListPreviewDark() {
-    ToDoAppTheme {
-        Surface {
-            val list = listOf(
-                TodoItemUi(
-                    id = "1",
-                    text = "Купить хлеб",
-                    importance = ItemImportance.COMMON,
-                    isDone = false,
-                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
-                ),
-                TodoItemUi(
-                    id = "2",
-                    text = "Купить много хлеба",
-                    importance = ItemImportance.HIGH,
-                    isDone = false,
-                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
-                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
-                ),
-                TodoItemUi(
-                    id = "3",
-                    text = "Купить много хлеба",
-                    importance = ItemImportance.HIGH,
-                    isDone = true,
-                    creationDate = ZonedDateTime.now().convertToReadable() ?: "",
-                    deadlineTs = ZonedDateTime.now().convertToReadable() ?: "",
-                )
-            )
-
-            LazyColumn() {
-                items(list, key = { it.id }) { item ->
-                    TodoListItem(
-                        modifier = Modifier
-                            .defaultMinSize(minHeight = 48.dp)
-                            .background(MaterialTheme.colorScheme.surfaceContainer),
-                        itemUi = item,
-                        clickOnItem = { },
-                        onChangeStatus = { },
-                        onDelete = { }
-                    )
-                }
-            }
-        }
-    }
-}
-

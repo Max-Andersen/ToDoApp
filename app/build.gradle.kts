@@ -129,6 +129,8 @@ dependencies {
 
     // WorkManager for periodic or single work
     implementation(libs.androidx.work.runtime.ktx)
+    ksp(libs.hilt.compiler)
+    ksp(libs.google.hilt.compiler)
 
     // Debug
     debugImplementation(libs.androidx.ui.tooling)

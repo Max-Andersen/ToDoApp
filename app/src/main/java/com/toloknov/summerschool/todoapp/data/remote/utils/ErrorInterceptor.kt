@@ -1,14 +1,13 @@
 package com.toloknov.summerschool.todoapp.data.remote.utils
 
 import android.util.Log
-import com.google.gson.Gson
 import okhttp3.Interceptor
 import okhttp3.Response
-import java.io.IOException
+import java.util.concurrent.atomic.AtomicInteger
 
-class ErrorInterceptor(private val gson: Gson) : Interceptor {
+class ErrorInterceptor : Interceptor {
 
-    private var retryCount = 0
+    private var retryCount: AtomicInteger = AtomicInteger(0)
     private val maxRetries = 3
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -22,13 +21,13 @@ class ErrorInterceptor(private val gson: Gson) : Interceptor {
             var retryResponse: Response? = null
             var responseOK = false
 
-            while (!responseOK && retryCount < maxRetries) {
+            while (!responseOK && retryCount.get() < maxRetries) {
                 try {
                     retryResponse = chain.proceed(retryRequest)
                     responseOK = retryResponse.isSuccessful
-                } catch (e: IOException) {
-                    retryCount++
-                    if (retryCount >= maxRetries) {
+                } catch (e: Exception) {
+                    retryCount.incrementAndGet()
+                    if (retryCount.get() >= maxRetries) {
                         break
                     }
                 }

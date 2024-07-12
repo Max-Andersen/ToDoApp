@@ -12,7 +12,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.toloknov.summerschool.todoapp.ui.AppNavGraph
 import com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme
-import com.toloknov.summerschool.todoapp.ui.navigation.AppScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -29,13 +28,9 @@ class MainActivity : ComponentActivity() {
             val startDestination by viewModel.startDestination.collectAsStateWithLifecycle()
 
             startDestination?.let { destination ->
-                val startDestinationRoute = when (destination) {
-                    MainViewModel.StartDestination.LOGIN -> AppScreen.Login.route
-                    MainViewModel.StartDestination.LIST -> AppScreen.List.route
-                }
                 ToDoAppTheme {
                     AppNavGraph(
-                        startDestination = startDestinationRoute,
+                        startDestination = destination,
                         navController = rememberNavController()
                     )
                 }

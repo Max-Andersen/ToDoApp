@@ -29,9 +29,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideErrorInterceptor(
-        gson: Gson
-    ): ErrorInterceptor = ErrorInterceptor(gson)
+    fun provideErrorInterceptor(): ErrorInterceptor = ErrorInterceptor()
 
     @Provides
     @Singleton

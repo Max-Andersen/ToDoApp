@@ -21,7 +21,8 @@ import com.yandex.authsdk.YandexAuthSdk
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    loginSuccess: () -> Unit
+    loginSuccess: () -> Unit,
+    tokenSpoiled: Boolean
 ) {
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val authSuccess by viewModel.authSuccess.collectAsStateWithLifecycle()
@@ -48,9 +49,14 @@ fun LoginScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             errorMessage?.let {
                 Text(text = it)
+            }
+            if (tokenSpoiled){
+                Text(text = "Что-то произошло с авторизацией, пожалуйста, повторите попытку")
             }
             Button(onClick = { launcher.launch(loginOptions) }) {
                 Text(text = "Войти через Яндекс ID")
@@ -58,5 +64,3 @@ fun LoginScreen(
         }
     }
 }
-
-

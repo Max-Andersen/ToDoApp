@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.toloknov.summerschool.todoapp.data.local.db.model.TodoItemEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -18,8 +19,8 @@ interface TodoDao {
     @Insert
     fun insert(entity: TodoItemEntity)
 
-    @Insert
-    fun insertAll(entityList: List<TodoItemEntity>)
+    @Upsert
+    fun upsertAll(entityList: List<TodoItemEntity>)
 
     @Update
     fun update(entity: TodoItemEntity)
