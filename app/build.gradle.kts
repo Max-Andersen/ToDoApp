@@ -1,6 +1,3 @@
-import org.gradle.configurationcache.extensions.capitalized
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -71,34 +68,14 @@ android {
     }
 }
 
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.21.7"
-    }
-    plugins {
-        generateProtoTasks {
-            all().forEach {
-                it.builtins {
-                    create("java") {
-                        option("lite")
-                    }
-                }
-            }
-        }
-    }
-}
-androidComponents {
-    onVariants(selector().all()) { variant ->
-        afterEvaluate {
-            val capName = variant.name.capitalized()
-            tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
-                setSource(tasks.getByName("generate${capName}Proto").outputs)
-            }
-        }
-    }
-}
+
 
 dependencies {
+    implementation(project(":domain"))
+    implementation(project(":core:database"))
+    implementation(project(":core:datastore"))
+    implementation(project(":core:network"))
+    implementation(project(":core-impl"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -129,6 +106,7 @@ dependencies {
 
     // WorkManager for periodic or single work
     implementation(libs.androidx.work.runtime.ktx)
+
     ksp(libs.hilt.compiler)
     ksp(libs.google.hilt.compiler)
 

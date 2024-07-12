@@ -3,8 +3,8 @@ package com.toloknov.summerschool.todoapp.ui.list
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.toloknov.summerschool.todoapp.data.remote.model.ResponseStatus
-import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
+import com.toloknov.summerschool.domain.api.TodoItemsRepository
+import com.toloknov.summerschool.domain.model.ResponseStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers

@@ -2,7 +2,7 @@ package com.toloknov.summerschool.todoapp.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.toloknov.summerschool.todoapp.domain.api.NetworkRepository
+import com.toloknov.summerschool.domain.api.NetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

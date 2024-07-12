@@ -61,8 +61,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.toloknov.summerschool.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.R
-import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.ui.common.snackbar.SnackbarError
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_LARGE

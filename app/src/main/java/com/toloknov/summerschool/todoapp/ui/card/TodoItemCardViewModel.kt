@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.toloknov.summerschool.todoapp.data.remote.model.ResponseStatus
-import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
-import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
-import com.toloknov.summerschool.todoapp.domain.model.TodoItem
+import com.toloknov.summerschool.domain.api.TodoItemsRepository
+import com.toloknov.summerschool.domain.model.ItemImportance
+import com.toloknov.summerschool.domain.model.ResponseStatus
+import com.toloknov.summerschool.domain.model.TodoItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers

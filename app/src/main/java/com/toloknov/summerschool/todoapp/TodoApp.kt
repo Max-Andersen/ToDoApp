@@ -3,7 +3,7 @@ package com.toloknov.summerschool.todoapp
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import com.toloknov.summerschool.todoapp.domain.api.SyncRepository
+import com.toloknov.summerschool.domain.api.SyncRepository
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -22,7 +22,12 @@ class TodoApp : Application(), Configuration.Provider {
     lateinit var syncRepository: SyncRepository
 
     override fun onCreate() {
+//        val domainComponent = DaggerCoreImplComponent.factory().create(this)
+//        val appComponent = DaggerAppComponent.factory().create(domainComponent)
+
         super.onCreate()
+
+
         syncRepository.configureSync()
     }
 }

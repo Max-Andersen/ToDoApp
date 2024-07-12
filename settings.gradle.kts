@@ -21,4 +21,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "ToDoApp"
 include(":app")
- 
+include(":domain")
+include(":core:database")
+include(":core:datastore")
+include(":core:network")
+include(":core-impl")
