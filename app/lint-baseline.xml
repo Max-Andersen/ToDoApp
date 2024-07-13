@@ -1,0 +1,854 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.3.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.3.1)" variant="all" version="8.3.1">
+
+    <issue
+        id="SimpleDateFormat"
+        message="To get local formatting use `getDateInstance()`, `getDateTimeInstance()`, or `getTimeInstance()`, or use `new SimpleDateFormat(String template, Locale locale)` with for example `Locale.US` for ASCII dates."
+        errorLine1="fun Date.convertToReadableTimeLess(): String = SimpleDateFormat(&quot;dd.MM.yyyy&quot;).format(this)"
+        errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/toloknov/summerschool/todoapp/ui/common/utils/DateUtils.kt"
+            line="13"
+            column="48"/>
+    </issue>
+
+    <issue
+        id="EnsureInitializerMetadata"
+        message="Every Initializer needs to be accompanied by a corresponding &lt;meta-data> entry in the AndroidManifest.xml file.">
+        <location
+            file="src/main/java/com/toloknov/summerschool/todoapp/WorkManagerModule.kt"/>
+    </issue>
+
+    <issue
+        id="RedundantLabel"
+        message="Redundant label can be removed"
+        errorLine1="            android:label=&quot;@string/app_name&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="25"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.application than 8.3.1 is available: 8.5.1. (There is also a newer version of 8.3.𝑥 available, if upgrading to 8.5.1 is difficult: 8.3.2)"
+        errorLine1="agp = &quot;8.3.1&quot;"
+        errorLine2="      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.application than 8.3.1 is available: 8.5.1. (There is also a newer version of 8.3.𝑥 available, if upgrading to 8.5.1 is difficult: 8.3.2)"
+        errorLine1="agp = &quot;8.3.1&quot;"
+        errorLine2="      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.application than 8.3.1 is available: 8.5.1. (There is also a newer version of 8.3.𝑥 available, if upgrading to 8.5.1 is difficult: 8.3.2)"
+        errorLine1="agp = &quot;8.3.1&quot;"
+        errorLine2="      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.library than 8.3.1 is available: 8.5.1. (There is also a newer version of 8.3.𝑥 available, if upgrading to 8.5.1 is difficult: 8.3.2)"
+        errorLine1="agp = &quot;8.3.1&quot;"
+        errorLine2="      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.library than 8.3.1 is available: 8.5.1. (There is also a newer version of 8.3.𝑥 available, if upgrading to 8.5.1 is difficult: 8.3.2)"
+        errorLine1="agp = &quot;8.3.1&quot;"
+        errorLine2="      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.library than 8.3.1 is available: 8.5.1. (There is also a newer version of 8.3.𝑥 available, if upgrading to 8.5.1 is difficult: 8.3.2)"
+        errorLine1="agp = &quot;8.3.1&quot;"
+        errorLine2="      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.tools.build:gradle than 8.3.1 is available: 8.5.1. (There is also a newer version of 8.3.𝑥 available, if upgrading to 8.5.1 is difficult: 8.3.2)"
+        errorLine1="agp = &quot;8.3.1&quot;"
+        errorLine2="      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.tools.build:gradle than 8.3.1 is available: 8.5.1. (There is also a newer version of 8.3.𝑥 available, if upgrading to 8.5.1 is difficult: 8.3.2)"
+        errorLine1="agp = &quot;8.3.1&quot;"
+        errorLine2="      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.tools.build:gradle than 8.3.1 is available: 8.5.1. (There is also a newer version of 8.3.𝑥 available, if upgrading to 8.5.1 is difficult: 8.3.2)"
+        errorLine1="agp = &quot;8.3.1&quot;"
+        errorLine2="      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="2"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.hilt:hilt-work than 1.0.0 is available: 1.2.0"
+        errorLine1="hiltWorkVersion = &quot;1.0.0&quot;"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="10"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.hilt:hilt-work than 1.0.0 is available: 1.2.0"
+        errorLine1="hiltWorkVersion = &quot;1.0.0&quot;"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="10"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.hilt:hilt-work than 1.0.0 is available: 1.2.0"
+        errorLine1="hiltWorkVersion = &quot;1.0.0&quot;"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="10"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin.android than 1.9.24 is available: 2.0.0"
+        errorLine1="kotlin = &quot;1.9.24&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="11"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin.android than 1.9.24 is available: 2.0.0"
+        errorLine1="kotlin = &quot;1.9.24&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="11"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin.android than 1.9.24 is available: 2.0.0"
+        errorLine1="kotlin = &quot;1.9.24&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="11"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin.plugin.serialization than 1.9.24 is available: 2.0.0"
+        errorLine1="kotlin = &quot;1.9.24&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="11"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin.plugin.serialization than 1.9.24 is available: 2.0.0"
+        errorLine1="kotlin = &quot;1.9.24&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="11"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin.plugin.serialization than 1.9.24 is available: 2.0.0"
+        errorLine1="kotlin = &quot;1.9.24&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="11"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.2.1"
+        errorLine1="junitVersion = &quot;1.1.5&quot;"
+        errorLine2="               ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="14"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.2.1"
+        errorLine1="junitVersion = &quot;1.1.5&quot;"
+        errorLine2="               ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="14"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.2.1"
+        errorLine1="junitVersion = &quot;1.1.5&quot;"
+        errorLine2="               ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="14"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.6.1"
+        errorLine1="espressoCore = &quot;3.5.1&quot;"
+        errorLine2="               ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="15"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.6.1"
+        errorLine1="espressoCore = &quot;3.5.1&quot;"
+        errorLine2="               ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="15"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.6.1"
+        errorLine1="espressoCore = &quot;3.5.1&quot;"
+        errorLine2="               ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="15"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-core than 1.6.1 is available: 1.8.1"
+        errorLine1="kotlinxCoroutinesCore = &quot;1.6.1&quot;"
+        errorLine2="                        ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="16"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-core than 1.6.1 is available: 1.8.1"
+        errorLine1="kotlinxCoroutinesCore = &quot;1.6.1&quot;"
+        errorLine2="                        ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="16"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-core than 1.6.1 is available: 1.8.1"
+        errorLine1="kotlinxCoroutinesCore = &quot;1.6.1&quot;"
+        errorLine2="                        ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="16"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-serialization-json than 1.6.0 is available: 1.6.3"
+        errorLine1="kotlinxSerializationJson = &quot;1.6.0&quot;"
+        errorLine2="                           ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="17"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-serialization-json than 1.6.0 is available: 1.6.3"
+        errorLine1="kotlinxSerializationJson = &quot;1.6.0&quot;"
+        errorLine2="                           ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="17"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-serialization-json than 1.6.0 is available: 1.6.3"
+        errorLine1="kotlinxSerializationJson = &quot;1.6.0&quot;"
+        errorLine2="                           ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="17"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-runtime-compose than 2.8.2 is available: 2.8.3"
+        errorLine1="lifecycleRuntimeKtx = &quot;2.8.2&quot;"
+        errorLine2="                      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="18"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-runtime-compose than 2.8.2 is available: 2.8.3"
+        errorLine1="lifecycleRuntimeKtx = &quot;2.8.2&quot;"
+        errorLine2="                      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="18"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-runtime-compose than 2.8.2 is available: 2.8.3"
+        errorLine1="lifecycleRuntimeKtx = &quot;2.8.2&quot;"
+        errorLine2="                      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="18"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.8.2 is available: 2.8.3"
+        errorLine1="lifecycleRuntimeKtx = &quot;2.8.2&quot;"
+        errorLine2="                      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="18"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.8.2 is available: 2.8.3"
+        errorLine1="lifecycleRuntimeKtx = &quot;2.8.2&quot;"
+        errorLine2="                      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="18"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.8.2 is available: 2.8.3"
+        errorLine1="lifecycleRuntimeKtx = &quot;2.8.2&quot;"
+        errorLine2="                      ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="18"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.navigation:navigation-compose than 2.7.6 is available: 2.7.7"
+        errorLine1="navigationCompose = &quot;2.7.6&quot;"
+        errorLine2="                    ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="21"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.navigation:navigation-compose than 2.7.6 is available: 2.7.7"
+        errorLine1="navigationCompose = &quot;2.7.6&quot;"
+        errorLine2="                    ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="21"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.navigation:navigation-compose than 2.7.6 is available: 2.7.7"
+        errorLine1="navigationCompose = &quot;2.7.6&quot;"
+        errorLine2="                    ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="21"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.squareup.okhttp3:logging-interceptor than 5.0.0-alpha.2 is available: 5.0.0-alpha.12"
+        errorLine1="okhttp = &quot;5.0.0-alpha.2&quot;"
+        errorLine2="         ~~~~~~~~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="23"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.squareup.okhttp3:logging-interceptor than 5.0.0-alpha.2 is available: 5.0.0-alpha.12"
+        errorLine1="okhttp = &quot;5.0.0-alpha.2&quot;"
+        errorLine2="         ~~~~~~~~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="23"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.squareup.okhttp3:logging-interceptor than 5.0.0-alpha.2 is available: 5.0.0-alpha.12"
+        errorLine1="okhttp = &quot;5.0.0-alpha.2&quot;"
+        errorLine2="         ~~~~~~~~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="23"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin.jvm than 1.9.24 is available: 2.0.0"
+        errorLine1="jetbrainsKotlinJvm = &quot;1.9.24&quot;"
+        errorLine2="                     ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="29"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin.jvm than 1.9.24 is available: 2.0.0"
+        errorLine1="jetbrainsKotlinJvm = &quot;1.9.24&quot;"
+        errorLine2="                     ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="29"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin.jvm than 1.9.24 is available: 2.0.0"
+        errorLine1="jetbrainsKotlinJvm = &quot;1.9.24&quot;"
+        errorLine2="                     ~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="29"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of io.ktor:ktor-client-core than 2.3.7 is available: 2.3.12"
+        errorLine1="ktor = &quot;2.3.7&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="32"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of io.ktor:ktor-client-core than 2.3.7 is available: 2.3.12"
+        errorLine1="ktor = &quot;2.3.7&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="32"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of io.ktor:ktor-client-core than 2.3.7 is available: 2.3.12"
+        errorLine1="ktor = &quot;2.3.7&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="32"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of io.ktor:ktor-client-okhttp than 2.3.7 is available: 2.3.12"
+        errorLine1="ktor = &quot;2.3.7&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="32"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of io.ktor:ktor-client-okhttp than 2.3.7 is available: 2.3.12"
+        errorLine1="ktor = &quot;2.3.7&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="32"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of io.ktor:ktor-client-okhttp than 2.3.7 is available: 2.3.12"
+        errorLine1="ktor = &quot;2.3.7&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="32"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.devtools.ksp than 2.0.0-1.0.21 is available: 2.0.0-1.0.22"
+        errorLine1="ksp = &quot;2.0.0-1.0.21&quot;"
+        errorLine2="      ~~~~~~~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="34"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.devtools.ksp than 2.0.0-1.0.21 is available: 2.0.0-1.0.22"
+        errorLine1="ksp = &quot;2.0.0-1.0.21&quot;"
+        errorLine2="      ~~~~~~~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="34"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.devtools.ksp than 2.0.0-1.0.21 is available: 2.0.0-1.0.22"
+        errorLine1="ksp = &quot;2.0.0-1.0.21&quot;"
+        errorLine2="      ~~~~~~~~~~~~~~">
+        <location
+            file="$HOME/AndroidStudioProjects/ToDoApp/gradle/libs.versions.toml"
+            line="34"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="LockedOrientationActivity"
+        message="Expecting `android:screenOrientation=&quot;unspecified&quot;` or `&quot;fullSensor&quot;` for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices"
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="26"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="26"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 26. Merge all the resources in this folder into `mipmap-anydpi`.">
+        <location
+            file="src/main/res/mipmap-anydpi-v26"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1127 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M12,13.68L15.48,17.16C15.7,17.38 15.98,17.49 16.32,17.49C16.66,17.49 16.94,17.38 17.16,17.16C17.38,16.94 17.49,16.66 17.49,16.32C17.49,15.98 17.38,15.7 17.16,15.48L13.68,12L17.16,8.52C17.38,8.3 17.49,8.02 17.49,7.68C17.49,7.34 17.38,7.06 17.16,6.84C16.94,6.62 16.66,6.51 16.32,6.51C15.98,6.51 15.7,6.62 15.48,6.84L12,10.32L8.52,6.84C8.3,6.62 8.02,6.51 7.68,6.51C7.34,6.51 7.06,6.62 6.84,6.84C6.62,7.06 6.51,7.34 6.51,7.68C6.51,8.02 6.62,8.3 6.84,8.52L10.32,12L6.84,15.48C6.62,15.7 6.51,15.98 6.51,16.32C6.51,16.66 6.62,16.94 6.84,17.16C7.06,17.38 7.34,17.49 7.68,17.49C8.02,17.49 8.3,17.38 8.52,17.16L12,13.68ZM12,24C10.34,24 8.78,23.685 7.32,23.055C5.86,22.425 4.59,21.57 3.51,20.49C2.43,19.41 1.575,18.14 0.945,16.68C0.315,15.22 0,13.66 0,12C0,10.34 0.315,8.78 0.945,7.32C1.575,5.86 2.43,4.59 3.51,3.51C4.59,2.43 5.86,1.575 7.32,0.945C8.78,0.315 10.34,0 12,0C13.66,0 15.22,0.315 16.68,0.945C18.14,1.575 19.41,2.43 20.49,3.51C21.57,4.59 22.425,5.86 23.055,7.32C23.685,8.78 24,10.34 24,12C24,13.66 23.685,15.22 23.055,16.68C22.425,18.14 21.57,19.41 20.49,20.49C19.41,21.57 18.14,22.425 16.68,23.055C15.22,23.685 13.66,24 12,24Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_circle_cancel_24.xml"
+            line="7"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1089 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M11.859,9H12C12.813,9 13.516,9.297 14.109,9.891C14.703,10.484 15,11.188 15,12V12.188L11.859,9ZM7.547,9.797C7.172,10.547 6.984,11.281 6.984,12C6.984,13.375 7.469,14.563 8.438,15.563C9.438,16.531 10.625,17.016 12,17.016C12.719,17.016 13.453,16.828 14.203,16.453L12.656,14.906C12.406,14.969 12.188,15 12,15C11.188,15 10.484,14.703 9.891,14.109C9.297,13.516 9,12.813 9,12C9,11.813 9.031,11.594 9.094,11.344L7.547,9.797ZM2.016,4.266L3.281,3L21,20.719L19.734,21.984C19.578,21.828 19.078,21.344 18.234,20.531C17.422,19.719 16.797,19.094 16.359,18.656C15.016,19.219 13.563,19.5 12,19.5C9.531,19.5 7.297,18.813 5.297,17.438C3.297,16.063 1.859,14.25 0.984,12C1.766,10.063 3.016,8.406 4.734,7.031C4.359,6.656 3.828,6.125 3.141,5.438C2.484,4.75 2.109,4.359 2.016,4.266ZM12,6.984C11.375,6.984 10.766,7.109 10.172,7.359L8.016,5.203C9.234,4.734 10.563,4.5 12,4.5C14.469,4.5 16.688,5.188 18.656,6.563C20.656,7.938 22.094,9.75 22.969,12C22.219,13.844 21.078,15.422 19.547,16.734L16.641,13.828C16.891,13.234 17.016,12.625 17.016,12C17.016,10.625 16.516,9.453 15.516,8.484C14.547,7.484 13.375,6.984 12,6.984Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_eye_closed_24.xml"
+            line="7"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (882 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M9.891,9.891C10.484,9.297 11.188,9 12,9C12.813,9 13.516,9.297 14.109,9.891C14.703,10.484 15,11.188 15,12C15,12.813 14.703,13.516 14.109,14.109C13.516,14.703 12.813,15 12,15C11.188,15 10.484,14.703 9.891,14.109C9.297,13.516 9,12.813 9,12C9,11.188 9.297,10.484 9.891,9.891ZM8.438,15.563C9.438,16.531 10.625,17.016 12,17.016C13.375,17.016 14.547,16.531 15.516,15.563C16.516,14.563 17.016,13.375 17.016,12C17.016,10.625 16.516,9.453 15.516,8.484C14.547,7.484 13.375,6.984 12,6.984C10.625,6.984 9.438,7.484 8.438,8.484C7.469,9.453 6.984,10.625 6.984,12C6.984,13.375 7.469,14.563 8.438,15.563ZM5.297,6.563C7.297,5.188 9.531,4.5 12,4.5C14.469,4.5 16.703,5.188 18.703,6.563C20.703,7.938 22.141,9.75 23.016,12C22.141,14.25 20.703,16.063 18.703,17.438C16.703,18.813 14.469,19.5 12,19.5C9.531,19.5 7.297,18.813 5.297,17.438C3.297,16.063 1.859,14.25 0.984,12C1.859,9.75 3.297,7.938 5.297,6.563Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_eye_opened_24.xml"
+            line="10"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="    var heightOffsetLimit by mutableStateOf(initialHeightOffsetLimit)"
+        errorLine2="                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/toloknov/summerschool/todoapp/ui/common/toolbar/CustomToolbarScrollState.kt"
+            line="47"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="    var contentOffset by mutableStateOf(initialContentOffset)"
+        errorLine2="                         ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/toloknov/summerschool/todoapp/ui/common/toolbar/CustomToolbarScrollState.kt"
+            line="71"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="    private var _heightOffset = mutableStateOf(initialHeightOffset)"
+        errorLine2="                                ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/toloknov/summerschool/todoapp/ui/common/toolbar/CustomToolbarScrollState.kt"
+            line="86"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.purple_200` appears to be unused"
+        errorLine1="    &lt;color name=&quot;purple_200&quot;>#FFBB86FC&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="3"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.purple_500` appears to be unused"
+        errorLine1="    &lt;color name=&quot;purple_500&quot;>#FF6200EE&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="4"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.purple_700` appears to be unused"
+        errorLine1="    &lt;color name=&quot;purple_700&quot;>#FF3700B3&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="5"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.teal_200` appears to be unused"
+        errorLine1="    &lt;color name=&quot;teal_200&quot;>#FF03DAC5&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="6"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.teal_700` appears to be unused"
+        errorLine1="    &lt;color name=&quot;teal_700&quot;>#FF018786&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="7"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.black` appears to be unused"
+        errorLine1="    &lt;color name=&quot;black&quot;>#FF000000&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="8"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.white` appears to be unused"
+        errorLine1="    &lt;color name=&quot;white&quot;>#FFFFFFFF&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="9"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_launcher_background` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_launcher_background.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_launcher_foreground` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_launcher_foreground.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.new_item` appears to be unused"
+        errorLine1="    &lt;string name=&quot;new_item&quot;>Новое&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="7"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MonochromeLauncherIcon"
+        message="The application adaptive icon is missing a monochrome tag"
+        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="MonochromeLauncherIcon"
+        message="The application adaptive roundIcon is missing a monochrome tag"
+        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+</issues>

@@ -25,6 +25,9 @@ android {
         // Выписан ручками на oauth.yandex.ru
         manifestPlaceholders["YANDEX_CLIENT_ID"] = "e81a1ac8f52f4a6fbe4980692627dc0e"
     }
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
 }
 
 
