@@ -4,9 +4,11 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
@@ -23,6 +25,16 @@ abstract class TelegramReporterTask @Inject constructor(
     @get:Input
     abstract val chatId: Property<String>
 
+    @get:InputFile
+    abstract val versionCode: RegularFileProperty
+
+    @get:InputFile
+    abstract val buildVariant: RegularFileProperty
+
+
+    @get:InputFile
+    abstract val apkSize: RegularFileProperty
+
     @TaskAction
     fun report() {
         val token = token.get()
@@ -31,10 +43,15 @@ abstract class TelegramReporterTask @Inject constructor(
             ?.filter { it.name.endsWith(".apk") }
             ?.forEach {
                 runBlocking {
-                    telegramApi.sendMessage("Build finished", token, chatId).apply {
+                    telegramApi.sendMessage(
+                        "Apk size = ${
+                            apkSize.get().asFile.readText().toLong()
+                        }     ${buildVariant.get().asFile.readText()} + ${versionCode.get().asFile.readText()}", token, chatId
+                    ).apply {
                         println(bodyAsText())
                     }
                 }
+
                 runBlocking {
                     telegramApi.upload(it, token, chatId).apply {
                         println(bodyAsText())

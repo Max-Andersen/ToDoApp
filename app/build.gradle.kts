@@ -10,6 +10,10 @@ tgReporter {
     chatId.set(providers.environmentVariable("TG_CHAT"))
 }
 
+maximSizeOfApk{
+    maxSizeMB.set(12)
+}
+
 
 android {
     namespace = "com.toloknov.summerschool.todoapp"
