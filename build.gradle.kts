@@ -9,3 +9,12 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinJvm) apply false
     alias(libs.plugins.androidLibrary) apply false
 }
+
+
+buildscript {
+    repositories{
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
