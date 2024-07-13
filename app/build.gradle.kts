@@ -9,7 +9,7 @@ tgReporter {
     token.set(providers.environmentVariable("TG_TOKEN"))
     chatId.set(providers.environmentVariable("TG_CHAT"))
 }
-
+// тест
 
 android {
     namespace = "com.toloknov.summerschool.todoapp"
