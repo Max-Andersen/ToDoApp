@@ -1,84 +1,43 @@
 plugins {
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsKotlinAndroid)
-    id("com.google.protobuf") version "0.9.0"
-    kotlin("plugin.serialization") version "1.9.0"
+    id("android-app-convention")
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+    id("telegram-reporter")
 }
+
+tgReporter {
+    token.set(providers.environmentVariable("TG_TOKEN"))
+    chatId.set(providers.environmentVariable("TG_CHAT"))
+}
+
+maximSizeOfApk{
+    maxSizeMB.set(12)
+}
+
 
 android {
     namespace = "com.toloknov.summerschool.todoapp"
-    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.toloknov.summerschool.todoapp"
-        minSdk = 26
-        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-
         // Выписан ручками на oauth.yandex.ru
         manifestPlaceholders["YANDEX_CLIENT_ID"] = "e81a1ac8f52f4a6fbe4980692627dc0e"
     }
-
-    buildTypes {
-
-        create("staging") {
-            initWith(getByName("debug"))
-            isDebuggable = false
-        }
-
-
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+    lint {
+        baseline = file("lint-baseline.xml")
     }
 }
 
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.21.7"
-    }
-    plugins {
-        generateProtoTasks {
-            all().forEach {
-                it.builtins {
-                    create("java") {
-                        option("lite")
-                    }
-                }
-            }
-        }
-    }
-}
+
 
 dependencies {
+    implementation(projects.domain)
+    implementation(projects.core.database)
+    implementation(projects.core.datastore)
+    implementation(projects.core.network)
+    implementation(projects.coreImpl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -90,25 +49,15 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
-
-    // Data store
-    implementation(libs.androidx.datastore)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.protobuf.javalite)
-
     // Compose Navigation
     implementation(libs.androidx.navigation.compose)
 
-    // Internet
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.converter.scalars)
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
-    implementation(libs.kotlinx.serialization.json)
 
     // WorkManager for periodic or single work
     implementation(libs.androidx.work.runtime.ktx)
+
+    ksp(libs.hilt.compiler)
+    ksp(libs.google.hilt.compiler)
 
     // Debug
     debugImplementation(libs.androidx.ui.tooling)
@@ -126,4 +75,14 @@ dependencies {
 
     // Splash Screen API
     implementation(libs.androidx.core.splashscreen)
+
+
+    // DI
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    kspAndroidTest(libs.google.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.work.runtime.ktx)
+
 }

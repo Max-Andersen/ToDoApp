@@ -1,7 +1,6 @@
 package com.toloknov.summerschool.todoapp.ui.card
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +21,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -37,7 +35,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -48,7 +45,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,9 +61,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.toloknov.summerschool.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.R
-import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
 import com.toloknov.summerschool.todoapp.ui.common.snackbar.SnackbarError
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG
 import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_LARGE
@@ -79,14 +74,13 @@ import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.rememberToolbarScrollBehavior
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToReadable
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToZonedDateTime
-import com.toloknov.summerschool.todoapp.ui.list.TodoItemsListEffect
 import java.time.ZonedDateTime
 
 @Composable
 fun TodoItemCard(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: TodoItemCardViewModel
 ) {
-    val viewModel: TodoItemCardViewModel = viewModel(factory = TodoItemCardViewModel.Factory)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -122,7 +116,7 @@ fun TodoItemCardStateless(
     isLoading: Boolean,
     uiState: TodoItemCardUiState,
     onBackClick: () -> Unit,
-    reduce: (TodoItemCardItent) -> Unit,
+    reduce: (TodoItemCardIntent) -> Unit,
     snackbarHostState: SnackbarHostState = SnackbarHostState()
 ) {
 
@@ -133,7 +127,7 @@ fun TodoItemCardStateless(
 
     if (firstDateDialogState) {
         DateDialog(currPickedDate = uiState.deadline,
-            onConfirmButtonClick = { reduce(TodoItemCardItent.SetDeadline(it)) },
+            onConfirmButtonClick = { reduce(TodoItemCardIntent.SetDeadline(it)) },
             onDismissRequest = {
                 firstDateDialogState = false
             })
@@ -150,7 +144,7 @@ fun TodoItemCardStateless(
                     CloseButton(onClick = onBackClick)
                 },
                 actions = {
-                    TextButton(onClick = { reduce(TodoItemCardItent.SaveTodoItem) }) {
+                    TextButton(onClick = { reduce(TodoItemCardIntent.SaveTodoItem) }) {
                         Text(text = stringResource(id = R.string.save))
                     }
                 },
@@ -187,7 +181,7 @@ fun TodoItemCardStateless(
                 Spacer(modifier = Modifier.size(PADDING_MEDIUM))
                 // Чтобы при каждой рекомпозиции мы этот список снова не собирали
                 val importanceItems = remember {
-                    ItemImportance.values()
+                    ItemImportance.entries.toTypedArray()
                 }
 
                 InputTodoText(
@@ -221,7 +215,7 @@ fun TodoItemCardStateless(
 
 @Composable
 private fun DeleteSection(
-    uiState: TodoItemCardUiState, reduce: (TodoItemCardItent) -> Unit
+    uiState: TodoItemCardUiState, reduce: (TodoItemCardIntent) -> Unit
 ) {
     val deleteSectionColor = if (uiState.isNewItem) {
         MaterialTheme.colorScheme.surfaceContainerLowest
@@ -233,7 +227,7 @@ private fun DeleteSection(
         modifier = Modifier
             .defaultMinSize(minHeight = PADDING_LARGE)
             .clip(RoundedCornerShape(PADDING_MEDIUM))
-            .clickable(enabled = !uiState.isNewItem) { reduce(TodoItemCardItent.DeleteTodoItem) },
+            .clickable(enabled = !uiState.isNewItem) { reduce(TodoItemCardIntent.DeleteTodoItem) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -245,7 +239,7 @@ private fun DeleteSection(
 
 @Composable
 private fun SelectDeadline(
-    uiState: TodoItemCardUiState, openDialog: () -> Unit, reduce: (TodoItemCardItent) -> Unit
+    uiState: TodoItemCardUiState, openDialog: () -> Unit, reduce: (TodoItemCardIntent) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -259,7 +253,7 @@ private fun SelectDeadline(
             if (newState) {
                 openDialog()
             } else {
-                reduce(TodoItemCardItent.SetDeadline(null))
+                reduce(TodoItemCardIntent.SetDeadline(null))
             }
         })
     }
@@ -275,7 +269,7 @@ private fun SelectDeadline(
 private fun ImportanceBlock(
     uiState: TodoItemCardUiState,
     importanceItems: Array<ItemImportance>,
-    reduce: (TodoItemCardItent) -> Unit
+    reduce: (TodoItemCardIntent) -> Unit
 ) {
     var dropDownExpanded by remember {
         mutableStateOf(false)
@@ -299,7 +293,7 @@ private fun ImportanceBlock(
                             text = "!! ${item.nameRu}", color = Color.Red
                         )
                     }, onClick = {
-                        reduce(TodoItemCardItent.SetImportance(item))
+                        reduce(TodoItemCardIntent.SetImportance(item))
                         dropDownExpanded = false
                     })
                 } else {
@@ -308,7 +302,7 @@ private fun ImportanceBlock(
                             text = item.nameRu,
                         )
                     }, onClick = {
-                        reduce(TodoItemCardItent.SetImportance(item))
+                        reduce(TodoItemCardIntent.SetImportance(item))
                         dropDownExpanded = false
                     })
                 }
@@ -320,7 +314,7 @@ private fun ImportanceBlock(
 
 @Composable
 private fun InputTodoText(
-    uiState: TodoItemCardUiState, reduce: (TodoItemCardItent) -> Unit
+    uiState: TodoItemCardUiState, reduce: (TodoItemCardIntent) -> Unit
 ) {
     OutlinedTextField(
         modifier = Modifier
@@ -328,7 +322,7 @@ private fun InputTodoText(
             .shadow(2.dp, RoundedCornerShape(PADDING_MEDIUM))
             .defaultMinSize(minHeight = 100.dp),
         value = uiState.text,
-        onValueChange = { reduce(TodoItemCardItent.SetText(it)) },
+        onValueChange = { reduce(TodoItemCardIntent.SetText(it)) },
         shape = RoundedCornerShape(PADDING_MEDIUM),
         colors = MaterialTheme.colorScheme.textFieldTheme,
         placeholder = {

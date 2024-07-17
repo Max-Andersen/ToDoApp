@@ -9,7 +9,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
+import com.toloknov.summerschool.domain.model.ItemImportance
 
 val ColorScheme.importanceCheckBoxTheme: @Composable (ItemImportance) -> CheckboxColors
     @Composable get() = { importance ->

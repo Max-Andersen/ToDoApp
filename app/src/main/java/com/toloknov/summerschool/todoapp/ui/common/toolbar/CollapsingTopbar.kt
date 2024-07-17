@@ -298,7 +298,8 @@ fun TopbarContent(
         Row(
             modifier = Modifier
                 .wrapContentSize()
-                .layoutId(ActionsId)
+                .layoutId(ActionsId),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             actions()
         }

@@ -1,18 +1,14 @@
 package com.toloknov.summerschool.todoapp.ui.card
 
 import android.util.Log
-import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.toloknov.summerschool.todoapp.TodoApp
-import com.toloknov.summerschool.todoapp.domain.api.TodoItemsRepository
-import com.toloknov.summerschool.todoapp.domain.model.ItemImportance
-import com.toloknov.summerschool.todoapp.domain.model.TodoItem
+import com.toloknov.summerschool.domain.api.TodoItemsRepository
+import com.toloknov.summerschool.domain.model.ItemImportance
+import com.toloknov.summerschool.domain.model.ResponseStatus
+import com.toloknov.summerschool.domain.model.TodoItem
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,27 +16,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 import java.util.UUID
+import javax.inject.Inject
 
-class TodoItemCardViewModel(
+@HiltViewModel
+class TodoItemCardViewModel @Inject constructor(
     private val todoItemsRepository: TodoItemsRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
-    private val itemId = savedStateHandle.get<String>("itemId")
-
-    private val _uiState: MutableStateFlow<TodoItemCardUiState> =
-        MutableStateFlow(TodoItemCardUiState())
-    val uiState: StateFlow<TodoItemCardUiState> =
-        _uiState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), _uiState.value)
-
-    private val _effect: MutableSharedFlow<TodoItemCardEffect> = MutableSharedFlow()
-    val effect: SharedFlow<TodoItemCardEffect> = _effect
-
+    
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
         viewModelScope.launch {
             Log.e(TAG, "caught  " + exception.stackTraceToString())
@@ -49,13 +38,36 @@ class TodoItemCardViewModel(
         }
     }
 
-    init {
-        viewModelScope.launch(Dispatchers.Default + exceptionHandler) {
-            itemId?.let {
-                _uiState.update { prevState -> prevState.copy(isLoading = true) }
-                val itemResult = todoItemsRepository.getById(itemId)
+    private val safeBackgroundCoroutineDispatcher = Dispatchers.Default + exceptionHandler
 
-                itemResult.onSuccess { item ->
+    private val itemId = savedStateHandle.get<String>("itemId")
+
+    private val _uiState: MutableStateFlow<TodoItemCardUiState> =
+        MutableStateFlow(TodoItemCardUiState())
+    val uiState: StateFlow<TodoItemCardUiState> =
+        combine(todoItemsRepository.getActionStatusFlow(), _uiState) { status, state ->
+            TodoItemCardUiState(
+                isLoading = state.isLoading,
+                networkRequestStatus = status,
+                isNewItem = state.isNewItem,
+                text = state.text,
+                isDone = state.isDone,
+                importance = state.importance,
+                creationTime = state.creationTime,
+                deadline = state.deadline,
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), _uiState.value)
+
+    private val _effect: MutableSharedFlow<TodoItemCardEffect> = MutableSharedFlow()
+    val effect: SharedFlow<TodoItemCardEffect> = _effect
+
+
+    init {
+        viewModelScope.launch(safeBackgroundCoroutineDispatcher) {
+            launch {
+                itemId?.let {
+                    val item = todoItemsRepository.getById(itemId)
+
                     item?.let { data ->
                         _uiState.update { lastState ->
                             lastState.copy(
@@ -68,19 +80,42 @@ class TodoItemCardViewModel(
                             )
                         }
                     }
-                }.onFailure {
-                    _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка получения информации"))
                 }
             }
-            _uiState.update { prevState -> prevState.copy(isLoading = false) }
+
+            launch {
+                todoItemsRepository.getActionStatusFlow().collect { status ->
+                    when (status) {
+                        ResponseStatus.Idle -> {}
+
+                        ResponseStatus.Error -> {
+                            _uiState.update { prevState -> prevState.copy(isLoading = false) }
+                            _effect.emit(TodoItemCardEffect.ShowSnackbar("Произошла ошибка, повторите попытку"))
+                        }
+
+                        ResponseStatus.InProgress -> {
+                            _uiState.update { prevState -> prevState.copy(isLoading = true) }
+                        }
+
+                        ResponseStatus.NetworkUnavailable -> {
+                            // Ok, дальше по приборам (в офлайн режиме)
+                            _uiState.update { prevState -> prevState.copy(isLoading = false) }
+                            _effect.emit(TodoItemCardEffect.NavigateBack)
+                        }
+
+                        ResponseStatus.Success -> {
+                            _effect.emit(TodoItemCardEffect.NavigateBack)
+                        }
+                    }
+                }
+            }
         }
     }
 
-
-    fun reduce(intent: TodoItemCardItent) =
-        viewModelScope.launch(Dispatchers.Default + exceptionHandler) {
+    fun reduce(intent: TodoItemCardIntent) =
+        viewModelScope.launch(safeBackgroundCoroutineDispatcher) {
             when (intent) {
-                is TodoItemCardItent.SetText -> {
+                is TodoItemCardIntent.SetText -> {
                     _uiState.update { lastState ->
                         lastState.copy(
                             text = intent.text
@@ -88,7 +123,7 @@ class TodoItemCardViewModel(
                     }
                 }
 
-                is TodoItemCardItent.SetImportance -> {
+                is TodoItemCardIntent.SetImportance -> {
                     _uiState.update { lastState ->
                         lastState.copy(
                             importance = intent.importance
@@ -96,7 +131,7 @@ class TodoItemCardViewModel(
                     }
                 }
 
-                is TodoItemCardItent.SetDeadline -> {
+                is TodoItemCardIntent.SetDeadline -> {
                     _uiState.update { lastState ->
                         lastState.copy(
                             deadline = intent.deadline
@@ -104,21 +139,14 @@ class TodoItemCardViewModel(
                     }
                 }
 
-                is TodoItemCardItent.DeleteTodoItem -> {
+                is TodoItemCardIntent.DeleteTodoItem -> {
                     if (itemId != null) {
-                        _uiState.update { prevState -> prevState.copy(isLoading = true) }
-                        todoItemsRepository.removeItem(itemId).onSuccess {
-                            _effect.emit(TodoItemCardEffect.NavigateBack)
-                        }.onFailure {
-                            _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка удаления"))
-                        }
-                        _uiState.update { prevState -> prevState.copy(isLoading = false) }
+                        todoItemsRepository.removeItem(itemId)
                     }
                 }
 
-                is TodoItemCardItent.SaveTodoItem -> {
+                is TodoItemCardIntent.SaveTodoItem -> {
                     with(_uiState.value) {
-                        _uiState.update { prevState -> prevState.copy(isLoading = true) }
                         if (isNewItem) {
                             todoItemsRepository.addItem(
                                 TodoItem(
@@ -130,13 +158,10 @@ class TodoItemCardViewModel(
                                     deadlineTs = deadline,
                                     updateTs = ZonedDateTime.now(),
                                 )
-                            ).onSuccess {
-                                _effect.emit(TodoItemCardEffect.NavigateBack)
-                            }.onFailure {
-                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Произошла ошибка"))
-                            }
+                            )
                         } else {
-                            val currentItemId = requireNotNull(itemId) // Невозможное состояние, но кто его знает
+                            val currentItemId =
+                                requireNotNull(itemId) // Невозможное состояние, но кто его знает
                             val currentItemCreationDate = requireNotNull(creationTime)
                             todoItemsRepository.updateItem(
                                 TodoItem(
@@ -148,37 +173,14 @@ class TodoItemCardViewModel(
                                     deadlineTs = deadline,
                                     updateTs = ZonedDateTime.now(),
                                 )
-                            ).onSuccess {
-                                _effect.emit(TodoItemCardEffect.NavigateBack)
-                            }.onFailure {
-                                _effect.emit(TodoItemCardEffect.ShowSnackbar("Ошибка обновления напоминания"))
-                            }
+                            )
                         }
-                        _uiState.update { prevState -> prevState.copy(isLoading = false) }
                     }
                 }
             }
         }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                // Получаем инстанс приложения (а он один, поэтому и di контейнер будет один)
-                val application = checkNotNull(extras[APPLICATION_KEY])
-                // Создаём SavedStateHandle для чтения навигационных аргументов
-                val savedStateHandle = extras.createSavedStateHandle()
-
-                return TodoItemCardViewModel(
-                    (application as TodoApp).getTodoItemsRepository(),
-                    savedStateHandle
-                ) as T
-            }
-        }
-
         private val TAG = TodoItemCardViewModel::class.simpleName
     }
 
@@ -186,7 +188,8 @@ class TodoItemCardViewModel(
 
 
 data class TodoItemCardUiState(
-    val isLoading: Boolean = true,
+    val isLoading: Boolean = false,
+    val networkRequestStatus: ResponseStatus = ResponseStatus.Idle,
 
     val isNewItem: Boolean = true,
 
@@ -203,16 +206,16 @@ sealed class TodoItemCardEffect {
     data class ShowSnackbar(val message: String) : TodoItemCardEffect()
 }
 
-sealed class TodoItemCardItent {
+sealed class TodoItemCardIntent {
 
-    data class SetText(val text: String) : TodoItemCardItent()
+    data class SetText(val text: String) : TodoItemCardIntent()
 
-    data class SetImportance(val importance: ItemImportance) : TodoItemCardItent()
+    data class SetImportance(val importance: ItemImportance) : TodoItemCardIntent()
 
-    data class SetDeadline(val deadline: ZonedDateTime?) : TodoItemCardItent()
+    data class SetDeadline(val deadline: ZonedDateTime?) : TodoItemCardIntent()
 
-    data object SaveTodoItem : TodoItemCardItent()
+    data object SaveTodoItem : TodoItemCardIntent()
 
-    data object DeleteTodoItem : TodoItemCardItent()
+    data object DeleteTodoItem : TodoItemCardIntent()
 
 }
