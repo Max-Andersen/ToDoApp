@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -35,6 +37,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+
+private const val DISABLED_ALPHA = 0.8f
 
 // Paddings
 val PADDING_LARGE = 32.dp
@@ -76,7 +80,6 @@ private val DarkColorScheme = darkColorScheme(
     surfaceContainerLowest = DarkGreyForText
 )
 
-
 val ColorScheme.TodoGreen: Color
     @ReadOnlyComposable
     @Composable
@@ -109,6 +112,14 @@ val ColorScheme.checkBoxUnCheckedNormalImportanceColor: Color
             com.toloknov.summerschool.theme.theme.DarkUncheckedBox
         }
     }
+
+val ColorScheme.textButton: ButtonColors
+    @Composable get() = ButtonDefaults.buttonColors(
+        containerColor = surfaceVariant,
+        contentColor = onBackground,
+        disabledContainerColor = surfaceVariant.copy(DISABLED_ALPHA),
+        disabledContentColor = onBackground.copy(DISABLED_ALPHA)
+    )
 
 val ColorScheme.textField: TextFieldColors
     @Composable get() = OutlinedTextFieldDefaults.colors(
