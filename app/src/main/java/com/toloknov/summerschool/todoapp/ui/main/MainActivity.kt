@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.toloknov.summerschool.domain.model.ApplicationTheme
+import com.toloknov.summerschool.theme.theme.ToDoAppTheme
 import com.toloknov.summerschool.todoapp.ui.AppNavGraph
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
             }
 
             startDestination?.let { destination ->
-                com.toloknov.summerschool.theme.theme.ToDoAppTheme(darkTheme = isDark) {
+                ToDoAppTheme(darkTheme = isDark) {
                     AppNavGraph(
                         startDestination = destination,
                         navController = rememberNavController()

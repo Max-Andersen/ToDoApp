@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -72,7 +73,8 @@ fun TodoItemsList(
     viewModel: TodoItemsListViewModel,
     clickOnItem: (itemId: String) -> Unit,
     clickOnCreate: () -> Unit,
-    clickOnSettings: () -> Unit
+    clickOnSettings: () -> Unit,
+    clickOnAbout: () -> Unit,
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -102,6 +104,7 @@ fun TodoItemsList(
         clickOnItem = clickOnItem,
         clickOnCreate = clickOnCreate,
         clickOnSettings = clickOnSettings,
+        clickOnAbout = clickOnAbout,
         snackbarHostState = snackbarHostState,
     )
 }
@@ -116,6 +119,7 @@ private fun TodoItemsStateless(
     clickOnItem: (itemId: String) -> Unit,
     clickOnCreate: () -> Unit,
     clickOnSettings: () -> Unit,
+    clickOnAbout: () -> Unit,
     snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) {
     val scrollBehavior =
@@ -141,6 +145,8 @@ private fun TodoItemsStateless(
                     }
 
                     SettingsIcon(clickOnSettings)
+
+                    AboutIcon(clickOnAbout)
                 },
                 navigationIcon = null,
                 // todo коммент и/или рефакторинг
@@ -238,6 +244,17 @@ private fun TodoItemsStateless(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AboutIcon(clickOnAbout: () -> Unit) {
+    IconButton(onClick = clickOnAbout) {
+        Icon(
+            imageVector = Icons.Default.Info,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primaryContainer
+        )
     }
 }
 
@@ -490,7 +507,8 @@ private fun TodoListPreview() {
             clickOnCreate = {},
             isLoading = false,
             networkAvailable = true,
-            clickOnSettings = {}
+            clickOnSettings = {},
+            clickOnAbout = {}
         )
     }
 }

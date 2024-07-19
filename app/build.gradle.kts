@@ -89,4 +89,9 @@ dependencies {
 
     implementation(libs.coil.compose)
 
+    // Divkit
+    implementation(libs.div.core)
+    implementation(libs.div)
+    implementation(libs.div.json)
+    implementation(libs.divkit.picasso)
 }

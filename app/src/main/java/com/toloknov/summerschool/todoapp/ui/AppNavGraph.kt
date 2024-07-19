@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.toloknov.summerschool.todoapp.ui.card.TodoItemCard
 import com.toloknov.summerschool.todoapp.ui.card.TodoItemCardViewModel
+import com.toloknov.summerschool.todoapp.ui.divkit.AboutScreen
 import com.toloknov.summerschool.todoapp.ui.list.TodoItemsList
 import com.toloknov.summerschool.todoapp.ui.list.TodoItemsListViewModel
 import com.toloknov.summerschool.todoapp.ui.login.LoginScreen
@@ -60,6 +61,9 @@ fun AppNavGraph(
                 },
                 clickOnSettings = {
                     navController.navigate(AppScreen.Settings.route)
+                },
+                clickOnAbout = {
+                    navController.navigate(AppScreen.About.route)
                 }
             )
         }
@@ -88,6 +92,14 @@ fun AppNavGraph(
 
             SettingsScreen(
                 viewModel = viewModel,
+                onBackClick = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            route = AppScreen.About.route
+        ){
+            AboutScreen(
                 onBackClick = { navController.popBackStack() },
             )
         }

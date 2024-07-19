@@ -1,0 +1,392 @@
+{
+  "templates": {
+    "text_block": {
+      "type": "text",
+      "font_size": 12,
+      "line_height": 15,
+      "text_alignment_horizontal": "center",
+      "text_alignment_vertical": "center",
+      "alignment_horizontal": "center",
+      "text_color": "#000000",
+      "paddings": {
+        "top": 4,
+        "bottom": 4,
+        "left": 8,
+        "right": 8
+      },
+      "width": {
+        "type": "fixed",
+        "value": 80
+      },
+      "height": {
+        "type": "fixed",
+        "value": 80
+      },
+      "actions": [
+        {
+          "$log_id": "clicked_on_number_log_id",
+          "$url": "clicked_on_number"
+        }
+      ]
+    },
+    "text_button": {
+      "type": "container",
+      "items": [
+        {
+          "type": "state",
+          "$id": "evaluation_id",
+          "width": {
+            "type": "match_parent"
+          },
+          "margins": {
+            "top": 10,
+            "left": 10,
+            "right": 10,
+            "bottom": 10
+          },
+          "border": {
+            "corner_radius": 12
+          },
+          "states": [
+            {
+              "state_id": "did_not_send",
+              "div": {
+                "type": "text",
+                "text": "Оценить (мок оценка)",
+                "font_size": 24,
+                "line_height": 15,
+                "height": {
+                  "type": "fixed",
+                  "value": 50
+                },
+                "background": [
+                  {
+                    "type": "solid",
+                    "color": "#a2c737"
+                  }
+                ],
+                "actions": [
+                  {
+                    "$log_id": "send_evaluation_log_id",
+                    "$url": "send_evaluation_url"
+                  }
+                ],
+                "text_alignment_horizontal": "center",
+                "text_alignment_vertical": "center",
+                "alignment_horizontal": "center"
+              }
+            },
+            {
+              "state_id": "was_send",
+              "div": {
+                "type": "text",
+                "text": "Отменить",
+                "font_size": 24,
+                "line_height": 15,
+                "height": {
+                  "type": "fixed",
+                  "value": 50
+                },
+                "background": [
+                  {
+                    "type": "solid",
+                    "color": "#990000"
+                  }
+                ],
+                "actions": [
+                  {
+                    "$log_id": "cancel_evaluation_log_id",
+                    "$url": "cancel_evaluation_url"
+                  }
+                ],
+                "text_alignment_horizontal": "center",
+                "text_alignment_vertical": "center",
+                "alignment_horizontal": "center"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "card": {
+    "variables": [
+      {
+        "name": "selectedEvaluation",
+        "type": "integer",
+        "value": 0
+      }
+    ],
+    "log_id": "divgram",
+    "states": [
+      {
+        "state_id": 0,
+        "div": {
+          "type": "gallery",
+          "orientation": "vertical",
+          "height": {
+            "type": "match_parent"
+          },
+          "width": {
+            "type": "match_parent"
+          },
+          "items": [
+            {
+              "type": "image",
+              "image_url": "https://www.svgrepo.com/show/324205/back-arrow-navigation.svg",
+              "tint_color": "#7ddefc",
+              "width": {
+                "type": "fixed",
+                "value": 24
+              },
+              "height": {
+                "type": "fixed",
+                "value": 24
+              },
+              "margins": {
+                "left": 10,
+                "top": 10
+              },
+              "actions": [
+                {
+                  "log_id": "navigate_back",
+                  "url": "sample-action://navigation?true"
+                }
+              ]
+            },
+            {
+              "type": "image",
+              "image_url": "https://images3.memedroid.com/images/UPLOADED173/6570cabd23df5.jpeg",
+              "width": {
+                "type": "fixed",
+                "value": 200
+              },
+              "alignment_horizontal": "center",
+              "paddings": {
+                "top": 25
+              },
+              "content_alignment_vertical": "top",
+              "extensions": [
+                {
+                  "id": "pinch-to-zoom"
+                }
+              ]
+            },
+            {
+              "type": "gallery",
+              "height": {
+                "type": "fixed",
+                "value": 120
+              },
+              "paddings": {
+                "left": 16,
+                "right": 16
+              },
+              "item_spacing": 16,
+              "items": [
+                {
+                  "type": "text_block",
+                  "text": "1",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#FF0000"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 1 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=1",
+                  "clicked_on_number_log_id": "clicked_on_1"
+                },
+                {
+                  "type": "text_block",
+                  "text": "2",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#E61A00"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 2 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=2",
+                  "clicked_on_number_log_id": "clicked_on_2"
+                },
+                {
+                  "type": "text_block",
+                  "text": "3",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#CC3300"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 3 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=3",
+                  "clicked_on_number_log_id": "clicked_on_3"
+                },
+                {
+                  "type": "text_block",
+                  "text": "4",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#B34D00"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 4 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=4",
+                  "clicked_on_number_log_id": "clicked_on_4"
+                },
+                {
+                  "type": "text_block",
+                  "text": "5",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#996600"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 5 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=5",
+                  "clicked_on_number_log_id": "clicked_on_5"
+                },
+                {
+                  "type": "text_block",
+                  "text": "6",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#7F8000"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 6 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=6",
+                  "clicked_on_number_log_id": "clicked_on_6"
+                },
+                {
+                  "type": "text_block",
+                  "text": "7",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#669900"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 7 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=7",
+                  "clicked_on_number_log_id": "clicked_on_7"
+                },
+                {
+                  "type": "text_block",
+                  "text": "8",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#4DB300"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 8 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=8",
+                  "clicked_on_number_log_id": "clicked_on_8"
+                },
+                {
+                  "type": "text_block",
+                  "text": "9",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#33CC00"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 9 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=9",
+                  "clicked_on_number_log_id": "clicked_on_9"
+                },
+                {
+                  "type": "text_block",
+                  "text": "10",
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#1AE600"
+                    }
+                  ],
+                  "border": {
+                    "corner_radius": 16,
+                    "stroke": {
+                      "color": "@{selectedEvaluation == 10 ? '#a436ff' : '#00FFFFFF' }",
+                      "width": 3
+                    }
+                  },
+                  "clicked_on_number": "div-action://set_variable?name=selectedEvaluation&value=10",
+                  "clicked_on_number_log_id": "clicked_on_10"
+                }
+              ]
+            },
+            {
+              "type": "text_button",
+              "evaluation_id": "evaluation_id",
+              "cancel_evaluation_url": "div-action://set_state?state_id=0/evaluation_id/did_not_send",
+              "cancel_evaluation_log_id": "evaluation_canceled",
+              "send_evaluation_url": "div-action://set_state?state_id=0/evaluation_id/was_send",
+              "send_evaluation_log_id": "evaluation_sended"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

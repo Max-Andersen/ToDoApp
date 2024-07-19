@@ -10,6 +10,7 @@ configure<BaseAppModuleExtension> {
     buildFeatures {
         compose = true
         buildConfig = true
+        viewBinding = true
     }
     buildTypes {
         getByName("staging") {
