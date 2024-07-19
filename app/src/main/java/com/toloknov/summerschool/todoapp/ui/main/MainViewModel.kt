@@ -3,6 +3,8 @@ package com.toloknov.summerschool.todoapp.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.toloknov.summerschool.domain.api.NetworkRepository
+import com.toloknov.summerschool.domain.api.ThemeRepository
+import com.toloknov.summerschool.domain.model.ApplicationTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,12 +15,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val networkRepository: NetworkRepository
+    private val networkRepository: NetworkRepository,
+    private val themeRepository: ThemeRepository
 ) : ViewModel() {
 
     private val _startDestination: MutableStateFlow<StartDestination?> = MutableStateFlow(null)
     val startDestination: StateFlow<StartDestination?> = _startDestination.asStateFlow()
 
+
+    private val _applicationTheme: MutableStateFlow<ApplicationTheme> = MutableStateFlow(
+        ApplicationTheme.SYSTEM
+    )
+    val applicationTheme = _applicationTheme.asStateFlow()
 
     private val _tokenMaySpoil: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -27,17 +35,24 @@ class MainViewModel @Inject constructor(
         // тут смотрим на текущий токен и возможность его "протухания", чтобы покрыть состояние,
         // когда заходим в первый раз и когда нас "выкидывает" из приложения из-за токена
         viewModelScope.launch {
-            networkRepository.getTokenFlow().distinctUntilChanged().collect { oauthToken ->
-                if (oauthToken.isNotBlank()) {
-                    _tokenMaySpoil.emit(true)
-                    _startDestination.emit(StartDestination.LIST)
-                } else {
-                    if (_tokenMaySpoil.value){
-                        _startDestination.emit(StartDestination.LOGIN(true))
-                    } else{
-                        _startDestination.emit(StartDestination.LOGIN(false))
+            launch {
+                networkRepository.getTokenFlow().distinctUntilChanged().collect { oauthToken ->
+                    if (oauthToken.isNotBlank()) {
+                        _tokenMaySpoil.emit(true)
+                        _startDestination.emit(StartDestination.LIST)
+                    } else {
+                        if (_tokenMaySpoil.value) {
+                            _startDestination.emit(StartDestination.LOGIN(true))
+                        } else {
+                            _startDestination.emit(StartDestination.LOGIN(false))
+                        }
+                        _tokenMaySpoil.emit(false)
                     }
-                    _tokenMaySpoil.emit(false)
+                }
+            }
+            launch {
+                themeRepository.getTheme().collect { theme ->
+                    _applicationTheme.emit(theme)
                 }
             }
         }
@@ -49,7 +64,7 @@ class MainViewModel @Inject constructor(
     }
 
     sealed class StartDestination {
-        data class LOGIN(val tokenSpoiled: Boolean): StartDestination()
-        data object  LIST: StartDestination()
+        data class LOGIN(val tokenSpoiled: Boolean) : StartDestination()
+        data object LIST : StartDestination()
     }
 }

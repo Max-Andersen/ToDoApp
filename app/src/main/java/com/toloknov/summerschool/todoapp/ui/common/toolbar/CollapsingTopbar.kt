@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +24,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
 import kotlin.math.roundToInt
 
 private fun lerp(a: Float, b: Float, fraction: Float): Float {
@@ -82,14 +82,15 @@ fun CollapsingTopbar(
     val elevationState = animateDpAsState(if (showElevation) collapsedElevation else 0.dp)
 
     val actionPaddingPxValue =
-        with(LocalDensity.current) { if (collapsingTitle != null) PADDING_MEDIUM.toPx() else 2.dp.toPx() }
+        with(LocalDensity.current) { if (collapsingTitle != null) com.toloknov.summerschool.theme.theme.PADDING_MEDIUM.toPx() else 2.dp.toPx() }
 
     val paddingMediumPxValue =
-        with(LocalDensity.current) { PADDING_MEDIUM.toPx() }
+        with(LocalDensity.current) { com.toloknov.summerschool.theme.theme.PADDING_MEDIUM.toPx() }
 
     Surface(
         modifier = modifier,
         shadowElevation = elevationState.value,
+        color = MaterialTheme.colorScheme.background
     ) {
         Layout(
             content = {

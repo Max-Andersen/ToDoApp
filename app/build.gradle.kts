@@ -55,6 +55,7 @@ dependencies {
 
     // WorkManager for periodic or single work
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(project(":core:theme"))
 
     ksp(libs.hilt.compiler)
     ksp(libs.google.hilt.compiler)
@@ -84,5 +85,8 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.work.runtime.ktx)
+
+
+    implementation(libs.coil.compose)
 
 }

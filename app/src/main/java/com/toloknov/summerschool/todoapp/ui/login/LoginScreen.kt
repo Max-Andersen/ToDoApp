@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,13 +54,16 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             errorMessage?.let {
-                Text(text = it)
-            }
-            if (tokenSpoiled){
-                Text(text = "Что-то произошло с авторизацией, пожалуйста, повторите попытку")
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             Button(onClick = { launcher.launch(loginOptions) }) {
-                Text(text = "Войти через Яндекс ID")
+                Text(
+                    text = "Войти через Яндекс ID",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }

@@ -23,6 +23,8 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,8 +60,10 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toloknov.summerschool.domain.model.ItemImportance
+import com.toloknov.summerschool.theme.theme.importanceCheckBoxTheme
 import com.toloknov.summerschool.todoapp.R
-import com.toloknov.summerschool.todoapp.ui.common.theme.importanceCheckBoxTheme
+import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTitle
+import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToReadable
 import java.time.ZonedDateTime
 
@@ -67,7 +71,8 @@ import java.time.ZonedDateTime
 fun TodoItemsList(
     viewModel: TodoItemsListViewModel,
     clickOnItem: (itemId: String) -> Unit,
-    clickOnCreate: () -> Unit
+    clickOnCreate: () -> Unit,
+    clickOnSettings: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -96,6 +101,7 @@ fun TodoItemsList(
         reduce = viewModel::reduce,
         clickOnItem = clickOnItem,
         clickOnCreate = clickOnCreate,
+        clickOnSettings = clickOnSettings,
         snackbarHostState = snackbarHostState,
     )
 }
@@ -109,6 +115,7 @@ private fun TodoItemsStateless(
     reduce: (TodoItemsListIntent) -> Unit,
     clickOnItem: (itemId: String) -> Unit,
     clickOnCreate: () -> Unit,
+    clickOnSettings: () -> Unit,
     snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) {
     val scrollBehavior =
@@ -119,10 +126,10 @@ private fun TodoItemsStateless(
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .systemBarsPadding(),
         topBar = {
-            com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar(
+            CollapsingTopbar(
                 modifier = Modifier,
                 scrollBehavior = scrollBehavior,
-                collapsingTitle = com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTitle(
+                collapsingTitle = CollapsingTitle(
                     titleText = stringResource(id = R.string.my_todo_items),
                     expandedTextStyle = MaterialTheme.typography.titleLarge
                 ),
@@ -132,6 +139,8 @@ private fun TodoItemsStateless(
                     ShowDoneItemsIcon(showDoneItems) {
                         reduce(TodoItemsListIntent.ClickOnShowDoneItems)
                     }
+
+                    SettingsIcon(clickOnSettings)
                 },
                 navigationIcon = null,
                 // todo коммент и/или рефакторинг
@@ -142,15 +151,15 @@ private fun TodoItemsStateless(
                                 R.string.count_done_items,
                                 "${items.filter { it.isDone }.size}"
                             ),
-                            modifier = Modifier.padding(start = com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG),
-                            color = MaterialTheme.colorScheme.surfaceContainerLowest
+                            modifier = Modifier.padding(start = com.toloknov.summerschool.theme.theme.PADDING_BIG),
+                            color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 } else null,
                 collapsedElevation = 10.dp,
             )
         },
-        containerColor = MaterialTheme.colorScheme.surface,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = clickOnCreate,
@@ -185,8 +194,8 @@ private fun TodoItemsStateless(
                     .fillMaxSize()
                     .padding(horizontal = 8.dp),
                 contentPadding = PaddingValues(
-                    top = paddingValues.calculateTopPadding() + com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM,
-                    bottom = com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG * 2
+                    top = paddingValues.calculateTopPadding() + com.toloknov.summerschool.theme.theme.PADDING_MEDIUM,
+                    bottom = com.toloknov.summerschool.theme.theme.PADDING_BIG * 2
                 )
             ) {
                 if (items.isEmpty() && !isLoading) {
@@ -195,7 +204,8 @@ private fun TodoItemsStateless(
                     ConterItem(
                         isListEmpty = items.isEmpty(),
                         roundedCornerShape = RoundedCornerShape(
-                            topStart = com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM, topEnd = com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
+                            topStart = com.toloknov.summerschool.theme.theme.PADDING_MEDIUM,
+                            topEnd = com.toloknov.summerschool.theme.theme.PADDING_MEDIUM
                         )
                     )
 
@@ -221,7 +231,8 @@ private fun TodoItemsStateless(
                     ConterItem(
                         isListEmpty = items.isEmpty(),
                         roundedCornerShape = RoundedCornerShape(
-                            bottomStart = com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM, bottomEnd = com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
+                            bottomStart = com.toloknov.summerschool.theme.theme.PADDING_MEDIUM,
+                            bottomEnd = com.toloknov.summerschool.theme.theme.PADDING_MEDIUM
                         )
                     )
                 }
@@ -231,8 +242,20 @@ private fun TodoItemsStateless(
 }
 
 @Composable
+private fun SettingsIcon(clickOnSettings: () -> Unit) {
+    IconButton(onClick = clickOnSettings) {
+        Icon(
+            imageVector = Icons.Default.Settings,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primaryContainer
+        )
+    }
+}
+
+@Composable
 private fun NetworkStatusIcon(networkAvailable: Boolean) {
     Icon(
+        modifier = Modifier.minimumInteractiveComponentSize(),
         painter = painterResource(id = if (networkAvailable) R.drawable.connetion_on else R.drawable.connetion_off),
         contentDescription = null,
         tint = MaterialTheme.colorScheme.primaryContainer
@@ -248,7 +271,7 @@ private fun LazyListScope.ConterItem(
         if (!isListEmpty) {
             Box(
                 modifier = Modifier
-                    .height(com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_SMALL)
+                    .height(com.toloknov.summerschool.theme.theme.PADDING_SMALL)
                     .fillMaxWidth()
                     .clip(roundedCornerShape)
                     .animateItemPlacement()
@@ -263,7 +286,8 @@ private fun LazyListScope.ListEmpty() {
         Box(modifier = Modifier.fillParentMaxSize()) {
             Text(
                 text = stringResource(id = R.string.list_is_empty),
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier.align(Alignment.Center),
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -316,8 +340,8 @@ private fun LazyItemScope.TodoListItem(
     )
 
     val color = when (dismissState.dismissDirection) {
-        SwipeToDismissBoxValue.StartToEnd -> com.toloknov.summerschool.todoapp.ui.common.theme.LightAcceptGreen
-        SwipeToDismissBoxValue.EndToStart -> com.toloknov.summerschool.todoapp.ui.common.theme.LightRejectRed
+        SwipeToDismissBoxValue.StartToEnd -> com.toloknov.summerschool.theme.theme.LightAcceptGreen
+        SwipeToDismissBoxValue.EndToStart -> com.toloknov.summerschool.theme.theme.LightRejectRed
         SwipeToDismissBoxValue.Settled -> Color.Transparent
     }
 
@@ -414,13 +438,14 @@ fun TodoListItemText(
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 style = textStyle,
-                color = textColor
+                color = textColor,
             )
         }
         itemUi.deadlineTs?.let { deadline ->
             Text(
                 text = deadline,
-                color = textColor
+                color = textColor,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -430,7 +455,7 @@ fun TodoListItemText(
 @PreviewLightDark
 @Composable
 private fun TodoListPreview() {
-    com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme {
+    com.toloknov.summerschool.theme.theme.ToDoAppTheme {
         TodoItemsStateless(
             items = listOf(
                 TodoItemUi(
@@ -464,7 +489,8 @@ private fun TodoListPreview() {
             clickOnItem = {},
             clickOnCreate = {},
             isLoading = false,
-            networkAvailable = true
+            networkAvailable = true,
+            clickOnSettings = {}
         )
     }
 }
@@ -472,8 +498,8 @@ private fun TodoListPreview() {
 
 @PreviewLightDark
 @Composable
-private fun TodoItemListPreviewLight() {
-    com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme {
+private fun TodoItemListPreview() {
+    com.toloknov.summerschool.theme.theme.ToDoAppTheme {
         Surface {
             val list = listOf(
                 TodoItemUi(

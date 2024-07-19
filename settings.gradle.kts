@@ -1,3 +1,4 @@
+include(":core:theme")
 
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

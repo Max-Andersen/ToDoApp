@@ -62,14 +62,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.toloknov.summerschool.domain.model.ItemImportance
+import com.toloknov.summerschool.theme.theme.ToDoAppTheme
+import com.toloknov.summerschool.theme.theme.TodoRed
+import com.toloknov.summerschool.theme.theme.textFieldTheme
 import com.toloknov.summerschool.todoapp.R
 import com.toloknov.summerschool.todoapp.ui.common.snackbar.SnackbarError
-import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_BIG
-import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_LARGE
-import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
-import com.toloknov.summerschool.todoapp.ui.common.theme.ToDoAppTheme
-import com.toloknov.summerschool.todoapp.ui.common.theme.TodoRed
-import com.toloknov.summerschool.todoapp.ui.common.theme.textFieldTheme
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.CollapsingTopbar
 import com.toloknov.summerschool.todoapp.ui.common.toolbar.rememberToolbarScrollBehavior
 import com.toloknov.summerschool.todoapp.ui.common.utils.convertToReadable
@@ -145,13 +142,15 @@ fun TodoItemCardStateless(
                 },
                 actions = {
                     TextButton(onClick = { reduce(TodoItemCardIntent.SaveTodoItem) }) {
-                        Text(text = stringResource(id = R.string.save))
+                        Text(
+                            text = stringResource(id = R.string.save),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 },
                 collapsedElevation = 10.dp,
             )
         },
-        containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = {
             Box(modifier = Modifier.safeDrawingPadding()) {
                 SnackbarHost(hostState = snackbarHostState,
@@ -175,10 +174,10 @@ fun TodoItemCardStateless(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = PADDING_BIG)
+                    .padding(horizontal = com.toloknov.summerschool.theme.theme.PADDING_BIG)
                     .verticalScroll(rememberScrollState())
             ) {
-                Spacer(modifier = Modifier.size(PADDING_MEDIUM))
+                Spacer(modifier = Modifier.size(com.toloknov.summerschool.theme.theme.PADDING_MEDIUM))
                 // Чтобы при каждой рекомпозиции мы этот список снова не собирали
                 val importanceItems = remember {
                     ItemImportance.entries.toTypedArray()
@@ -187,27 +186,27 @@ fun TodoItemCardStateless(
                 InputTodoText(
                     uiState = uiState, reduce = reduce
                 )
-                Spacer(modifier = Modifier.size(PADDING_BIG))
+                Spacer(modifier = Modifier.size(com.toloknov.summerschool.theme.theme.PADDING_BIG))
 
                 ImportanceBlock(
                     uiState = uiState, importanceItems = importanceItems, reduce = reduce
                 )
-                Spacer(modifier = Modifier.size(PADDING_BIG))
+                Spacer(modifier = Modifier.size(com.toloknov.summerschool.theme.theme.PADDING_BIG))
                 HorizontalDivider()
 
-                Spacer(modifier = Modifier.size(PADDING_BIG))
+                Spacer(modifier = Modifier.size(com.toloknov.summerschool.theme.theme.PADDING_BIG))
                 SelectDeadline(
                     uiState = uiState, openDialog = { firstDateDialogState = true }, reduce = reduce
                 )
 
-                Spacer(modifier = Modifier.size(PADDING_BIG))
+                Spacer(modifier = Modifier.size(com.toloknov.summerschool.theme.theme.PADDING_BIG))
                 HorizontalDivider()
-                Spacer(modifier = Modifier.size(PADDING_BIG))
+                Spacer(modifier = Modifier.size(com.toloknov.summerschool.theme.theme.PADDING_BIG))
 
 
                 DeleteSection(uiState, reduce)
 
-                Spacer(modifier = Modifier.size(PADDING_BIG * 2))
+                Spacer(modifier = Modifier.size(com.toloknov.summerschool.theme.theme.PADDING_BIG * 2))
             }
         }
     }
@@ -225,15 +224,18 @@ private fun DeleteSection(
 
     Row(
         modifier = Modifier
-            .defaultMinSize(minHeight = PADDING_LARGE)
-            .clip(RoundedCornerShape(PADDING_MEDIUM))
+            .defaultMinSize(minHeight = com.toloknov.summerschool.theme.theme.PADDING_LARGE)
+            .clip(RoundedCornerShape(com.toloknov.summerschool.theme.theme.PADDING_MEDIUM))
             .clickable(enabled = !uiState.isNewItem) { reduce(TodoItemCardIntent.DeleteTodoItem) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Default.Delete, contentDescription = null, tint = deleteSectionColor
         )
-        Text(text = stringResource(id = R.string.delete), color = deleteSectionColor)
+        Text(
+            text = stringResource(id = R.string.delete), color = deleteSectionColor,
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
@@ -247,7 +249,8 @@ private fun SelectDeadline(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(id = R.string.do_before)
+            text = stringResource(id = R.string.do_before),
+            style = MaterialTheme.typography.bodyMedium
         )
         Switch(checked = uiState.deadline != null, onCheckedChange = { newState ->
             if (newState) {
@@ -260,7 +263,8 @@ private fun SelectDeadline(
     if (uiState.deadline != null) {
         Text(
             text = uiState.deadline.convertToReadable() ?: "",
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
@@ -277,10 +281,14 @@ private fun ImportanceBlock(
 
     Box(modifier = Modifier.clickable { dropDownExpanded = true }) {
         Column {
-            Text(text = stringResource(id = R.string.importance))
+            Text(
+                text = stringResource(id = R.string.importance),
+                style = MaterialTheme.typography.bodyMedium
+            )
             Text(
                 text = uiState.importance.nameRu,
-                color = if (uiState.importance == ItemImportance.HIGH) MaterialTheme.colorScheme.TodoRed else Color.Unspecified
+                color = if (uiState.importance == ItemImportance.HIGH) MaterialTheme.colorScheme.TodoRed else Color.Unspecified,
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         DropdownMenu(modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer),
@@ -290,7 +298,9 @@ private fun ImportanceBlock(
                 if (item == ItemImportance.HIGH) {
                     DropdownMenuItem(text = {
                         Text(
-                            text = "!! ${item.nameRu}", color = Color.Red
+                            text = "!! ${item.nameRu}",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }, onClick = {
                         reduce(TodoItemCardIntent.SetImportance(item))
@@ -300,6 +310,7 @@ private fun ImportanceBlock(
                     DropdownMenuItem(text = {
                         Text(
                             text = item.nameRu,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }, onClick = {
                         reduce(TodoItemCardIntent.SetImportance(item))
@@ -319,17 +330,18 @@ private fun InputTodoText(
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(2.dp, RoundedCornerShape(PADDING_MEDIUM))
+            .shadow(2.dp, RoundedCornerShape(com.toloknov.summerschool.theme.theme.PADDING_MEDIUM))
             .defaultMinSize(minHeight = 100.dp),
         value = uiState.text,
         onValueChange = { reduce(TodoItemCardIntent.SetText(it)) },
-        shape = RoundedCornerShape(PADDING_MEDIUM),
+        shape = RoundedCornerShape(com.toloknov.summerschool.theme.theme.PADDING_MEDIUM),
         colors = MaterialTheme.colorScheme.textFieldTheme,
         placeholder = {
             Text(
                 text = stringResource(id = R.string.what_need_to_do),
                 color = MaterialTheme.colorScheme.surfaceContainerLowest,
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                style = MaterialTheme.typography.bodyMedium
             )
         })
 }
@@ -353,7 +365,10 @@ private fun DateDialog(
                     ?.let { onConfirmButtonClick(it) }
                 onDismissRequest()
             }) {
-                Text(text = stringResource(R.string.select))
+                Text(
+                    text = stringResource(R.string.select),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         },
         dismissButton = {
@@ -361,7 +376,10 @@ private fun DateDialog(
                 onClick = onDismissRequest,
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.surfaceTint)
             ) {
-                Text(text = stringResource(R.string.cancel))
+                Text(
+                    text = stringResource(R.string.cancel),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         },
         properties = DialogProperties(),
@@ -371,8 +389,9 @@ private fun DateDialog(
             state = datePickerState,
             title = {
                 Text(
-                    modifier = Modifier.padding(start = PADDING_BIG, top = PADDING_BIG),
-                    text = stringResource(R.string.date)
+                    modifier = Modifier.padding(start = com.toloknov.summerschool.theme.theme.PADDING_BIG, top = com.toloknov.summerschool.theme.theme.PADDING_BIG),
+                    text = stringResource(R.string.date),
+                    style = MaterialTheme.typography.bodyMedium
                 )
             },
         )
@@ -391,7 +410,7 @@ private fun CloseButton(onClick: () -> Unit) {
 @Composable
 @Preview
 private fun TodoItemCardPreviewLight() {
-    ToDoAppTheme {
+    com.toloknov.summerschool.theme.theme.ToDoAppTheme {
         TodoItemCardStateless(
             uiState = TodoItemCardUiState(),
             onBackClick = { },
@@ -404,7 +423,7 @@ private fun TodoItemCardPreviewLight() {
 @Composable
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 private fun TodoItemCardPreviewDark() {
-    ToDoAppTheme {
+    com.toloknov.summerschool.theme.theme.ToDoAppTheme {
         TodoItemCardStateless(
             uiState = TodoItemCardUiState(),
             onBackClick = { },
@@ -432,7 +451,7 @@ private fun DatePickerLight() {
 @Composable
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 private fun DatePickerDark() {
-    ToDoAppTheme {
+    com.toloknov.summerschool.theme.theme.ToDoAppTheme {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -446,7 +465,7 @@ private fun DatePickerDark() {
 @Composable
 @Preview(showBackground = true)
 private fun ToggleLight() {
-    ToDoAppTheme {
+    com.toloknov.summerschool.theme.theme.ToDoAppTheme {
         Surface {
             Column {
                 Switch(checked = true, onCheckedChange = {})
@@ -463,7 +482,7 @@ private fun ToggleLight() {
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
 )
 private fun ToggleDark() {
-    ToDoAppTheme {
+    com.toloknov.summerschool.theme.theme.ToDoAppTheme {
         Surface {
             Column {
                 Switch(checked = true, onCheckedChange = {})

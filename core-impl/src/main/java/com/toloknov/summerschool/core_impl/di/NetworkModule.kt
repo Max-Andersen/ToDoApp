@@ -1,10 +1,11 @@
 package com.toloknov.summerschool.core_impl.di
 
+import androidx.datastore.core.DataStore
 import com.google.gson.Gson
 import com.toloknov.summerschool.core_impl.remote.utils.ErrorInterceptor
 import com.toloknov.summerschool.core_impl.remote.utils.OAuthInterceptor
-import com.toloknov.summerschool.domain.api.NetworkRepository
 import com.toloknov.summerschool.network.TodoApi
+import com.toloknov.summerschool.todoapp.NetworkPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,9 +24,9 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOAuthInterceptor(
-        networkRepository: NetworkRepository
+        dataStore: DataStore<NetworkPreferences>
     ): OAuthInterceptor =
-        OAuthInterceptor(networkRepository)
+        OAuthInterceptor(dataStore)
 
     @Provides
     @Singleton

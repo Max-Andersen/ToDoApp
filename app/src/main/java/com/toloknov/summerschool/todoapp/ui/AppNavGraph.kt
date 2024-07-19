@@ -16,14 +16,16 @@ import com.toloknov.summerschool.todoapp.ui.login.LoginScreen
 import com.toloknov.summerschool.todoapp.ui.login.LoginViewModel
 import com.toloknov.summerschool.todoapp.ui.main.MainViewModel
 import com.toloknov.summerschool.todoapp.ui.navigation.AppScreen
+import com.toloknov.summerschool.todoapp.ui.settings.SettingsScreen
+import com.toloknov.summerschool.todoapp.ui.settings.SettingsViewModel
 
 @Composable
 fun AppNavGraph(
     startDestination: MainViewModel.StartDestination,
     navController: NavHostController
 ) {
-    val startAppScreen = remember(startDestination){
-        when(startDestination){
+    val startAppScreen = remember(startDestination) {
+        when (startDestination) {
             is MainViewModel.StartDestination.LOGIN -> AppScreen.Login
             is MainViewModel.StartDestination.LIST -> AppScreen.List
         }
@@ -39,7 +41,8 @@ fun AppNavGraph(
             LoginScreen(
                 viewModel = viewModel,
                 loginSuccess = { navController.navigate(AppScreen.List.route) },
-                tokenSpoiled = (startDestination as? MainViewModel.StartDestination.LOGIN)?.tokenSpoiled ?: false
+                tokenSpoiled = (startDestination as? MainViewModel.StartDestination.LOGIN)?.tokenSpoiled
+                    ?: false
             )
         }
 
@@ -55,6 +58,9 @@ fun AppNavGraph(
                 clickOnCreate = {
                     navController.navigate(AppScreen.ItemCard().getRoute())
                 },
+                clickOnSettings = {
+                    navController.navigate(AppScreen.Settings.route)
+                }
             )
         }
 
@@ -72,6 +78,17 @@ fun AppNavGraph(
             TodoItemCard(
                 onBackClick = { navController.popBackStack() },
                 viewModel = viewModel
+            )
+        }
+
+        composable(
+            route = AppScreen.Settings.route
+        ) {
+            val viewModel = hiltViewModel<SettingsViewModel>()
+
+            SettingsScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.popBackStack() },
             )
         }
     }
