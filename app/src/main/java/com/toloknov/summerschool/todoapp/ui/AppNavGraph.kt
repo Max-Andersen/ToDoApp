@@ -1,5 +1,10 @@
 package com.toloknov.summerschool.todoapp.ui
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,6 +24,8 @@ import com.toloknov.summerschool.todoapp.ui.main.MainViewModel
 import com.toloknov.summerschool.todoapp.ui.navigation.AppScreen
 import com.toloknov.summerschool.todoapp.ui.settings.SettingsScreen
 import com.toloknov.summerschool.todoapp.ui.settings.SettingsViewModel
+
+const val AnimationMills = 300
 
 @Composable
 fun AppNavGraph(
@@ -47,7 +54,21 @@ fun AppNavGraph(
             )
         }
 
-        composable(AppScreen.List.route) {
+        composable(
+            AppScreen.List.route,
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(durationMillis = AnimationMills),
+                    initialAlpha = 0.9f
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(durationMillis = AnimationMills),
+                    targetAlpha = 0.9f
+                )
+            },
+        ) {
 
             val viewModel = hiltViewModel<TodoItemsListViewModel>()
 
@@ -75,7 +96,25 @@ fun AppNavGraph(
                     type = NavType.StringType
                     nullable = true
                 }
-            )
+            ),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                    animationSpec = tween(
+                        AnimationMills,
+                        easing = FastOutSlowInEasing
+                    )
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.End,
+                    animationSpec = tween(
+                        AnimationMills,
+                        easing = FastOutSlowInEasing
+                    )
+                )
+            },
         ) {
             val viewModel = hiltViewModel<TodoItemCardViewModel>()
 
