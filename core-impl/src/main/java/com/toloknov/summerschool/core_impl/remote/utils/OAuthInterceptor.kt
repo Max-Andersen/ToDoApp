@@ -1,6 +1,7 @@
 package com.toloknov.summerschool.core_impl.remote.utils
 
-import com.toloknov.summerschool.domain.api.NetworkRepository
+import androidx.datastore.core.DataStore
+import com.toloknov.summerschool.todoapp.NetworkPreferences
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -9,12 +10,12 @@ import okhttp3.Response
 import java.io.IOException
 
 class OAuthInterceptor(
-    private val networkRepository: NetworkRepository,
+    private val dataStore: DataStore<NetworkPreferences>,
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val token =
             runBlocking {
-                networkRepository.getTokenFlow().first()
+                dataStore.data.first().token
             }
 
         var request = chain.request()

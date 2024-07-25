@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.ui.common.theme
+package com.toloknov.summerschool.theme.theme
 
 import android.app.Activity
 import android.content.res.Configuration
@@ -14,12 +14,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.Typography
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -34,6 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
+private const val DISABLED_ALPHA = 0.8f
+
 // Paddings
 val PADDING_LARGE = 32.dp
 val PADDING_BIG = 16.dp
@@ -45,9 +51,9 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = Color.White,
     primaryContainer = LightPrimary,
     onPrimaryContainer = White,
-    surface = LightSurface,
+    surface = LightGreyForText,
     onSurface = Color.Black,
-    background = LightGreyForText,
+    background = LightBackground,
     surfaceContainer = LightSurfaceContainer,
     onBackground = Color.Black,
     surfaceVariant = LightSurfaceVariant,
@@ -62,10 +68,10 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = Color.Black,
     primaryContainer = DarkPrimary,
     onPrimaryContainer = White,
-    surface = DarkSurface,
+    surface = DarkGreyForText,
     surfaceContainer = DarkSurfaceContainer,
     onSurface = Color.White,
-    background = DarkGreyForText,
+    background = DarkBackground,
     onBackground = Color.White,
     surfaceVariant = DarkSurfaceVariant,
     onSurfaceVariant = Color.White,
@@ -74,7 +80,6 @@ private val DarkColorScheme = darkColorScheme(
     surfaceContainerLowest = DarkGreyForText
 )
 
-
 val ColorScheme.TodoGreen: Color
     @ReadOnlyComposable
     @Composable
@@ -82,7 +87,7 @@ val ColorScheme.TodoGreen: Color
         return if (!isSystemInDarkTheme()) {
             LightAcceptGreen
         } else {
-            DarkAcceptGreeen
+            com.toloknov.summerschool.theme.theme.DarkAcceptGreeen
         }
     }
 
@@ -91,9 +96,9 @@ val ColorScheme.TodoRed: Color
     @Composable
     get() {
         return if (!isSystemInDarkTheme()) {
-            LightRejectRed
+            com.toloknov.summerschool.theme.theme.LightRejectRed
         } else {
-            DarkRejectRed
+            com.toloknov.summerschool.theme.theme.DarkRejectRed
         }
     }
 
@@ -102,11 +107,157 @@ val ColorScheme.checkBoxUnCheckedNormalImportanceColor: Color
     @Composable
     get() {
         return if (!isSystemInDarkTheme()) {
-            LightUncheckedBox
+            com.toloknov.summerschool.theme.theme.LightUncheckedBox
         } else {
-            DarkUncheckedBox
+            com.toloknov.summerschool.theme.theme.DarkUncheckedBox
         }
     }
+
+val ColorScheme.textButton: ButtonColors
+    @Composable get() = ButtonDefaults.buttonColors(
+        containerColor = surfaceVariant,
+        contentColor = onBackground,
+        disabledContainerColor = surfaceVariant.copy(DISABLED_ALPHA),
+        disabledContentColor = onBackground.copy(DISABLED_ALPHA)
+    )
+
+val ColorScheme.textField: TextFieldColors
+    @Composable get() = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = background,
+        focusedTextColor = onSurface,
+        focusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedTrailingIconColor = MaterialTheme.colorScheme.surfaceTint,
+
+        disabledTextColor = MaterialTheme.colorScheme.surfaceTint,
+        disabledBorderColor = Color.Unspecified,
+        disabledTrailingIconColor = MaterialTheme.colorScheme.outline,
+        disabledLabelColor = MaterialTheme.colorScheme.surfaceTint,
+
+        unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint.copy(0.4f),
+        unfocusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
+
+        errorBorderColor = error,
+        errorTrailingIconColor = error,
+        errorLabelColor = error,
+
+        cursorColor = onBackground,
+    )
+
+val ColorScheme.filledTextField: TextFieldColors
+    @Composable get() = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = background,
+        focusedTextColor = onSurface,
+        focusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedTrailingIconColor = MaterialTheme.colorScheme.surfaceTint,
+
+        disabledTextColor = MaterialTheme.colorScheme.surfaceTint,
+        disabledBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        disabledTrailingIconColor = MaterialTheme.colorScheme.outline,
+        disabledLabelColor = MaterialTheme.colorScheme.surfaceTint,
+
+        unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
+
+        errorBorderColor = error,
+        errorTrailingIconColor = error,
+        errorLabelColor = error,
+
+        cursorColor = onBackground,
+    )
+
+val ColorScheme.textFieldWithBlackDisabledColor: TextFieldColors
+    @Composable get() = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = background,
+        focusedTextColor = onSurface,
+        focusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedTrailingIconColor = MaterialTheme.colorScheme.surfaceTint,
+
+        disabledTextColor = onBackground,
+        disabledBorderColor = Color.Unspecified,
+        disabledTrailingIconColor = MaterialTheme.colorScheme.outline,
+        disabledLabelColor = MaterialTheme.colorScheme.surfaceTint,
+
+        unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint.copy(0.4f),
+        unfocusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
+
+        errorBorderColor = error,
+        errorTrailingIconColor = error,
+        errorLabelColor = error,
+
+        cursorColor = onBackground,
+
+        selectionColors = TextSelectionColors(
+            handleColor = primary,
+            backgroundColor = primary.copy(alpha = 0.4f)
+        )
+    )
+val ColorScheme.requiredTextFieldWithBlackDisabledColor: TextFieldColors
+    @Composable get() = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = background,
+        focusedTextColor = onSurface,
+        focusedBorderColor = secondary,
+        focusedLabelColor = secondary,
+        focusedLeadingIconColor = secondary,
+        focusedTrailingIconColor = secondary,
+
+        disabledTextColor = onBackground,
+        disabledBorderColor = secondary,
+        disabledTrailingIconColor = secondary,
+        disabledLabelColor = secondary,
+
+        unfocusedBorderColor = secondary,
+        unfocusedLabelColor = secondary,
+
+        errorBorderColor = error,
+        errorTrailingIconColor = error,
+        errorLabelColor = error,
+
+        cursorColor = onBackground,
+
+        selectionColors = TextSelectionColors(
+            handleColor = primary,
+            backgroundColor = primary.copy(alpha = 0.4f)
+        )
+    )
+
+val ColorScheme.filledTextFieldWithBlackDisabledColor: TextFieldColors
+    @Composable get() = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = background,
+        focusedTextColor = onSurface,
+        focusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedTrailingIconColor = MaterialTheme.colorScheme.surfaceTint,
+
+        disabledTextColor = onBackground,
+        disabledBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        disabledTrailingIconColor = MaterialTheme.colorScheme.outline,
+        disabledLabelColor = MaterialTheme.colorScheme.surfaceTint,
+
+        unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedLabelColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedLeadingIconColor = MaterialTheme.colorScheme.surfaceTint,
+
+        errorBorderColor = error,
+        errorTrailingIconColor = error,
+        errorLabelColor = error,
+
+        cursorColor = MaterialTheme.colorScheme.onBackground,
+
+        selectionColors = TextSelectionColors(
+            handleColor = primary,
+            backgroundColor = primary.copy(alpha = 0.4f)
+        )
+    )
 
 
 // С цветами в макете жесть конечно, не соотносится в палетку Material3, чтобы compose автоматически всё тянул
@@ -124,8 +275,8 @@ fun ToDoAppTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.surface.toArgb()
-            window.navigationBarColor = colorScheme.surface.toArgb()
+            window.statusBarColor = colorScheme.background.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
@@ -286,7 +437,8 @@ private fun ColoredBoxWithText(
     ) {
         Text(
             text = text,
-            color = Color.Green.copy(alpha = 0.7f)
+            color = Color.Green.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }

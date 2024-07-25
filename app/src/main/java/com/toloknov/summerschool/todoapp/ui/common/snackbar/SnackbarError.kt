@@ -15,9 +15,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.toloknov.summerschool.theme.theme.TodoRed
 import com.toloknov.summerschool.todoapp.R
-import com.toloknov.summerschool.todoapp.ui.common.theme.PADDING_MEDIUM
-import com.toloknov.summerschool.todoapp.ui.common.theme.TodoRed
 
 @Composable
 fun SnackbarError(
@@ -26,7 +25,7 @@ fun SnackbarError(
 ) {
     Snackbar(
         modifier = Modifier
-            .padding(PADDING_MEDIUM)
+            .padding(com.toloknov.summerschool.theme.theme.PADDING_MEDIUM)
             .shadow(elevation = 4.dp, shape = Shapes().large)
             .clip(Shapes().large)
             .clickable(onClick = onClick),
@@ -44,7 +43,7 @@ fun SnackbarError(
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(start = 12.dp)
+                modifier = Modifier.padding(start = 12.dp),
             )
         }
     }

@@ -5,6 +5,12 @@ import androidx.datastore.core.DataStore
 import com.toloknov.summerschool.core_impl.ItemListMerger
 import com.toloknov.summerschool.core_impl.remote.toDomain
 import com.toloknov.summerschool.core_impl.remote.toRest
+import com.toloknov.summerschool.core_impl.remote.utils.RestException
+import com.toloknov.summerschool.core_impl.remote.utils.RestException.BadCredentials
+import com.toloknov.summerschool.core_impl.remote.utils.RestException.InternalServerError
+import com.toloknov.summerschool.core_impl.remote.utils.RestException.NotAuthorize
+import com.toloknov.summerschool.core_impl.remote.utils.RestException.NotFound
+import com.toloknov.summerschool.core_impl.remote.utils.RestException.UnexpectedRest
 import com.toloknov.summerschool.database.dao.TodoDao
 import com.toloknov.summerschool.database.model.toDomain
 import com.toloknov.summerschool.database.model.toEntity
@@ -231,29 +237,29 @@ class TodoItemsRepositoryImpl @Inject constructor(
                 val response = request()
                 _networkRequestStatus.emit(ResponseStatus.Success)
                 return@withContext response
-            } catch (e: com.toloknov.summerschool.core_impl.remote.utils.RestException) {
+            } catch (e: RestException) {
                 when (e) {
-                    is com.toloknov.summerschool.core_impl.remote.utils.RestException.BadCredentials -> {
+                    is BadCredentials -> {
                         syncItems()
                         return@withContext safeRequest(request)
                     }
 
-                    is com.toloknov.summerschool.core_impl.remote.utils.RestException.NotAuthorize -> {
+                    is NotAuthorize -> {
                         networkDataStore.updateData { it.toBuilder().setToken("").build() }
                         return@withContext null
                     }
 
-                    is com.toloknov.summerschool.core_impl.remote.utils.RestException.NotFound -> {
+                    is NotFound -> {
                         syncItems()
                         return@withContext safeRequest(request)
                     }
 
-                    is com.toloknov.summerschool.core_impl.remote.utils.RestException.InternalServerError -> {
+                    is InternalServerError -> {
                         _networkRequestStatus.emit(ResponseStatus.Error)
                         return@withContext null
                     }
 
-                    is com.toloknov.summerschool.core_impl.remote.utils.RestException.UnexpectedRest -> {
+                    is UnexpectedRest -> {
                         _networkRequestStatus.emit(ResponseStatus.Error)
                         return@withContext null
                     }

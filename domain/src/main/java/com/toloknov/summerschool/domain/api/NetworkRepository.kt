@@ -11,4 +11,6 @@ interface NetworkRepository {
     suspend fun getRevision(): Int
 
     suspend fun saveRevision(revision: Int)
+
+    suspend fun getAvatarId(): String?
 }

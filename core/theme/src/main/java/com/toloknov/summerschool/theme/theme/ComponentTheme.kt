@@ -1,4 +1,4 @@
-package com.toloknov.summerschool.todoapp.ui.common.theme
+package com.toloknov.summerschool.theme.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.CheckboxColors
@@ -36,9 +36,9 @@ val ColorScheme.plainImportancecheckBoxTheme: CheckboxColors
     @Composable get() =
         if (!isSystemInDarkTheme()) {
             CheckboxDefaults.colors(
-                checkedColor = LightAcceptGreen,
+                checkedColor = com.toloknov.summerschool.theme.theme.LightAcceptGreen,
                 uncheckedColor = Color(0xFFcccccc),
-                checkmarkColor = White,
+                checkmarkColor = com.toloknov.summerschool.theme.theme.White,
                 disabledCheckedColor = MaterialTheme.colorScheme.primary,
                 disabledUncheckedColor = MaterialTheme.colorScheme.primary,
                 disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
@@ -58,9 +58,9 @@ val ColorScheme.hightImportancecheckBoxTheme: CheckboxColors
     @Composable get() =
         if (!isSystemInDarkTheme()) {
             CheckboxDefaults.colors(
-                checkedColor = LightAcceptGreen,
-                uncheckedColor = LightRejectRed,
-                checkmarkColor = White,
+                checkedColor = com.toloknov.summerschool.theme.theme.LightAcceptGreen,
+                uncheckedColor = com.toloknov.summerschool.theme.theme.LightRejectRed,
+                checkmarkColor = com.toloknov.summerschool.theme.theme.White,
                 disabledCheckedColor = MaterialTheme.colorScheme.primary,
                 disabledUncheckedColor = MaterialTheme.colorScheme.primary,
                 disabledIndeterminateColor = MaterialTheme.colorScheme.primary,
