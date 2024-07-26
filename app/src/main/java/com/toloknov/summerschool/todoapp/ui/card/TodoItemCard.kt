@@ -54,6 +54,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -232,19 +238,24 @@ private fun DeleteSection(
     } else {
         MaterialTheme.colorScheme.TodoRed
     }
+    val deleteString = stringResource(id = R.string.delete)
 
     Row(
         modifier = Modifier
             .defaultMinSize(minHeight = com.toloknov.summerschool.theme.theme.PADDING_LARGE)
             .clip(RoundedCornerShape(com.toloknov.summerschool.theme.theme.PADDING_MEDIUM))
-            .clickable(enabled = !uiState.isNewItem) { reduce(TodoItemCardIntent.DeleteTodoItem) },
+            .clickable(enabled = !uiState.isNewItem) { reduce(TodoItemCardIntent.DeleteTodoItem) }
+            .semantics {
+                contentDescription = deleteString
+                role = Role.Button
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Default.Delete, contentDescription = null, tint = deleteSectionColor
         )
         Text(
-            text = stringResource(id = R.string.delete), color = deleteSectionColor,
+            text = deleteString, color = deleteSectionColor,
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -254,30 +265,49 @@ private fun DeleteSection(
 private fun SelectDeadline(
     uiState: TodoItemCardUiState, openDialog: () -> Unit, reduce: (TodoItemCardIntent) -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(id = R.string.do_before),
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Switch(checked = uiState.deadline != null, onCheckedChange = { newState ->
-            if (newState) {
-                openDialog()
-            } else {
-                reduce(TodoItemCardIntent.SetDeadline(null))
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics {
+                isTraversalGroup = true
             }
-        })
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.do_before),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.semantics {
+                    traversalIndex = 0f
+                }
+            )
+            Switch(checked = uiState.deadline != null, onCheckedChange = { newState ->
+                if (newState) {
+                    openDialog()
+                } else {
+                    reduce(TodoItemCardIntent.SetDeadline(null))
+                }
+            },
+                modifier = Modifier.semantics {
+                    traversalIndex = 1f
+                })
+        }
+        if (uiState.deadline != null) {
+            Text(
+                text = uiState.deadline.convertToReadable() ?: "",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.semantics {
+                    traversalIndex = 0f
+                }
+            )
+        }
     }
-    if (uiState.deadline != null) {
-        Text(
-            text = uiState.deadline.convertToReadable() ?: "",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.bodyMedium
-        )
-    }
+
 }
 
 @Composable
@@ -285,7 +315,17 @@ private fun ImportanceBlock(
     uiState: TodoItemCardUiState,
     openBottomSheet: () -> Unit,
 ) {
-    Box(modifier = Modifier.clickable { openBottomSheet() }) {
+    val a11yDescription = stringResource(id = R.string.select_importance_a11y)
+    Box(
+        modifier = Modifier
+            .clickable(
+                onClick = openBottomSheet,
+                role = Role.Button,
+            )
+            .semantics {
+                contentDescription = a11yDescription
+            }
+    ) {
         Column {
             Text(
                 text = stringResource(id = R.string.importance),
@@ -382,7 +422,11 @@ private fun DateDialog(
 @Composable
 private fun CloseButton(onClick: () -> Unit) {
     IconButton(onClick = onClick) {
-        Icon(imageVector = Icons.Default.Close, contentDescription = null)
+        val a11yDescription = stringResource(id = R.string.close_a11y)
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = a11yDescription
+        )
     }
 }
 

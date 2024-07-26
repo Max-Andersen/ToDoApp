@@ -19,4 +19,16 @@
     <string name="do_before">Сделать до</string>
 
 
+    <!--  A11y  -->
+    <string name="auth_with_yandex_a11y">Авторизоваться через Яндекс аккаунт</string>
+    <string name="network_status_on_a11y">Сеть доступна</string>
+    <string name="network_status_off_a11y">Сеть недоступна, работа в оффлайн режиме</string>
+    <string name="show_done_items_a11y">Показывать выполненные дела</string>
+    <string name="settings_a11y">Настройки</string>
+    <string name="about_app_a11y">О приложении</string>
+    <string name="mark_as_done_a11y">Отметить выполненым</string>
+    <string name="add_todo_item_a11y">Добавить напоминание</string>
+    <string name="close_a11y">Вернуться</string>
+    <string name="select_importance_a11y">Выбрать приоритет</string>
+
 </resources>

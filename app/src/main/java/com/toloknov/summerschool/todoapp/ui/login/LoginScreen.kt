@@ -59,7 +59,7 @@ fun LoginScreen(
             errorMessage?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
             Button(onClick = { launcher.launch(loginOptions) }) {
