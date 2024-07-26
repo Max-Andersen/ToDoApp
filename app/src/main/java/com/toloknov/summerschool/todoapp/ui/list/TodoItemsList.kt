@@ -55,6 +55,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -167,7 +174,12 @@ private fun TodoItemsStateless(
             )
         },
         floatingActionButton = {
+            val a11yDescription = stringResource(id = R.string.add_todo_item_a11y)
             FloatingActionButton(
+                modifier = Modifier.semantics {
+                    contentDescription = a11yDescription
+                    role = Role.Button
+                },
                 onClick = clickOnCreate,
             ) {
                 Icon(
@@ -219,7 +231,10 @@ private fun TodoItemsStateless(
                         TodoListItem(
                             modifier = Modifier
                                 .defaultMinSize(minHeight = 48.dp)
-                                .background(MaterialTheme.colorScheme.surfaceContainer),
+                                .background(MaterialTheme.colorScheme.surfaceContainer)
+                                .semantics {
+                                    isTraversalGroup = true
+                                },
                             itemUi = itemUi,
                             clickOnItem = { clickOnItem(itemUi.id) },
                             onChangeStatus = { newStatus ->
@@ -250,9 +265,10 @@ private fun TodoItemsStateless(
 @Composable
 private fun AboutIcon(clickOnAbout: () -> Unit) {
     IconButton(onClick = clickOnAbout) {
+        val a11yDescription = stringResource(id = R.string.about_app_a11y)
         Icon(
             imageVector = Icons.Default.Info,
-            contentDescription = null,
+            contentDescription = a11yDescription,
             tint = MaterialTheme.colorScheme.primaryContainer
         )
     }
@@ -261,9 +277,10 @@ private fun AboutIcon(clickOnAbout: () -> Unit) {
 @Composable
 private fun SettingsIcon(clickOnSettings: () -> Unit) {
     IconButton(onClick = clickOnSettings) {
+        val a11yDescription = stringResource(id = R.string.settings_a11y)
         Icon(
             imageVector = Icons.Default.Settings,
-            contentDescription = null,
+            contentDescription = a11yDescription,
             tint = MaterialTheme.colorScheme.primaryContainer
         )
     }
@@ -274,7 +291,9 @@ private fun NetworkStatusIcon(networkAvailable: Boolean) {
     Icon(
         modifier = Modifier.minimumInteractiveComponentSize(),
         painter = painterResource(id = if (networkAvailable) R.drawable.connetion_on else R.drawable.connetion_off),
-        contentDescription = null,
+        contentDescription = if (networkAvailable) stringResource(id = R.string.network_status_on_a11y) else stringResource(
+            id = R.string.network_status_off_a11y
+        ),
         tint = MaterialTheme.colorScheme.primaryContainer
     )
 }
@@ -318,11 +337,20 @@ private fun ShowDoneItemsIcon(
     val iconResId = remember(showDoneItems) {
         if (showDoneItems) R.drawable.ic_eye_opened_24 else R.drawable.ic_eye_closed_24
     }
-    IconButton(onClick = onClick) {
+    val a11yDescription = stringResource(id = R.string.show_done_items_a11y)
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.semantics {
+            contentDescription = a11yDescription
+        }
+    ) {
         Icon(
             painter = painterResource(id = iconResId),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primaryContainer
+            tint = MaterialTheme.colorScheme.primaryContainer,
+            modifier = Modifier.semantics {
+                selected = showDoneItems
+            }
         )
     }
 }
@@ -389,20 +417,36 @@ private fun LazyItemScope.TodoListItem(
         modifier = Modifier
             .animateItemPlacement()
             .clickable { clickOnItem() }
+            .semantics {
+                isTraversalGroup = true
+            }
     ) {
         Row(
             modifier = modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceContainer)
+                .semantics {
+                    isTraversalGroup = true
+                }
         ) {
+            val a11yDescription = stringResource(id = R.string.mark_as_done_a11y)
             Checkbox(
                 checked = itemUi.isDone,
                 onCheckedChange = { newStatus -> onChangeStatus(newStatus) },
                 colors = MaterialTheme.colorScheme.importanceCheckBoxTheme(itemUi.importance),
+                modifier = Modifier.semantics {
+                    contentDescription = a11yDescription
+                    selected = itemUi.isDone
+                    traversalIndex = 1f
+                }
             )
 
             TodoListItemText(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics {
+                        traversalIndex = 0f
+                    },
                 itemUi = itemUi,
             )
 
